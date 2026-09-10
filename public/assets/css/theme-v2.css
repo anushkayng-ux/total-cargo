@@ -1,0 +1,421 @@
+/* =============================================================
+   TCE — Theme v2 (2026-08 · logo-matched, premium)
+   Palette drawn directly from the maritime-wheel logo:
+   deep navy for authority, cyan for accent, generous whitespace.
+   Load order: bootstrap → app.css → theme-v2.css → tom-select.
+   Change any CSS var below and it re-themes the entire product.
+   =============================================================*/
+
+/* Inter is a corporate-neutral, high-legibility sans — feels more
+   editorial than Poppins (which reads a bit startup-y). Loaded here
+   so the whole app picks it up without touching the layout file. */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
+
+:root {
+  /* ── Palette — sampled from the Total Cargo Solutions logo ── */
+  --v2-navy-900:    #0e2a52;   /* darkest navy — sidebar, headers */
+  --v2-navy-800:    #14355e;
+  --v2-navy-700:    #1b4278;   /* primary buttons, active links */
+  --v2-navy-600:    #24549a;
+  --v2-navy-500:    #3a6fb8;   /* hover / link */
+  --v2-cyan-500:    #2ba9e0;   /* logo cyan — accent only */
+  --v2-cyan-400:    #55c2f0;
+  --v2-cyan-100:    #e4f4fb;
+
+  --v2-bg:          #f7f9fc;   /* app background — cool white */
+  --v2-surface:     #ffffff;
+  --v2-surface-2:   #eef2f8;
+  --v2-border:      #dfe5ee;
+  --v2-border-2:    #c8d1de;
+  --v2-fg:          #0d1e36;   /* body text — deep navy near-black */
+  --v2-fg-muted:    #566277;
+  --v2-fg-subtle:   #8892a4;
+
+  --v2-primary:     var(--v2-navy-700);
+  --v2-primary-fg:  #ffffff;
+  --v2-primary-tone:#e5edf7;
+
+  --v2-success:     #0f7a4a;
+  --v2-success-tone:#e4f2ea;
+  --v2-warn:        #a35d00;
+  --v2-warn-tone:   #fef1dc;
+  --v2-danger:      #b62c2c;
+  --v2-danger-tone: #fbe6e6;
+
+  /* Slightly tighter radii for a more grown-up feel */
+  --v2-radius:      10px;
+  --v2-radius-sm:   6px;
+  --v2-shadow-1:    0 1px 2px rgba(14,42,82,.04);
+  --v2-shadow-2:    0 4px 14px rgba(14,42,82,.07);
+  --v2-shadow-3:    0 12px 36px rgba(14,42,82,.13);
+  --v2-focus-ring:  0 0 0 3px rgba(43,169,224,.28);
+
+  /* Remap existing TPT vars so every component picks up the new look */
+  --tpt-bg:        var(--v2-bg);
+  --tpt-fg:        var(--v2-fg);
+  --tpt-muted:     var(--v2-fg-muted);
+  --tpt-border:    var(--v2-border);
+  --tpt-surface:   var(--v2-surface);
+  --tpt-surface-2: var(--v2-surface-2);
+  --tpt-btn:       var(--v2-primary);
+  --tpt-btn-hover: var(--v2-navy-800);
+  --tpt-btn-light: var(--v2-surface-2);
+  --tpt-accent:    var(--v2-cyan-500);
+  --tpt-danger:    var(--v2-danger);
+  --tpt-warn:      var(--v2-warn);
+  --tpt-success:   var(--v2-success);
+  --tpt-radius:    var(--v2-radius);
+}
+
+/* ── Typography — premium editorial feel ────────────────────── */
+html, body {
+  background: var(--v2-bg);
+  color: var(--v2-fg);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 14.5px;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11", "ss01";
+  letter-spacing: -.005em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+h1,h2,h3,h4,h5,h6 {
+  color: var(--v2-navy-900);
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  letter-spacing: -.015em;
+}
+h5 { font-size: 1.12rem; line-height: 1.3; }
+small, .text-muted { color: var(--v2-fg-muted) !important; }
+code {
+  color: var(--v2-navy-800);
+  background: var(--v2-primary-tone);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: .85em;
+  font-family: 'SF Mono', 'Menlo', 'Consolas', monospace;
+}
+a { color: var(--v2-primary); text-decoration: none; }
+a:hover { color: var(--v2-navy-800); text-decoration: none; }
+
+/* ── Sidebar — navy, elevated ────────────────────────────────── */
+.tpt-sidebar {
+  background: var(--v2-navy-900);
+  border-right: 0;
+  box-shadow: 2px 0 12px rgba(14,42,82,.08);
+}
+.tpt-sidebar-brand {
+  padding: 20px 20px 16px;
+  font-weight: 700;
+  letter-spacing: .2px;
+  color: #ffffff;
+  font-size: 1rem;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+.tpt-nav { padding: 12px 10px; }
+.tpt-nav a, .tpt-section-head {
+  border-radius: var(--v2-radius-sm);
+  padding: 8px 12px;
+  color: rgba(255,255,255,.72);
+  transition: background .12s ease, color .12s ease;
+  margin: 1px 0;
+  font-weight: 500;
+  font-size: .88rem;
+}
+.tpt-nav a:hover, .tpt-section-head:hover {
+  background: rgba(255,255,255,.07);
+  color: #ffffff;
+}
+.tpt-nav a.active {
+  background: var(--v2-cyan-500);
+  color: #ffffff;
+  box-shadow: 0 2px 10px rgba(43,169,224,.35);
+  font-weight: 600;
+}
+.tpt-section-items a { padding-left: 32px; font-size: .84rem; color: rgba(255,255,255,.64); }
+.tpt-section-items a:hover { color: #ffffff; background: rgba(255,255,255,.05); }
+.tpt-section.has-active > .tpt-section-head { color: #ffffff; }
+.tpt-section-caret { color: rgba(255,255,255,.5) !important; }
+
+/* ── Topbar — clean, restrained ──────────────────────────────── */
+.tpt-topbar {
+  background: var(--v2-surface);
+  border-bottom: 1px solid var(--v2-border);
+  box-shadow: none;
+  padding: 14px 24px;
+}
+.tpt-topbar-title { font-weight: 600; color: var(--v2-navy-900); font-size: 1rem; }
+
+/* ── Cards — subtle borders, quiet shadows ──────────────────── */
+.card {
+  background: var(--v2-surface);
+  border: 1px solid var(--v2-border);
+  border-radius: var(--v2-radius);
+  box-shadow: var(--v2-shadow-1);
+}
+.card + .card { margin-top: 14px; }
+.card-header {
+  background: transparent;
+  border-bottom: 1px solid var(--v2-border);
+  padding: 13px 18px;
+  font-weight: 600;
+  font-size: .92rem;
+  color: var(--v2-navy-900);
+  letter-spacing: -.01em;
+}
+.card-body { padding: 18px; }
+
+/* ── Forms — restrained, high-contrast focus ────────────────── */
+.form-label {
+  font-weight: 500;
+  font-size: .78rem;
+  color: var(--v2-fg-muted);
+  margin-bottom: 5px;
+  letter-spacing: .01em;
+  text-transform: none;
+}
+.form-label .text-danger { color: var(--v2-danger) !important; }
+.form-label small { color: var(--v2-fg-subtle) !important; font-weight: 400; font-size: .72rem; }
+
+.form-control, .form-select {
+  border-radius: var(--v2-radius-sm);
+  border-color: var(--v2-border-2);
+  padding: 8px 12px;
+  background: var(--v2-surface);
+  font-size: .9rem;
+  color: var(--v2-fg);
+  transition: border-color .12s ease, box-shadow .12s ease;
+}
+.form-control:focus, .form-select:focus {
+  border-color: var(--v2-cyan-500);
+  box-shadow: var(--v2-focus-ring);
+}
+.form-control[readonly] { background: var(--v2-surface-2) !important; color: var(--v2-fg); border-color: var(--v2-border); }
+.form-control::placeholder { color: var(--v2-fg-subtle); }
+
+/* ── Buttons — one strict hierarchy ─────────────────────────── */
+.btn {
+  border-radius: var(--v2-radius-sm);
+  font-weight: 500;
+  letter-spacing: .005em;
+  padding: 7px 15px;
+  font-size: .86rem;
+  transition: all .12s ease;
+  border-width: 1px;
+}
+.btn:focus, .btn:focus-visible { box-shadow: var(--v2-focus-ring) !important; }
+.btn-primary {
+  background: var(--v2-primary);
+  border-color: var(--v2-primary);
+  color: var(--v2-primary-fg);
+}
+.btn-primary:hover { background: var(--v2-navy-800); border-color: var(--v2-navy-800); color: #fff; }
+.btn-success { background: var(--v2-success); border-color: var(--v2-success); color: #fff; }
+.btn-success:hover { background: #0b6640; border-color: #0b6640; }
+.btn-danger  { background: var(--v2-danger);  border-color: var(--v2-danger);  color: #fff; }
+.btn-warning { background: var(--v2-warn); border-color: var(--v2-warn); color: #fff; }
+.btn-light   { background: var(--v2-surface); border-color: var(--v2-border-2); color: var(--v2-fg); }
+.btn-light:hover { background: var(--v2-surface-2); border-color: var(--v2-fg-muted); color: var(--v2-navy-900); }
+.btn-outline-dark { border-color: var(--v2-border-2); color: var(--v2-navy-800); background: var(--v2-surface); }
+.btn-outline-dark:hover { background: var(--v2-primary-tone); border-color: var(--v2-navy-700); color: var(--v2-navy-800); }
+.btn-outline-primary { border-color: var(--v2-primary); color: var(--v2-primary); background: transparent; }
+.btn-outline-primary:hover { background: var(--v2-primary); color: var(--v2-primary-fg); }
+.btn-outline-success { border-color: var(--v2-success); color: var(--v2-success); background: transparent; }
+.btn-outline-success:hover { background: var(--v2-success); color: #fff; }
+.btn-outline-danger { border-color: var(--v2-danger); color: var(--v2-danger); background: transparent; }
+.btn-outline-danger:hover { background: var(--v2-danger); color: #fff; }
+.btn-sm { padding: 5px 11px; font-size: .78rem; }
+
+/* ── Tabs — subtle, editorial ───────────────────────────────── */
+.nav-tabs {
+  border-bottom: 1px solid var(--v2-border);
+}
+.nav-tabs .nav-link {
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  color: var(--v2-fg-muted);
+  font-weight: 500;
+  font-size: .88rem;
+  padding: 10px 18px;
+  margin-bottom: -1px;
+  background: transparent;
+}
+.nav-tabs .nav-link:hover {
+  color: var(--v2-navy-900);
+  border-bottom-color: var(--v2-border-2);
+  background: transparent;
+}
+.nav-tabs .nav-link.active {
+  color: var(--v2-navy-900);
+  border-bottom-color: var(--v2-cyan-500);
+  background: transparent;
+  font-weight: 600;
+}
+
+/* ── Tables — grown-up, easy to skim ─────────────────────────── */
+.table {
+  color: var(--v2-fg);
+  --bs-table-hover-bg: var(--v2-primary-tone);
+  --bs-table-striped-bg: #fafbfd;
+  font-size: .89rem;
+}
+.table > :not(caption) > * > * { border-bottom-color: var(--v2-border); padding: 11px 14px; }
+.table thead th, .table-light th {
+  background: var(--v2-surface-2) !important;
+  color: var(--v2-fg-muted);
+  font-weight: 600;
+  font-size: .72rem;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--v2-border);
+}
+.card .table { margin-bottom: 0; }
+.card .table tbody tr:last-child > * { border-bottom-color: transparent; }
+
+/* Table containers scroll HORIZONTALLY only, not vertically —
+   and never auto-jump. This prevents the annoying "table scrolls to
+   bottom on load" behaviour the user reported. Vertical scroll stays
+   with the page; wide tables scroll sideways where the cursor is. */
+.table-responsive {
+  overflow-x: auto;
+  overflow-y: visible;
+  scroll-behavior: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Chat / thread panels are the ONE place we auto-scroll (to latest).
+   Everything else must obey the browser's native scroll position. */
+.dchat-thread { scroll-behavior: smooth; }
+
+/* ── Badges & pills — subtle tone-on-tone ───────────────────── */
+.badge-soft {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: var(--v2-surface-2);
+  color: var(--v2-fg-muted);
+  border-radius: 999px;
+  padding: 2px 10px;
+  font-size: .72rem; font-weight: 500;
+  letter-spacing: .02em;
+}
+.badge-soft.badge-ok, .badge-ok    { background: var(--v2-success-tone); color: var(--v2-success); }
+.badge-soft.badge-warn, .badge-warn { background: var(--v2-warn-tone);   color: var(--v2-warn); }
+.badge-soft.badge-danger, .badge-danger { background: var(--v2-danger-tone); color: var(--v2-danger); }
+
+.badge.bg-danger  { background: var(--v2-danger)  !important; }
+.badge.bg-success { background: var(--v2-success) !important; }
+.badge.bg-primary { background: var(--v2-primary) !important; }
+.badge.bg-secondary { background: var(--v2-fg-muted) !important; }
+
+/* ── KPI / stat tiles ───────────────────────────────────────── */
+.stat {
+  background: var(--v2-surface);
+  border: 1px solid var(--v2-border);
+  border-radius: var(--v2-radius);
+  padding: 18px 20px;
+  display: flex; flex-direction: column; gap: 4px;
+  box-shadow: var(--v2-shadow-1);
+  transition: border-color .12s ease, box-shadow .12s ease, transform .12s ease;
+  min-height: 108px;
+  justify-content: center;
+}
+.stat .label {
+  color: var(--v2-fg-muted);
+  font-size: .68rem;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+.stat .value {
+  color: var(--v2-navy-900);
+  font-size: 1.55rem;
+  font-weight: 700;
+  letter-spacing: -.02em;
+  line-height: 1.15;
+  font-feature-settings: "tnum";
+}
+a.stat-link { text-decoration: none; }
+a.stat-link:hover .stat {
+  border-color: var(--v2-cyan-500);
+  box-shadow: var(--v2-shadow-2);
+  transform: translateY(-1px);
+}
+
+/* ── Alerts — softer tones, no primary-color scream ─────────── */
+.alert {
+  border-radius: var(--v2-radius);
+  padding: 12px 16px;
+  border: 1px solid transparent;
+  font-size: .88rem;
+  line-height: 1.5;
+}
+.alert-success { background: var(--v2-success-tone); color: var(--v2-success); border-color: rgba(15,122,74,.15); }
+.alert-warning { background: var(--v2-warn-tone);    color: var(--v2-warn);    border-color: rgba(163,93,0,.18); }
+.alert-danger  { background: var(--v2-danger-tone);  color: var(--v2-danger);  border-color: rgba(182,44,44,.18); }
+.alert-info, .alert-light { background: var(--v2-primary-tone); color: var(--v2-navy-800); border-color: rgba(27,66,120,.15); }
+
+/* ── Modals ─────────────────────────────────────────────────── */
+.modal-content { border-radius: var(--v2-radius); border: 1px solid var(--v2-border); box-shadow: var(--v2-shadow-3); }
+.modal-header { border-bottom-color: var(--v2-border); padding: 16px 20px; }
+.modal-body   { padding: 20px; }
+.modal-title  { font-weight: 600; color: var(--v2-navy-900); }
+
+/* ── Bell / navbar controls ─────────────────────────────────── */
+#tptBellBtn { background: var(--v2-surface); border: 1px solid var(--v2-border-2); border-radius: var(--v2-radius-sm); color: var(--v2-navy-800); }
+#tptBellBtn:hover { background: var(--v2-primary-tone); }
+#tptBellBadge { background: var(--v2-danger) !important; }
+
+/* ── Tom Select — match form-control look ───────────────────── */
+.ts-wrapper .ts-control {
+  border-radius: var(--v2-radius-sm) !important;
+  border-color: var(--v2-border-2) !important;
+  padding: 6px 12px !important;
+  min-height: 38px !important;
+  background: var(--v2-surface) !important;
+}
+.ts-wrapper.focus .ts-control { box-shadow: var(--v2-focus-ring) !important; border-color: var(--v2-cyan-500) !important; }
+.ts-dropdown { border-radius: var(--v2-radius-sm); box-shadow: var(--v2-shadow-2); border-color: var(--v2-border); }
+.ts-dropdown .active { background: var(--v2-primary-tone); color: var(--v2-navy-900); }
+
+/* ── Main content area — generous breathing room ────────────── */
+.tpt-main { padding: 24px 28px; background: var(--v2-bg); }
+@media (max-width: 768px) { .tpt-main { padding: 16px; } }
+
+/* ── Utility ────────────────────────────────────────────────── */
+hr { border-color: var(--v2-border); opacity: 1; margin: 14px 0; }
+kbd {
+  background: var(--v2-surface-2);
+  border: 1px solid var(--v2-border-2);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: .72em;
+  font-family: 'SF Mono', 'Menlo', 'Consolas', monospace;
+  color: var(--v2-fg-muted);
+}
+
+/* Row-click detail rows (Arrival / Purchase Ops tables) — softer hover */
+tr.ar-row:hover, tr.po-row:hover, tr.ins-row:hover { background: var(--v2-primary-tone) !important; }
+
+/* ── Global anti-jump: never let the browser scroll-anchor tables
+       past the user's cursor position. Overflow containers keep their
+       natural scroll position on tab change / DOM mutation. ── */
+* { overflow-anchor: auto; }
+.table-responsive, .tab-content, .card { overflow-anchor: none; }
+
+/* Bootstrap tabs sometimes force focus into a tab-pane and scroll.
+   Suppress that side-effect — user picked the tab, they know where it is. */
+.tab-pane:focus, .tab-pane:focus-visible { outline: 0; }
+.tab-pane { scroll-margin-top: 80px; }
+
+/* Left-column tab-content on the Trip page (and any other place a tab strip
+   sits next to a taller sidebar) — stretch the white box to match column
+   height so we don't see a big grey gap below it. */
+.tpt-main .row > [class*="col-"] > .tab-content { min-height: calc(100% - 42px); }
+
+/* ── Print — strip app chrome so PDFs / prints stay clean ───── */
+@media print {
+  .tpt-sidebar, .tpt-topbar, .no-print, .nav-tabs { display: none !important; }
+  .tab-pane { display: block !important; opacity: 1 !important; }
+  .tab-content { border: 0 !important; padding: 0 !important; }
+  .tpt-main { padding: 0 !important; }
+  .card { box-shadow: none !important; border-color: #000 !important; break-inside: avoid; }
+}

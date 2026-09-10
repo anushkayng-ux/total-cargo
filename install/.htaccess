@@ -1,0 +1,15 @@
+# Block installer entirely once writable/.installed exists.
+# If the lock isn't present, allow the wizard pages to load.
+
+RewriteEngine On
+
+# When the lock file exists, refuse all access — operator must delete it
+# deliberately to re-run setup. This is belt-and-braces in addition to the
+# PHP-side check inside install/index.php.
+RewriteCond %{DOCUMENT_ROOT}/../writable/.installed -f [OR]
+RewriteCond %{REQUEST_URI}/../writable/.installed -f
+RewriteRule .* - [F,L]
+
+# Prevent directory listing
+Options -Indexes
+DirectoryIndex index.php

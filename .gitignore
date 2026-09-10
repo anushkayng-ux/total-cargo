@@ -1,0 +1,65 @@
+# ─── CI4 writable runtime ─────────────────────────────
+writable/cache/
+writable/logs/
+writable/session/
+writable/uploads/
+writable/debugbar/
+writable/backups/
+!writable/**/.htaccess
+!writable/**/index.html
+
+# ─── Secrets / env ─────────────────────────────────────
+.env
+.env.*
+!.env.example
+
+# ─── Composer / Node ──────────────────────────────────
+vendor/
+node_modules/
+composer.lock
+package-lock.json
+
+# ─── Local / IDE / OS ─────────────────────────────────
+.vscode/
+.idea/
+*.iml
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+
+# ─── Build artefacts / scratch ────────────────────────
+*.log
+*.bak
+*.tmp
+*.old
+public/uploads/
+public/pdfs/
+public/backups/
+
+# ─── Test / coverage ──────────────────────────────────
+tests/_output/
+tests/_support/_generated/
+phpunit.xml
+.phpunit.result.cache
+coverage/
+
+# ─── Deploy artefacts ─────────────────────────────────
+*.zip
+*.tar.gz
+deploy.sql
+grant-report-permissions.sql
+enforce-client-scope.sql
+create-super-admin-user.sql
+assign-*.sql
+diag-*.sql
+
+# ─── Editor autosave ──────────────────────────────────
+*~
+.#*
+\#*#
+
+# ─── Storage / cache produced at runtime ──────────────
+public/thumbs/
+public/qrcodes/

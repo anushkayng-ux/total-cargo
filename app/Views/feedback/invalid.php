@@ -1,0 +1,8 @@
+<!doctype html>
+<html><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Link not valid</title>
+<style>body{font-family:'Inter',system-ui,sans-serif;margin:0;background:#f4f6fa;color:#0f172a;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem;}.box{background:#fff;border:1px solid #e3e7ee;border-radius:14px;padding:2rem 1.6rem;max-width:420px;text-align:center;}.ic{width:64px;height:64px;border-radius:50%;background:#fee2e2;color:#991b1b;display:inline-flex;align-items:center;justify-content:center;font-size:1.8rem;margin-bottom:1rem;}h1{font-size:1.15rem;font-weight:700;margin:0 0 .6rem;}p{color:#6b7280;font-size:.92rem;line-height:1.6;margin:0;}</style>
+</head><body><div class="box"><div class="ic">⚠</div><h1>Feedback link not valid</h1><p>This feedback link is expired, revoked or invalid. If you'd still like to share your experience, please reply to the original email.</p></div></body></html>

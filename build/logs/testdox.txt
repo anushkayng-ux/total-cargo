@@ -1,0 +1,18 @@
+Audit Logger (Tests\Unit\AuditLogger)
+ [x] Normal call writes row
+ [x] Bad payload does not throw
+
+Cities Lookup (Tests\Unit\CitiesLookup)
+ [x] Search returns prefix matches first
+ [x] Resolve is case insensitive
+ [x] Resolve follows aliases
+ [x] Resolve returns null for unknown
+
+Smoke Chain (Tests\Feature\SmokeChain)
+ [x] Health endpoint returns json
+ [x] Login page renders
+ [x] Root redirects to dashboard
+ [x] Dashboard requires auth
+ [x] Cities lookup requires auth
+ [x] Static public endpoints load
+

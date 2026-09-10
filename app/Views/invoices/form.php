@@ -1,0 +1,199 @@
+<?php
+$isEdit = !empty($row);
+$action = $isEdit ? site_url('invoices/' . $row['id']) : site_url('invoices/store');
+$items  = $row['items'] ?? [];
+if (empty($items) && !empty($prefill['items'])) {
+    $items = $prefill['items'];
+}
+if (empty($items) && !empty($prefill['line_desc'])) {
+    $items = [[
+        'description'    => $prefill['line_desc'],
+        'hsn_sac'        => '996791',
+        'qty'            => 1,
+        'rate'           => $prefill['line_rate'] ?? 0,
+        'gst_percent'    => (float) ($settings['billing']['default_gst_rate'] ?? 0),
+    ]];
+}
+if (empty($items)) {
+    $items = [['description' => '', 'hsn_sac' => '996791', 'qty' => 1, 'rate' => 0, 'gst_percent' => (float) ($settings['billing']['default_gst_rate'] ?? 0)]];
+}
+$v = function ($k, $d = '') use ($row, $prefill) {
+    return old($k, $row[$k] ?? $prefill[$k] ?? $d);
+};
+?>
+<h5 class="mb-3"><?= esc($pageTitle) ?></h5>
+<form method="post" action="<?= $action ?>">
+  <?= csrf_field() ?>
+
+  <div class="card mb-3"><div class="card-body"><div class="row g-3">
+    <div class="col-md-3"><label class="form-label">Invoice No.</label>
+      <input class="form-control" name="invoice_no" value="<?= esc($v('invoice_no')) ?>" placeholder="Leave blank to auto-generate"></div>
+    <div class="col-md-3"><label class="form-label">Invoice Date</label>
+      <input type="date" class="form-control" name="invoice_date" value="<?= esc($v('invoice_date', date('Y-m-d'))) ?>" required></div>
+    <div class="col-md-3"><label class="form-label">Due Date</label>
+      <input type="date" class="form-control" name="due_date" value="<?= esc($v('due_date')) ?>"></div>
+    <div class="col-md-6"><label class="form-label">Client <span class="text-danger">*</span></label>
+      <select class="form-select" name="client_id" required>
+        <option value="">— Select —</option>
+        <?php foreach ($clients as $c): ?>
+          <option value="<?= $c['id'] ?>" <?= (int)$v('client_id') === (int)$c['id'] ? 'selected' : '' ?>>
+            <?= esc($c['company_name']) ?><?= $c['gst_no'] ? ' · ' . esc($c['gst_no']) : '' ?> (<?= esc($c['state']) ?>)
+          </option>
+        <?php endforeach; ?>
+      </select>
+      <small class="text-muted">GST is split CGST+SGST if same state as <code><?= esc($settings['company']['company_state'] ?? '(company state unset)') ?></code>, else IGST.</small>
+    </div>
+
+    <div class="col-md-6"><label class="form-label">Booking (optional)</label>
+      <select class="form-select" name="booking_id">
+        <option value="">—</option>
+        <?php foreach ($bookings as $b): ?>
+          <option value="<?= $b['id'] ?>" <?= (int)$v('booking_id') === (int)$b['id'] ? 'selected' : '' ?>>
+            <?= esc($b['booking_no']) ?> · <?= esc(tpt_route($b['route_text'] ?? '', '')) ?>
+          </option>
+        <?php endforeach; ?>
+      </select>
+    </div>
+    <div class="col-md-6"><label class="form-label">Trip (optional)</label>
+      <select class="form-select" name="trip_id">
+        <option value="">—</option>
+        <?php foreach ($trips as $t): ?>
+          <option value="<?= $t['id'] ?>" <?= (int)$v('trip_id') === (int)$t['id'] ? 'selected' : '' ?>>
+            <?= esc($t['trip_no']) ?> · <?= esc($t['vehicle_number']) ?>
+          </option>
+        <?php endforeach; ?>
+      </select>
+    </div>
+
+    <div class="col-12"><label class="form-label">Payment Terms <small class="text-muted">(prints on invoice PDF — leave blank to use the default from Settings)</small></label>
+      <textarea class="form-control" name="payment_terms" rows="2" placeholder="e.g. Payment due within 30 days by RTGS / NEFT. Advance %, Balance on delivery."><?= esc($v('payment_terms')) ?></textarea></div>
+
+    <div class="col-12"><label class="form-label">Notes <small class="text-muted">(internal — prints as Remarks on invoice)</small></label>
+      <textarea class="form-control" name="notes" rows="2"><?= esc($v('notes')) ?></textarea></div>
+  </div></div></div>
+
+  <div class="card mb-3">
+    <div class="card-header d-flex align-items-center">Line Items
+      <button type="button" class="btn btn-sm btn-outline-dark ms-auto" id="addRow"><i class="bi bi-plus-lg"></i> Add Row</button>
+    </div>
+    <div class="table-responsive">
+      <table class="table mb-0" id="itemsTbl">
+        <thead>
+          <tr>
+            <th style="min-width:260px;">Description</th>
+            <th>HSN/SAC</th>
+            <th class="text-end">Qty</th>
+            <th class="text-end">Rate</th>
+            <th class="text-end">Taxable</th>
+            <th class="text-end">GST %</th>
+            <th class="text-end">GST Amt</th>
+            <th class="text-end">Total</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php foreach ($items as $i => $it): ?>
+            <tr class="item-row">
+              <td>
+                <input class="form-control form-control-sm itm-desc" name="line_description[]" value="<?= esc($it['description']) ?>">
+                <input type="hidden" class="itm-expense-id" name="line_expense_id[]" value="<?= (int) ($it['expense_id'] ?? 0) ?>">
+                <?php if (!empty($it['expense_id'])): ?>
+                  <small class="text-warning" style="font-size:.72rem;"><i class="bi bi-link-45deg"></i> Linked to trip expense #<?= (int) $it['expense_id'] ?></small>
+                <?php endif; ?>
+              </td>
+              <td><input class="form-control form-control-sm itm-hsn"  name="line_hsn[]"  value="<?= esc($it['hsn_sac'] ?? '996791') ?>"></td>
+              <td class="text-end"><input type="number" step="0.01" class="form-control form-control-sm text-end itm-qty" name="line_qty[]" value="<?= esc($it['qty'] ?? 1) ?>"></td>
+              <td class="text-end"><input type="number" step="0.01" class="form-control form-control-sm text-end itm-rate" name="line_rate[]" value="<?= esc($it['rate'] ?? 0) ?>"></td>
+              <td class="text-end itm-taxable">0.00</td>
+              <td class="text-end"><input type="number" step="0.01" class="form-control form-control-sm text-end itm-gst" name="line_gst[]" value="<?= esc($it['gst_percent'] ?? 5) ?>"></td>
+              <td class="text-end itm-gstamt">0.00</td>
+              <td class="text-end itm-total">0.00</td>
+              <td class="text-end"><button type="button" class="btn btn-sm btn-light rm-row"><i class="bi bi-trash"></i></button></td>
+            </tr>
+          <?php endforeach; ?>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="7" class="text-end"><strong>Taxable</strong></td><td class="text-end"><strong id="sumTaxable">0.00</strong></td><td></td>
+          </tr>
+          <tr>
+            <td colspan="7" class="text-end">GST</td><td class="text-end" id="sumGst">0.00</td><td></td>
+          </tr>
+          <tr>
+            <td colspan="7" class="text-end">Round Off</td><td class="text-end" id="sumRound">0.00</td><td></td>
+          </tr>
+          <tr>
+            <td colspan="7" class="text-end"><strong>Grand Total (INR)</strong></td><td class="text-end"><strong id="sumTotal">0.00</strong></td><td></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  <div class="d-flex gap-2">
+    <button class="btn btn-primary" type="submit">Save Draft</button>
+    <a class="btn btn-light" href="<?= site_url('invoices') ?>">Cancel</a>
+  </div>
+</form>
+
+<script>
+(function () {
+  const tbl = document.getElementById('itemsTbl');
+  const tbody = tbl.querySelector('tbody');
+
+  function rowTemplate() {
+    const d = (<?= (float) ($settings['billing']['default_gst_rate'] ?? 0) ?>).toFixed(2);
+    return `<tr class="item-row">
+      <td>
+        <input class="form-control form-control-sm itm-desc" name="line_description[]">
+        <input type="hidden" class="itm-expense-id" name="line_expense_id[]" value="0">
+      </td>
+      <td><input class="form-control form-control-sm itm-hsn"  name="line_hsn[]" value="996791"></td>
+      <td class="text-end"><input type="number" step="0.01" class="form-control form-control-sm text-end itm-qty" name="line_qty[]" value="1"></td>
+      <td class="text-end"><input type="number" step="0.01" class="form-control form-control-sm text-end itm-rate" name="line_rate[]" value="0"></td>
+      <td class="text-end itm-taxable">0.00</td>
+      <td class="text-end"><input type="number" step="0.01" class="form-control form-control-sm text-end itm-gst" name="line_gst[]" value="${d}"></td>
+      <td class="text-end itm-gstamt">0.00</td>
+      <td class="text-end itm-total">0.00</td>
+      <td class="text-end"><button type="button" class="btn btn-sm btn-light rm-row"><i class="bi bi-trash"></i></button></td>
+    </tr>`;
+  }
+
+  function recompute() {
+    let taxable = 0, gst = 0;
+    tbody.querySelectorAll('.item-row').forEach(r => {
+      const qty  = parseFloat(r.querySelector('.itm-qty').value)  || 0;
+      const rate = parseFloat(r.querySelector('.itm-rate').value) || 0;
+      const gstP = parseFloat(r.querySelector('.itm-gst').value)  || 0;
+      const tx   = Math.round(qty * rate * 100) / 100;
+      const ga   = Math.round(tx * gstP) / 100;
+      taxable += tx; gst += ga;
+      r.querySelector('.itm-taxable').textContent = tx.toFixed(2);
+      r.querySelector('.itm-gstamt').textContent  = ga.toFixed(2);
+      r.querySelector('.itm-total').textContent   = (tx + ga).toFixed(2);
+    });
+    const pre   = Math.round((taxable + gst) * 100) / 100;
+    const total = Math.round(pre);
+    const round = Math.round((total - pre) * 100) / 100;
+    document.getElementById('sumTaxable').textContent = taxable.toFixed(2);
+    document.getElementById('sumGst').textContent     = gst.toFixed(2);
+    document.getElementById('sumRound').textContent   = round.toFixed(2);
+    document.getElementById('sumTotal').textContent   = total.toFixed(2);
+  }
+
+  document.getElementById('addRow').addEventListener('click', () => {
+    tbody.insertAdjacentHTML('beforeend', rowTemplate());
+    recompute();
+  });
+  tbody.addEventListener('click', (e) => {
+    if (e.target.closest('.rm-row')) {
+      if (tbody.querySelectorAll('.item-row').length > 1) {
+        e.target.closest('tr').remove();
+        recompute();
+      }
+    }
+  });
+  tbody.addEventListener('input', recompute);
+  recompute();
+})();
+</script>

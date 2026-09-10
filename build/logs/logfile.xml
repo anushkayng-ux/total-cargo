@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="C:\xampp\htdocs\tpt\phpunit.xml.dist" tests="12" assertions="25" errors="0" failures="0" skipped="0" time="0.689928">
+    <testsuite name="App" tests="12" assertions="25" errors="0" failures="0" skipped="0" time="0.689928">
+      <testsuite name="Tests\Feature\SmokeChainTest" file="C:\xampp\htdocs\tpt\tests\feature\SmokeChainTest.php" tests="6" assertions="17" errors="0" failures="0" skipped="0" time="0.621518">
+        <testcase name="testHealthEndpointReturnsJson" file="C:\xampp\htdocs\tpt\tests\feature\SmokeChainTest.php" line="26" class="Tests\Feature\SmokeChainTest" classname="Tests.Feature.SmokeChainTest" assertions="5" time="0.296418"/>
+        <testcase name="testLoginPageRenders" file="C:\xampp\htdocs\tpt\tests\feature\SmokeChainTest.php" line="40" class="Tests\Feature\SmokeChainTest" classname="Tests.Feature.SmokeChainTest" assertions="4" time="0.036959"/>
+        <testcase name="testRootRedirectsToDashboard" file="C:\xampp\htdocs\tpt\tests\feature\SmokeChainTest.php" line="49" class="Tests\Feature\SmokeChainTest" classname="Tests.Feature.SmokeChainTest" assertions="2" time="0.061274"/>
+        <testcase name="testDashboardRequiresAuth" file="C:\xampp\htdocs\tpt\tests\feature\SmokeChainTest.php" line="56" class="Tests\Feature\SmokeChainTest" classname="Tests.Feature.SmokeChainTest" assertions="2" time="0.004417"/>
+        <testcase name="testCitiesLookupRequiresAuth" file="C:\xampp\htdocs\tpt\tests\feature\SmokeChainTest.php" line="64" class="Tests\Feature\SmokeChainTest" classname="Tests.Feature.SmokeChainTest" assertions="1" time="0.005643"/>
+        <testcase name="testStaticPublicEndpointsLoad" file="C:\xampp\htdocs\tpt\tests\feature\SmokeChainTest.php" line="70" class="Tests\Feature\SmokeChainTest" classname="Tests.Feature.SmokeChainTest" assertions="3" time="0.216807"/>
+      </testsuite>
+      <testsuite name="Tests\Unit\AuditLoggerTest" file="C:\xampp\htdocs\tpt\tests\unit\AuditLoggerTest.php" tests="2" assertions="1" errors="0" failures="0" skipped="0" time="0.018166">
+        <testcase name="testNormalCallWritesRow" file="C:\xampp\htdocs\tpt\tests\unit\AuditLoggerTest.php" line="15" class="Tests\Unit\AuditLoggerTest" classname="Tests.Unit.AuditLoggerTest" assertions="1" time="0.011434"/>
+        <testcase name="testBadPayloadDoesNotThrow" file="C:\xampp\htdocs\tpt\tests\unit\AuditLoggerTest.php" line="26" class="Tests\Unit\AuditLoggerTest" classname="Tests.Unit.AuditLoggerTest" assertions="0" time="0.006732"/>
+      </testsuite>
+      <testsuite name="Tests\Unit\CitiesLookupTest" file="C:\xampp\htdocs\tpt\tests\unit\CitiesLookupTest.php" tests="4" assertions="7" errors="0" failures="0" skipped="0" time="0.050244">
+        <testcase name="testSearchReturnsPrefixMatchesFirst" file="C:\xampp\htdocs\tpt\tests\unit\CitiesLookupTest.php" line="14" class="Tests\Unit\CitiesLookupTest" classname="Tests.Unit.CitiesLookupTest" assertions="2" time="0.026306"/>
+        <testcase name="testResolveIsCaseInsensitive" file="C:\xampp\htdocs\tpt\tests\unit\CitiesLookupTest.php" line="21" class="Tests\Unit\CitiesLookupTest" classname="Tests.Unit.CitiesLookupTest" assertions="2" time="0.001577"/>
+        <testcase name="testResolveFollowsAliases" file="C:\xampp\htdocs\tpt\tests\unit\CitiesLookupTest.php" line="28" class="Tests\Unit\CitiesLookupTest" classname="Tests.Unit.CitiesLookupTest" assertions="2" time="0.020557"/>
+        <testcase name="testResolveReturnsNullForUnknown" file="C:\xampp\htdocs\tpt\tests\unit\CitiesLookupTest.php" line="35" class="Tests\Unit\CitiesLookupTest" classname="Tests.Unit.CitiesLookupTest" assertions="1" time="0.001803"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

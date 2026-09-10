@@ -1,0 +1,31 @@
+# ─────────────────────────────────────────────────────────────────────
+#  Project-root .htaccess for shared-hosting / cPanel deployment.
+#
+#  Purpose: When the web-server DocumentRoot points at this project's
+#  ROOT (rather than at /public/), every request is internally rewritten
+#  to /public/<path>. The browser URL stays clean — no "/public/" prefix.
+#
+#  If your hosting lets you point DocumentRoot at /public/ directly,
+#  prefer that and delete this file.
+# ─────────────────────────────────────────────────────────────────────
+
+DirectoryIndex public/index.php
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Don't rewrite requests already pointing at /public/
+    RewriteCond %{REQUEST_URI} !^/public/
+    # Internally rewrite everything else to /public/
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
+
+# ─────────────────────────────────────────────────────────────────────
+#  Block direct HTTP access to sensitive project files.
+# ─────────────────────────────────────────────────────────────────────
+<FilesMatch "^(\.env|\.env\..*|composer\.json|composer\.lock|spark|preload\.php|phpunit\.xml\.dist|database\.sql|README\.md|INSTALL\.md|USER-GUIDE\.md|FEATURES\.md|LICENSE)$">
+    Require all denied
+</FilesMatch>
+
+# Block access to whole directories that should never be web-reachable
+RedirectMatch 404 ^/(app|tests|tools|writable|vendor|builds)(/.*)?$
