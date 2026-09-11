@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Retro UI Rollout — Progress</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f5f7fb; --surface:#ffffff; --surface-2:#eef1f8;
+    --ink:#141b2e; --muted:#5b6478; --border:#e1e6f0;
+    --accent:#3457d5; --accent-ink:#1d2f8f; --accent-soft:#eaf0ff;
+    --done:#1a8754; --done-soft:#e7f6ee;
+    --warn:#b06b00; --warn-soft:#fbf1de;
+    --hold:#7d8598; --hold-soft:#eef0f5;
+    --scope:#8a5cc9; --scope-soft:#f2ecfb;
+    --code-bg:#f0f2f9;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0c111d; --surface:#131a2b; --surface-2:#182036;
+      --ink:#e7ebf5; --muted:#93a0bd; --border:#232c42;
+      --accent:#6f95ff; --accent-ink:#bcd0ff; --accent-soft:#1c2745;
+      --done:#3ecb84; --done-soft:#123625;
+      --warn:#e2a33e; --warn-soft:#3a2c10;
+      --hold:#8a93aa; --hold-soft:#1a2032;
+      --scope:#b48eea; --scope-soft:#241c3a;
+      --code-bg:#1a2236;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0c111d; --surface:#131a2b; --surface-2:#182036;
+    --ink:#e7ebf5; --muted:#93a0bd; --border:#232c42;
+    --accent:#6f95ff; --accent-ink:#bcd0ff; --accent-soft:#1c2745;
+    --done:#3ecb84; --done-soft:#123625;
+    --warn:#e2a33e; --warn-soft:#3a2c10;
+    --hold:#8a93aa; --hold-soft:#1a2032;
+    --scope:#b48eea; --scope-soft:#241c3a;
+    --code-bg:#1a2236;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin:0; }
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:"IBM Plex Sans", -apple-system, "Segoe UI", sans-serif;
+    padding-inline: max(16px, 4vw);
+    padding-block: 22px 60px;
+  }
+  .wrap{ max-width: 1280px; margin: 0 auto; }
+  code, .mono{ font-family:"IBM Plex Mono", ui-monospace, monospace; }
+
+  .backlink{ display:inline-flex; align-items:center; gap:6px; color:var(--accent-ink); text-decoration:none; font-size:13px; font-weight:600; margin-bottom:18px; }
+  .backlink:hover{ text-decoration:underline; }
+
+  header.top{
+    display:flex; flex-wrap:wrap; gap:24px 40px; align-items:flex-end;
+    justify-content:space-between;
+    padding-bottom:22px; margin-bottom:26px;
+    border-bottom:1px solid var(--border);
+  }
+  .titleblock h1{
+    margin:0 0 6px; font-size:26px; font-weight:700; letter-spacing:-.01em;
+    text-wrap:balance;
+  }
+  .titleblock p{ margin:0; color:var(--muted); font-size:14px; max-width:56ch; }
+  .titleblock .sys{ color:var(--muted); font-size:12.5px; margin-top:8px; }
+  .titleblock .sys .mono{ color:var(--accent-ink); }
+  .titleblock .sys a{ color:var(--accent-ink); }
+
+  .progress-card{
+    background:var(--surface); border:1px solid var(--border); border-radius:10px;
+    padding:14px 20px; min-width:230px;
+    display:flex; flex-direction:column; gap:8px;
+  }
+  .progress-card .num{ font-size:28px; font-weight:700; font-family:"IBM Plex Mono", monospace; font-variant-numeric: tabular-nums; }
+  .progress-card .num span{ font-size:15px; color:var(--muted); font-weight:500; }
+  .progress-card .label{ font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); }
+  .bar{ height:6px; border-radius:4px; background:var(--surface-2); overflow:hidden; }
+  .bar > i{ display:block; height:100%; background:var(--accent); border-radius:4px; }
+
+  main.board{
+    display:grid; grid-template-columns: repeat(4, 1fr); gap:18px;
+    align-items:start;
+  }
+  @media (max-width: 980px){ main.board{ grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 620px){ main.board{ grid-template-columns: 1fr; } }
+
+  .livegrid{ grid-column: 1 / -1; display:grid; grid-template-columns: repeat(4, 1fr); gap:14px; }
+  @media (max-width: 980px){ .livegrid{ grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 620px){ .livegrid{ grid-template-columns: 1fr; } }
+  .livegroup{ background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:12px 14px; }
+  .livegroup h3{ margin:0 0 8px; font-size:11.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--done); font-weight:700; }
+  .liverow{ display:flex; align-items:baseline; justify-content:space-between; gap:8px; padding:5px 0; border-top:1px solid var(--border); font-size:12.5px; }
+  .liverow:first-of-type{ border-top:none; }
+  .liverow .n{ font-weight:600; }
+  .liverow .c{ font-family:"IBM Plex Mono",monospace; color:var(--muted); font-size:11.5px; white-space:nowrap; font-variant-numeric: tabular-nums; }
+  .bottomrow{ grid-column: 1 / -1; display:grid; grid-template-columns: 1fr 1fr; gap:18px; }
+  @media (max-width: 700px){ .bottomrow{ grid-template-columns: 1fr; } }
+
+  section.col{ display:flex; flex-direction:column; gap:10px; min-width:0; }
+  .col-head{ display:flex; align-items:center; justify-content:space-between; padding:2px 2px 4px; }
+  .col-head h2{ font-size:13px; margin:0; text-transform:uppercase; letter-spacing:.06em; font-weight:700; }
+  .col-head .count{ font-family:"IBM Plex Mono",monospace; font-size:12px; color:var(--muted); background:var(--surface-2); border-radius:20px; padding:2px 9px; }
+  .col-note{ font-size:12px; color:var(--muted); margin:-6px 2px 4px; line-height:1.5; }
+
+  .card{
+    background:var(--surface); border:1px solid var(--border); border-left:3px solid var(--stripe, var(--border));
+    border-radius:8px; padding:11px 13px;
+  }
+  .card .row1{ display:flex; align-items:baseline; justify-content:space-between; gap:8px; }
+  .card .name{ font-weight:600; font-size:13.5px; }
+  .card .count{ font-family:"IBM Plex Mono",monospace; font-size:12px; color:var(--muted); white-space:nowrap; font-variant-numeric: tabular-nums;}
+  .card .count b{ color:var(--ink); font-weight:600; }
+  .card .note{ font-size:12px; color:var(--muted); margin-top:4px; line-height:1.45; }
+  .card .code{ display:inline-block; font-family:"IBM Plex Mono",monospace; font-size:10.5px; background:var(--code-bg); color:var(--accent-ink); border-radius:4px; padding:1px 5px; margin-top:6px; letter-spacing:.02em; }
+
+  .col--live .card{ --stripe: var(--done); }
+  .col--next .card{ --stripe: var(--accent); }
+  .col--hold .card{ --stripe: var(--warn); }
+  .col--scope .card{ --stripe: var(--scope); }
+
+  .col--live .col-head h2{ color:var(--done); }
+  .col--next .col-head h2{ color:var(--accent-ink); }
+  .col--hold .col-head h2{ color:var(--warn); }
+  .col--scope .col-head h2{ color:var(--scope); }
+
+  .scope-list{ background:var(--scope-soft); border:1px solid var(--border); border-radius:8px; padding:11px 13px; font-size:12.5px; color:var(--muted); line-height:1.7; }
+  .scope-list b{ color:var(--ink); font-weight:600; }
+
+  .sectiontitle{ grid-column: 1 / -1; margin: 8px 2px 0; }
+  .sectiontitle h2{ font-size:15px; margin:0 0 4px; font-weight:700; }
+  .sectiontitle p{ font-size:12.5px; color:var(--muted); margin:0; max-width:70ch; }
+
+  .crudwrap{ grid-column: 1 / -1; overflow-x:auto; }
+  table.crud{ width:100%; min-width:640px; border-collapse:collapse; background:var(--surface); border:1px solid var(--border); border-radius:8px; overflow:hidden; font-size:12.5px; }
+  table.crud th{ text-align:left; padding:9px 12px; background:var(--surface-2); color:var(--ink); font-weight:700; font-size:11.5px; text-transform:uppercase; letter-spacing:.04em; border-bottom:1px solid var(--border); }
+  table.crud th.c, table.crud td.c{ text-align:center; width:90px; }
+  table.crud td{ padding:7px 12px; border-bottom:1px solid var(--border); }
+  table.crud tr:last-child td{ border-bottom:none; }
+  table.crud tr:nth-child(even){ background: color-mix(in srgb, var(--surface-2) 40%, transparent); }
+  table.crud .grp{ background:var(--surface-2); font-weight:700; font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); }
+  .pend{ display:inline-block; width:18px; height:18px; line-height:18px; border-radius:50%; background:var(--warn-soft); color:var(--warn); font-weight:700; font-size:11px; }
+
+  footer{ margin-top:34px; padding-top:16px; border-top:1px solid var(--border); color:var(--muted); font-size:12px; display:flex; gap:16px; flex-wrap:wrap; justify-content:space-between; }
+  footer .mono{ color:var(--muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="backlink" href="index.php">&larr; Back to Demo</a>
+
+  <header class="top">
+    <div class="titleblock">
+      <h1>Retro UI Rollout — Total Cargo Express</h1>
+      <p>Porting the live CI4 dashboard (<span class="mono">localhost:8080</span>) into the old-style GCM layout, one module at a time — same database, same records, new skin. This board is the running checklist for that work.</p>
+      <div class="sys">Source of truth: <span class="mono">total_cargo</span> database, 81 tables · Demo at <a href="index.php" class="mono">localhost/Bliz/total-cargo-demo</a></div>
+      <div class="sys">14 of these modules had empty tables — each now carries a few seeded rows, tagged <span class="mono">[DEMO DATA]</span> in its notes field so they stay easy to tell apart from real records.</div>
+    </div>
+    <div style="display:flex; gap:14px; flex-wrap:wrap;">
+      <div class="progress-card">
+        <div class="label">Modules viewable</div>
+        <div class="num">31 <span>/ 31 planned</span></div>
+        <div class="bar"><i style="width:100%"></i></div>
+      </div>
+      <div class="progress-card">
+        <div class="label">Add / Edit / Delete built</div>
+        <div class="num">0 <span>/ 31 modules</span></div>
+        <div class="bar"><i style="width:0%; background:var(--warn);"></i></div>
+      </div>
+    </div>
+  </header>
+
+  <main class="board">
+    <div class="livegrid">
+      <div class="livegroup">
+        <h3>Transportation (14)</h3>
+        <div class="liverow"><span class="n">GR/LR Booking</span><span class="c">144 rows</span></div>
+        <div class="liverow"><span class="n">Trip Sheet</span><span class="c">124 rows</span></div>
+        <div class="liverow"><span class="n">Lead / Enquiry</span><span class="c">12 rows</span></div>
+        <div class="liverow"><span class="n">Meeting Log</span><span class="c">204 rows</span></div>
+        <div class="liverow"><span class="n">RFQ + Quotations</span><span class="c">22 / 9</span></div>
+        <div class="liverow"><span class="n">WhatsApp Log</span><span class="c">66 rows</span></div>
+        <div class="liverow"><span class="n">Email Log + Templates</span><span class="c">30 / 20</span></div>
+        <div class="liverow"><span class="n">Trip Advance</span><span class="c">3 rows</span></div>
+        <div class="liverow"><span class="n">Document</span><span class="c">3 rows</span></div>
+        <div class="liverow"><span class="n">Trip Expense</span><span class="c">3 rows</span></div>
+        <div class="liverow"><span class="n">Trip Stop</span><span class="c">4 rows</span></div>
+        <div class="liverow"><span class="n">Loading Slot</span><span class="c">2 rows</span></div>
+        <div class="liverow"><span class="n">GPS Tracking</span><span class="c">6 rows</span></div>
+        <div class="liverow"><span class="n">E-POD Signature</span><span class="c">2 rows</span></div>
+      </div>
+      <div class="livegroup">
+        <h3>General Masters (9)</h3>
+        <div class="liverow"><span class="n">Home / Overview</span><span class="c">—</span></div>
+        <div class="liverow"><span class="n">Clients Master</span><span class="c">616 rows</span></div>
+        <div class="liverow"><span class="n">Vehicles Master</span><span class="c">2 rows</span></div>
+        <div class="liverow"><span class="n">Drivers Master</span><span class="c">2 rows</span></div>
+        <div class="liverow"><span class="n">Vendors Master</span><span class="c">145 rows</span></div>
+        <div class="liverow"><span class="n">Cities + Lead Sources</span><span class="c">172 / 8</span></div>
+        <div class="liverow"><span class="n">Attendance (HRMS)</span><span class="c">178 rows</span></div>
+        <div class="liverow"><span class="n">Leave (HRMS)</span><span class="c">3 rows</span></div>
+        <div class="liverow"><span class="n">Payroll Run (HRMS)</span><span class="c">3 rows</span></div>
+      </div>
+      <div class="livegroup">
+        <h3>Accounts (6)</h3>
+        <div class="liverow"><span class="n">Home / Overview</span><span class="c">—</span></div>
+        <div class="liverow"><span class="n">Client Invoices</span><span class="c">18 rows</span></div>
+        <div class="liverow"><span class="n">Vendor Bills / Payments</span><span class="c">3 / 2</span></div>
+        <div class="liverow"><span class="n">Receipt</span><span class="c">2 rows</span></div>
+        <div class="liverow"><span class="n">Rate Contract</span><span class="c">2 rows</span></div>
+        <div class="liverow"><span class="n">TDS Certificate</span><span class="c">2 rows</span></div>
+      </div>
+      <div class="livegroup">
+        <h3>Other (2)</h3>
+        <div class="liverow"><span class="n">Vendor Deposit</span><span class="c">3 rows</span></div>
+        <div class="liverow"><span class="n">Administration home</span><span class="c">—</span></div>
+        <div class="liverow"><span class="n">Support Ticket</span><span class="c">3 rows</span></div>
+        <div class="liverow"><span class="n">Client Portal User</span><span class="c">2 rows</span></div>
+      </div>
+    </div>
+
+    <div class="sectiontitle">
+      <h2>Add / Edit / Delete — build status</h2>
+      <p>Every module above is currently <b>view-only</b>: real data renders, but the New / Edit / Save toolbar buttons don't write to the database yet. This table is the checklist for turning each one on, module by module, once the design is approved.</p>
+    </div>
+    <div class="crudwrap">
+      <table class="crud">
+        <thead><tr><th>Module</th><th class="c">Add</th><th class="c">Edit</th><th class="c">Delete</th></tr></thead>
+        <tbody>
+          <tr class="grp"><td colspan="4">Transportation</td></tr>
+          <tr><td>GR/LR Booking</td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td></tr>
+          <tr><td>Trip Sheet</td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td></tr>
+          <tr><td>Lead / Enquiry</td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td></tr>
+          <tr><td>Meeting Log</td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td></tr>
+          <tr><td>RFQ + Quotations</td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td></tr>
+          <tr><td>WhatsApp Log</td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td></tr>
+          <tr><td>Email Log + Templates</td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td></tr>
+          <tr><td>Trip Advance</td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td></tr>
+          <tr><td>Document</td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td></tr>
+          <tr><td>Trip Expense</td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td></tr>
+          <tr><td>Trip Stop</td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td></tr>
+          <tr><td>Loading Slot</td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td></tr>
+          <tr><td>GPS Tracking</td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td></tr>
+          <tr><td>E-POD Signature</td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td></tr>
+
+          <tr class="grp"><td colspan="4">General Masters</td></tr>
+          <tr><td>Clients Master</td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td></tr>
+          <tr><td>Vehicles Master</td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td></tr>
+          <tr><td>Drivers Master</td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td></tr>
+          <tr><td>Vendors Master</td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td></tr>
+          <tr><td>Cities + Lead Sources</td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td></tr>
+          <tr><td>Attendance (HRMS)</td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td></tr>
+          <tr><td>Leave (HRMS)</td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td></tr>
+          <tr><td>Payroll Run (HRMS)</td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td></tr>
+
+          <tr class="grp"><td colspan="4">Accounts</td></tr>
+          <tr><td>Client Invoices</td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td></tr>
+          <tr><td>Vendor Bills / Payments</td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td></tr>
+          <tr><td>Receipt</td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td></tr>
+          <tr><td>Rate Contract</td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td></tr>
+          <tr><td>TDS Certificate</td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td></tr>
+
+          <tr class="grp"><td colspan="4">Other</td></tr>
+          <tr><td>Vendor Deposit</td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td></tr>
+          <tr><td>Support Ticket</td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td></tr>
+          <tr><td>Client Portal User</td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td><td class="c"><span class="pend">–</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="bottomrow" style="grid-template-columns:1fr;">
+      <section class="col col--scope">
+        <div class="col-head"><h2>Out of scope</h2><span class="count">—</span></div>
+        <div class="col-note">Admin / system plumbing, not part of the visual workflow demo — everything else is now live.</div>
+        <div class="scope-list">
+          <b>Settings</b>, Roles &amp; Permissions, Users, Audit Logs, Health checks, Webhooks, Bank Import, Comments, Saved Views, Public Quote link, Data Import
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <span>Updated as each module ships — reload this page anytime to see current status.</span>
+    <span class="mono">2026-09-11</span>
+  </footer>
+</div>
+</body>
+</html>
