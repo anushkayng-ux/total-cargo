@@ -29,14 +29,14 @@ class EmailLogsController extends BaseController
         }
 
         return $this->render('email_logs/index', [
-            'pageTitle' => 'Email Logs',
+            'pageTitle' => 'Email Logs [Communication] — List',
             'rows'      => $q->paginate(40),
             'pager'     => $model->pager,
             'status'    => $status,
             'search'    => $search,
             'tpl'       => $tpl,
             'unsubs'    => (new EmailUnsubscribeModel())->orderBy('id', 'DESC')->limit(20)->find(),
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function show(int $id)
@@ -50,10 +50,10 @@ class EmailLogsController extends BaseController
         }
         $events = (new EmailEventModel())->forLog($id);
         return $this->render('email_logs/show', [
-            'pageTitle' => 'Email Log #' . $id,
+            'pageTitle' => 'Email Logs [Communication]',
             'row'       => $log,
             'events'    => $events,
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function retry(int $id)

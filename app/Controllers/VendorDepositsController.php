@@ -22,9 +22,9 @@ class VendorDepositsController extends BaseController
         ")->getResultArray();
 
         return $this->render('vendor_deposits/index', [
-            'pageTitle' => 'Vendor Security Deposits',
+            'pageTitle' => 'Vendor Deposit Master [Purchase] — List',
             'rows'      => $rows,
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function ledger(int $vendorId)
@@ -33,11 +33,11 @@ class VendorDepositsController extends BaseController
         if (!$vendor) return redirect()->to(site_url('vendor-deposits'))->with('error', 'Not found.');
         $model = new VendorDepositModel();
         return $this->render('vendor_deposits/ledger', [
-            'pageTitle' => 'Deposit ledger · ' . $vendor['company_name'],
+            'pageTitle' => 'Vendor Deposit Master [Purchase]',
             'vendor'    => $vendor,
             'rows'      => $model->ledger($vendorId),
             'balance'   => $model->balance($vendorId),
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function record(int $vendorId)

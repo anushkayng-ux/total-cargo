@@ -10,46 +10,49 @@ if ($latest && $latest['latitude'] && $latest['longitude']) {
     $latestPt = ['lat' => (float) $latest['latitude'], 'lng' => (float) $latest['longitude']];
 }
 ?>
-<div class="d-flex align-items-center mb-3 gap-2 flex-wrap">
-  <h5 class="m-0">GPS · <code><?= esc($trip['trip_no']) ?></code></h5>
-  <?php if (!empty($latest['delay_flag'])): ?><span class="badge-soft badge-danger">Delay flagged</span><?php endif; ?>
-  <a class="ms-auto btn btn-sm btn-light" href="<?= site_url('gps') ?>"><i class="bi bi-arrow-left"></i> Fleet</a>
-  <a class="btn btn-sm btn-light" href="<?= site_url('trips/' . $trip['id']) ?>"><i class="bi bi-truck"></i> Trip Detail</a>
+<div class="retro-toolbar is-sticky">
   <form method="post" action="<?= site_url('gps/trip/' . $trip['id'] . '/refresh') ?>" class="d-inline">
-    <?= csrf_field() ?><button class="btn btn-sm btn-primary"><i class="bi bi-arrow-clockwise"></i> Refresh Now</button>
+    <?= csrf_field() ?>
+    <button type="submit" class="retro-tbtn retro-primary"><i class="bi bi-arrow-clockwise"></i>Refresh Now</button>
   </form>
+  <a class="retro-tbtn" href="<?= site_url('trips/' . $trip['id']) ?>"><i class="bi bi-truck"></i>Trip Detail</a>
+  <a class="retro-tbtn" href="<?= site_url('gps') ?>"><i class="bi bi-x-lg"></i>Close</a>
 </div>
 
-<div class="row g-3">
-  <div class="col-lg-9">
-    <div class="card"><div class="card-body p-0">
-      <div id="tripmap" style="height: 540px; border-radius: 10px;"></div>
-    </div></div>
+<div class="tabs">
+  <div class="tab active">Live Map</div>
+  <div class="spacer"></div>
+  <div class="recordnav">
+    <a href="<?= site_url('gps') ?>"><i class="bi bi-list"></i> Fleet</a> &middot;
+    Trip <?= esc($trip['trip_no']) ?>
+    <?php if (!empty($latest['delay_flag'])): ?> &middot; <span class="badge-soft badge-danger">Delay flagged</span><?php endif; ?>
   </div>
+</div>
 
-  <div class="col-lg-3">
-    <div class="card mb-3"><div class="card-body" style="font-size:.9rem;">
-      <div class="text-muted">Vehicle</div><div><code><?= esc($trip['vehicle_number'] ?? '—') ?></code></div>
-      <div class="text-muted mt-2">Driver</div><div><?= esc($trip['driver_name'] ?? '—') ?> · <?= esc($trip['driver_mobile'] ?? '') ?></div>
-      <div class="text-muted mt-2">Route</div><div><?= esc($trip['route_text'] ?? '—') ?></div>
-      <div class="text-muted mt-2">Status</div><div><span class="badge-soft"><?= esc($trip['current_status']) ?></span></div>
-    </div></div>
-
-    <div class="card"><div class="card-body" style="font-size:.9rem;">
-      <div class="text-muted">Last Fix</div>
-      <div><?= esc($latest['gps_timestamp'] ?? '—') ?></div>
-      <div class="text-muted mt-2">Coordinates</div>
-      <div><?= $latest ? esc($latest['latitude']) . ', ' . esc($latest['longitude']) : '—' ?></div>
-      <div class="text-muted mt-2">Speed</div>
-      <div><?= $latest && $latest['speed'] !== null ? esc($latest['speed']) . ' km/h' : '—' ?></div>
-      <div class="text-muted mt-2">Address</div>
-      <div><?= esc($latest['address'] ?? '—') ?></div>
-      <?php if (!$service->isConfigured()): ?>
-        <div class="alert alert-danger mt-2 mb-0" style="font-size:.8rem;">
-          LocoNav API key not set. Fill <code>loconav.apiKey</code> in <code>.env</code> for live updates.
-        </div>
-      <?php endif; ?>
-    </div></div>
+<div class="retro-detail">
+  <div class="retro-detail-main" style="padding:0;">
+    <div id="tripmap" style="height: 100%; min-height:540px;"></div>
+  </div>
+  <div class="retro-detail-side">
+    <h4>Vehicle :</h4>
+    <div class="remarksbox">
+      <code><?= esc($trip['vehicle_number'] ?? '—') ?></code><br>
+      <span style="color:var(--v2-fg-muted);">Driver</span><br><?= esc($trip['driver_name'] ?? '—') ?> · <?= esc($trip['driver_mobile'] ?? '') ?><br>
+      <span style="color:var(--v2-fg-muted);">Route</span><br><?= esc($trip['route_text'] ?? '—') ?><br>
+      <span style="color:var(--v2-fg-muted);">Status</span><br><span class="badge-soft"><?= esc($trip['current_status']) ?></span>
+    </div>
+    <h4 style="margin-top:14px;">Last Fix :</h4>
+    <div class="remarksbox">
+      <?= esc($latest['gps_timestamp'] ?? '—') ?><br>
+      <span style="color:var(--v2-fg-muted);">Coordinates</span><br><?= $latest ? esc($latest['latitude']) . ', ' . esc($latest['longitude']) : '—' ?><br>
+      <span style="color:var(--v2-fg-muted);">Speed</span><br><?= $latest && $latest['speed'] !== null ? esc($latest['speed']) . ' km/h' : '—' ?><br>
+      <span style="color:var(--v2-fg-muted);">Address</span><br><?= esc($latest['address'] ?? '—') ?>
+    </div>
+    <?php if (!$service->isConfigured()): ?>
+      <div class="alert alert-danger mt-2 mb-0" style="font-size:.8rem;">
+        LocoNav API key not set. Fill <code>loconav.apiKey</code> in <code>.env</code> for live updates.
+      </div>
+    <?php endif; ?>
   </div>
 </div>
 
@@ -78,5 +81,6 @@ if ($latest && $latest['latitude'] && $latest['longitude']) {
     L.marker([latest.lat, latest.lng]).addTo(map).bindPopup('Last known position');
     if (trail.length <= 1) map.setView([latest.lat, latest.lng], 10);
   }
+  setTimeout(() => map.invalidateSize(), 50);
 })();
 </script>

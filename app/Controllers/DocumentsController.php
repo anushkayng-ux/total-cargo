@@ -36,7 +36,7 @@ class DocumentsController extends BaseController
         $types   = array_column($db->table('documents')->select('document_type')->distinct()->where('deleted_at IS NULL')->get()->getResultArray(), 'document_type');
 
         return $this->render('documents/index', [
-            'pageTitle' => 'Documents',
+            'pageTitle' => 'Documents [Transportation] — List',
             'rows'      => $query->paginate($this->perPage()),
             'pager'     => $model->pager,
             'search'    => $search,
@@ -45,7 +45,7 @@ class DocumentsController extends BaseController
             'verified'  => $verified,
             'modules'   => array_values(array_filter($modules)),
             'types'     => array_values(array_filter($types)),
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function download(int $id)

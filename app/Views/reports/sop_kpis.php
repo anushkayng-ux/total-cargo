@@ -18,45 +18,54 @@ $ratingFor = function ($p50, $target) {
     if ($p50 <= $target * 1.5)   return ['At risk',  'badge-issued'];
     return ['Off track', 'badge-cancelled'];
 };
+
+$extra = '<form method="get" class="d-flex align-items-center gap-2 flex-wrap m-0">'
+    . '<input class="form-control form-control-sm" style="width:150px;" type="date" name="from" value="' . esc($from) . '">'
+    . '<input class="form-control form-control-sm" style="width:150px;" type="date" name="to" value="' . esc($to) . '">'
+    . '<button class="btn btn-sm btn-outline-dark">Apply</button></form>';
 ?>
-<h5 class="mb-3"><?= esc($pageTitle) ?></h5>
+<?= tpt_toolbar([
+    'close_href' => site_url('reports'),
+    'extra'      => $extra,
+    'auth'       => $auth,
+]) ?>
+<div class="tabs">
+  <div class="tab active">SOP / TAT KPIs</div>
+  <div class="spacer"></div>
+  <div class="recordnav"><?= esc($from) ?> – <?= esc($to) ?></div>
+</div>
 
-<form method="get" class="row g-2 mb-3 align-items-end">
-  <div class="col-6 col-md-3"><label class="form-label" style="font-size:.85rem;">From</label><input type="date" class="form-control form-control-sm" name="from" value="<?= esc($from) ?>"></div>
-  <div class="col-6 col-md-3"><label class="form-label" style="font-size:.85rem;">To</label><input type="date" class="form-control form-control-sm" name="to" value="<?= esc($to) ?>"></div>
-  <div class="col-md-2"><button class="btn btn-sm btn-light w-100">Apply</button></div>
-  <div class="col-md-4 text-end text-muted" style="font-size:.85rem;">Stats over the selected window. P50 = median, P90 = 90th percentile.</div>
-</form>
-
-<div class="row g-3 mb-3">
-  <?php foreach ($kpis as $k): [$label, $cls] = $ratingFor($k['data']['p50_h'] ?? null, $k['target_h']); ?>
-  <div class="col-md-6 col-lg-4">
-    <div class="card h-100">
-      <div class="card-body">
-        <div class="d-flex justify-content-between align-items-start">
-          <div>
-            <div style="font-weight:600;"><?= esc($k['label']) ?></div>
-            <div class="text-muted" style="font-size:.78rem;"><?= esc($k['desc']) ?></div>
+<div class="formwrap" style="flex:0 0 auto;">
+  <p class="text-muted mb-3" style="font-size:.85rem;">Stats over the selected window. P50 = median, P90 = 90th percentile.</p>
+  <div class="row g-3">
+    <?php foreach ($kpis as $k): [$label, $cls] = $ratingFor($k['data']['p50_h'] ?? null, $k['target_h']); ?>
+    <div class="col-md-6 col-lg-4">
+      <div class="card h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <div style="font-weight:600;"><?= esc($k['label']) ?></div>
+              <div class="text-muted" style="font-size:.78rem;"><?= esc($k['desc']) ?></div>
+            </div>
+            <span class="badge-status <?= esc($cls) ?>"><?= esc($label) ?></span>
           </div>
-          <span class="badge-status <?= esc($cls) ?>"><?= esc($label) ?></span>
-        </div>
-        <div class="mt-3 d-flex gap-3 flex-wrap" style="font-size:.92rem;">
-          <div><div class="text-muted" style="font-size:.72rem;">SAMPLES</div><strong><?= (int) ($k['data']['count'] ?? 0) ?></strong></div>
-          <div><div class="text-muted" style="font-size:.72rem;">AVG</div><strong><?= $fmt($k['data']['avg_h'] ?? null) ?></strong></div>
-          <div><div class="text-muted" style="font-size:.72rem;">P50</div><strong><?= $fmt($k['data']['p50_h'] ?? null) ?></strong></div>
-          <div><div class="text-muted" style="font-size:.72rem;">P90</div><strong><?= $fmt($k['data']['p90_h'] ?? null) ?></strong></div>
-          <div><div class="text-muted" style="font-size:.72rem;">TARGET</div><strong><?= $fmt($k['target_h']) ?></strong></div>
+          <div class="mt-3 d-flex gap-3 flex-wrap" style="font-size:.92rem;">
+            <div><div class="text-muted" style="font-size:.72rem;">SAMPLES</div><strong><?= (int) ($k['data']['count'] ?? 0) ?></strong></div>
+            <div><div class="text-muted" style="font-size:.72rem;">AVG</div><strong><?= $fmt($k['data']['avg_h'] ?? null) ?></strong></div>
+            <div><div class="text-muted" style="font-size:.72rem;">P50</div><strong><?= $fmt($k['data']['p50_h'] ?? null) ?></strong></div>
+            <div><div class="text-muted" style="font-size:.72rem;">P90</div><strong><?= $fmt($k['data']['p90_h'] ?? null) ?></strong></div>
+            <div><div class="text-muted" style="font-size:.72rem;">TARGET</div><strong><?= $fmt($k['target_h']) ?></strong></div>
+          </div>
         </div>
       </div>
     </div>
+    <?php endforeach; ?>
   </div>
-  <?php endforeach; ?>
 </div>
 
-<div class="card">
-  <div class="card-header">Per-user scorecard</div>
+<div class="gridwrap">
   <div class="table-responsive">
-    <table class="table table-sm align-middle mb-0">
+    <table class="table grid mb-0">
       <thead>
         <tr>
           <th>User</th>

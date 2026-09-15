@@ -1,0 +1,638 @@
+/* =============================================================
+   TCE — Retro Theme (classic GCM-style look, 2026)
+   Loads AFTER theme-v2.css, so these overrides win.
+   Remaps the same --v2-*/--tpt-* variables theme-v2 already uses,
+   then restyles the sidebar/topbar/forms/tables to the old-software
+   look approved in the total-cargo-demo prototype.
+   Functionality (search, quick add, notifications, tom-select) is
+   untouched — this file only changes appearance.
+   ============================================================= */
+
+:root {
+  /* ── Palette — matches the retro demo ── */
+  --v2-navy-900:    #132038;
+  --v2-navy-800:    #0c1626;
+  --v2-navy-700:    #163a7a;
+  --v2-navy-600:    #1a2b4d;
+  --v2-navy-500:    #2f6fe0;
+  --v2-cyan-500:    #2f6fe0;
+  --v2-cyan-400:    #4f8cf7;
+  --v2-cyan-100:    #e1ecff;
+
+  --v2-bg:          #eef3fb;
+  --v2-surface:     #ffffff;
+  --v2-surface-2:   #dbe4f2;
+  --v2-border:      #cdd8ea;
+  --v2-border-2:    #aebedb;
+  --v2-fg:          #1c2b45;
+  --v2-fg-muted:    #5c6b88;
+  --v2-fg-subtle:   #9aa7bd;
+
+  --v2-primary:     #2f6fe0;
+  --v2-primary-fg:  #ffffff;
+  --v2-primary-tone:#e1ecff;
+
+  --v2-success:     #1c7a34;
+  --v2-success-tone:#e1f6e6;
+  --v2-warn:        #946200;
+  --v2-warn-tone:   #fff2d9;
+  --v2-danger:      #b3261e;
+  --v2-danger-tone: #fde8e6;
+
+  --v2-radius:      4px;
+  --v2-radius-sm:   3px;
+  --v2-shadow-1:    0 1px 2px rgba(0,0,0,.06);
+  --v2-shadow-2:    0 4px 14px rgba(0,0,0,.10);
+  --v2-shadow-3:    0 12px 36px rgba(0,0,0,.18);
+  --v2-focus-ring:  0 0 0 2px rgba(47,111,224,.18);
+
+  /* Demo actually uses 3 different border tones depending on element —
+     matching each one exactly (instead of one color everywhere) is what
+     makes cards/tables/inputs read as the same app instead of "close". */
+  --v2-border-3:    #b9c6de; /* cards, table.grid, toolbar, tabs, kpi, mastercard */
+
+  /* theme-v2.css's own --tpt-border (used by .stat and ~12 other rules we
+     never touched directly) — repoint it at the correct structural tone so
+     every one of them matches without hunting each rule down individually. */
+  --tpt-border:     var(--v2-border-3);
+
+  /* ── Bootstrap 5.3 itself renders most rounded corners / colors from
+     ITS OWN root variables, not from classes — a card, alert, dropdown,
+     modal etc. all read --bs-border-radius directly. Overriding --v2-*
+     alone left every un-touched Bootstrap component (and untouched corners
+     of touched ones) on stock Bootstrap radius/shadow/spacing. Remapping
+     these once here is what makes the retro look apply everywhere. ── */
+  --bs-body-bg:                var(--v2-bg);
+  --bs-body-color:              var(--v2-fg);
+  --bs-body-font-family:       "Segoe UI", Tahoma, Arial, sans-serif;
+  --bs-body-font-size:          .844rem; /* 13.5px against a 16px root */
+  --bs-border-color:            var(--v2-border-3);
+  --bs-border-color-translucent:var(--v2-border-3);
+  --bs-border-radius:           3px;
+  --bs-border-radius-sm:        2px;
+  --bs-border-radius-lg:        4px;
+  --bs-border-radius-xl:        4px;
+  --bs-border-radius-xxl:       6px;
+  --bs-border-radius-pill:      10px;
+  --bs-primary:                 var(--v2-primary);
+  --bs-primary-rgb:             47,111,224;
+  --bs-link-color:              var(--v2-primary);
+  --bs-link-color-rgb:          47,111,224;
+  --bs-link-hover-color:        var(--v2-navy-700);
+  --bs-link-hover-color-rgb:    22,58,122;
+  --bs-box-shadow:              none;
+  --bs-box-shadow-sm:           none;
+  --bs-box-shadow-lg:           none;
+  --bs-emphasis-color:          var(--v2-fg);
+
+  /* Demo's sidebar is a fixed 190px column — the real app's own
+     --tpt-sidebar-w (240px) drives both the sidebar's width and the
+     main column's margin-left, so overriding it here fixes both. */
+  --tpt-sidebar-w: 190px;
+}
+
+/* ── Typography — old-software sans, no fancy display face ──── */
+html, body {
+  background: var(--v2-bg) !important;
+  font-family: "Segoe UI", Tahoma, Arial, sans-serif !important;
+  font-size: 13.5px;
+  letter-spacing: 0;
+}
+h1,h2,h3,h4,h5,h6 { font-family: "Segoe UI", Tahoma, Arial, sans-serif !important; color: var(--v2-navy-700); font-weight: 700; letter-spacing: 0; }
+
+/* ── Top banner — full-width navy title bar, matches the demo. The
+   company name stays centered; Quick Add/System/Sign out (moved here
+   by app.js from the old topbar, since the banner — unlike the icon
+   toolbar — is on every page) sit at the right via a mirrored spacer
+   on the left, so the centered text doesn't drift off-center. ── */
+.retro-banner {
+  background: linear-gradient(#1b2947, #131d33);
+  color: #eaf1ff;
+  font-weight: 700;
+  letter-spacing: .4px;
+  font-size: 15px;
+  padding: 8px 12px;
+  border-bottom: 1px solid #26375c;
+  display: flex; align-items: center; gap: 10px;
+  /* Pinned everywhere — not just on the fixed-shell pages — so the
+     company banner never scrolls out of view on ANY page. */
+  position: sticky; top: 0; z-index: 1050;
+}
+@media (max-width: 991.98px) {
+  /* The topbar (hamburger etc, still visible below 992px) is also
+     sticky at top:0 from the base CSS — stack it below the banner
+     instead of both fighting for the same spot. */
+  .tpt-topbar { position: sticky; top: 50px; z-index: 1040; }
+}
+.retro-banner-spacer, .retro-banner-controls { flex: 1 1 0; min-width: 0; }
+.retro-banner-controls { display: flex; align-items: center; justify-content: flex-end; gap: 4px; flex-wrap: wrap; }
+.retro-banner-text { flex: 0 1 auto; text-align: center; }
+@media (max-width: 767.98px) {
+  .retro-banner { flex-wrap: wrap; }
+  .retro-banner-spacer { display: none; }
+  .retro-banner-text {
+    flex: 1 1 100%; order: 1; min-width: 0;
+    font-size: 12.5px; word-break: keep-all; overflow-wrap: normal;
+  }
+  .retro-banner-controls { order: 2; flex: 1 1 100%; justify-content: center; }
+}
+/* Quick Add / notifications / profile / sign-out, moved into the banner —
+   a compact horizontal pill (icon + label side by side) instead of the
+   toolbar's tall icon-over-label button, sized to fit the thin banner and
+   colored for the dark navy background. */
+.retro-banner-controls a.retro-tbtn,
+.retro-banner-controls button.retro-tbtn,
+.retro-banner-controls div.retro-tbtn {
+  width: auto !important; flex-direction: row !important; gap: 5px;
+  padding: 5px 9px !important; font-size: 11px !important;
+  color: #eaf1ff !important; border-right: none !important; border-radius: 4px !important;
+  background: rgba(255,255,255,.08) !important;
+}
+.retro-banner-controls a.retro-tbtn:hover, .retro-banner-controls button.retro-tbtn:hover {
+  background: rgba(255,255,255,.2) !important;
+}
+.retro-banner-controls .retro-tbtn i.bi { font-size: 14px; color: #eaf1ff !important; }
+.retro-banner-controls .tpt-bell #tptBellBadge { top: -2px !important; right: -2px !important; }
+
+.retro-banner small {
+  display: block;
+  font-weight: 400;
+  color: #8ea3cc;
+  font-size: 11px;
+  margin-top: 2px;
+  letter-spacing: .3px;
+}
+
+/* ── Sidebar — same navy gradient as the demo ────────────────── */
+/* Sidebar is position:fixed from the top of the viewport in the base
+   CSS — offset it below our new banner so the two don't overlap. */
+.tpt-sidebar {
+  background: linear-gradient(180deg, #132038, #0c1626 70%, #0a1220) !important;
+  box-shadow: none;
+  top: 52px !important;
+  height: calc(100vh - 52px) !important;
+}
+@media (max-width: 767.98px) {
+  .tpt-sidebar { top: 0 !important; height: 100vh !important; }
+}
+.tpt-sidebar-brand {
+  background: linear-gradient(#1b2947, #131d33);
+  border-bottom: 1px solid #26375c;
+  color: #eaf1ff;
+  font-weight: 700;
+}
+/* Sidebar links — exact values lifted from the demo's .sidebar a /
+   .sidebar a.active (devtools-inspected, not approximated). */
+.tpt-sidebar { padding: 18px 0; }
+.tpt-nav { padding: 0; }
+.tpt-nav a, .tpt-section-head {
+  border-radius: 0; font-weight: 700; font-size: 13.5px;
+  padding: 12px 20px !important; border-bottom: 1px solid #1a2540;
+  color: #dfe9ff;
+}
+.tpt-nav a.active { background: #1a2b4d !important; box-shadow: none; color: #7fb2ff !important; }
+.tpt-nav a:hover, .tpt-section-head:hover { background: #16233f; }
+
+/* Demo sidebar is a flat, always-visible list — no collapsing accordion.
+   Force every section open and turn the header into a plain heading
+   label instead of a toggle button, without removing any real links. */
+.tpt-section-items {
+  max-height: none !important;
+  overflow: visible !important;
+}
+.tpt-section-caret { display: none !important; }
+.tpt-section-head {
+  cursor: default;
+  padding-top: 12px;
+  border-top: 1px solid #1a2540;
+  margin-top: 4px;
+  color: rgba(255,255,255,.9) !important;
+}
+.tpt-section:first-child .tpt-section-head { border-top: none; margin-top: 0; }
+.tpt-section-head:hover { background: transparent !important; }
+.tpt-section-items a { border-bottom: 1px solid #1a2540; padding-left: 34px !important; }
+
+/* ── Topbar — on desktop its only remaining job was the search box and
+   Quick Add/profile/sign-out, and both moved out (search → the sidebar's
+   "Search" link; the rest → the page's own icon toolbar via app.js), so
+   the bar itself is redundant there and hidden. On mobile it still holds
+   the hamburger that opens the sidebar drawer, so it stays. ── */
+.tpt-topbar {
+  background: linear-gradient(#fbfcfe, #eef1f6) !important;
+  border-bottom: 1px solid var(--v2-border-2);
+}
+.tpt-topbar-title { display: none; } /* replaced by .win-titlebar below the topbar, matching the demo */
+@media (min-width: 992px) {
+  .tpt-topbar { display: none; }
+}
+
+/* ── Title bar — dedicated centered bar below the topbar, copied verbatim
+   from the demo's .win-titlebar/.win-title (every page gets one via the
+   shared layout, same as the demo's shell_start()). Fixed/sticky so it
+   never scrolls out of view. Offsets differ by breakpoint since the
+   topbar above it is only present on mobile. ── */
+.win-titlebar {
+  background: linear-gradient(#e9edf3,#d7dee9);
+  border-bottom: 1px solid var(--v2-border-3);
+  padding: 8px 14px; display: flex; align-items: center;
+  position: sticky; top: 68px; z-index: 1015;
+}
+.win-title { flex: 1; text-align: center; font-weight: 700; color: #16233f; font-size: 14.5px; }
+@media (min-width: 992px) {
+  .win-titlebar { top: 0; }
+  .retro-toolbar.is-sticky { top: 37px; }
+  .tabs { top: 82px; }
+}
+
+/* ── Cards — square-ish, thin border, no soft shadow ─────────── */
+.card { border-radius: var(--v2-radius); box-shadow: none; border-color: var(--v2-border-3); background: var(--v2-surface); }
+.card-header { background: linear-gradient(#e9edf3,#d7dee9); font-weight: 700; color: var(--v2-navy-700); border-color: var(--v2-border-3); }
+.card-body { padding: 14px 16px; }
+
+/* ── Forms — white boxes, navy bold labels, square corners, and the
+   SAME compact 4px/8px padding + 12.5px type the demo's .field .box
+   uses (Bootstrap's default padding/font-size is noticeably taller). ── */
+.form-label { color: var(--v2-navy-700) !important; font-weight: 700 !important; font-size: .78rem; text-transform: none; margin-bottom: .3rem; }
+.form-control, .form-select {
+  border-radius: var(--v2-radius-sm) !important;
+  border-color: var(--v2-border-2) !important;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,.05) !important;
+  padding: 4px 8px !important;
+  font-size: 12.5px !important;
+  min-height: 0 !important;
+}
+.form-control-sm, .form-select-sm { padding: 3px 6px !important; font-size: 12px !important; }
+.form-control:focus, .form-select:focus { border-color: var(--v2-primary) !important; }
+.form-control[readonly] { background: var(--v2-surface-2) !important; }
+
+/* ── Buttons — flat, square-ish, no glow, same dense sizing ──── */
+.btn { border-radius: var(--v2-radius-sm) !important; font-weight: 700; box-shadow: none !important; padding: 5px 12px; font-size: 12.5px; }
+.btn-sm { padding: 3px 9px !important; font-size: 11.5px !important; }
+.btn-primary { background: linear-gradient(#4f8cf7,#2f6fe0) !important; border-color: var(--v2-navy-500) !important; }
+.btn-primary:hover { background: var(--v2-navy-500) !important; }
+
+/* ── Tabs — filled active tab like the demo ──────────────────── */
+.nav-tabs { background: var(--v2-surface-2); border-bottom-color: var(--v2-border-3); }
+.nav-tabs .nav-link { border-radius: 0; font-weight: 700; color: var(--v2-fg-muted); font-size: 12.5px; padding: 9px 16px; }
+.nav-tabs .nav-link.active {
+  background: #f5f8fd !important;
+  color: var(--v2-navy-700) !important;
+  border-bottom: 2px solid var(--v2-primary) !important;
+}
+
+/* ── Demo's own .tabs/.tab bar — a flat strip (not underlined Bootstrap
+   tabs) with a record-nav on the right. Copied verbatim; Bootstrap's
+   tab.js still drives which pane shows (it only needs data-bs-toggle
+   + data-bs-target, not any particular class), so these can carry real
+   working tab-content instead of the demo's decorative-only tabs. ── */
+.tabs {
+ display: flex;
+  align-items: center;
+  background: #dbe4f2;
+  border-bottom: 1px solid #b9c6de;
+  padding: 0 10px;
+  flex-wrap: wrap;
+}
+/* Base .tab styling applies whether the tab is a plain decorative <div>
+   (list pages have exactly one, non-interactive — matches the demo) or a
+   real <button> (detail pages, where Bootstrap's tab.js switches panes).
+   It was scoped to "button.tab" only before, so a <div class="tab"> (no
+   button) rendered with none of this — just bare underlined text. */
+.tab {
+  display: inline-flex; align-items: center;
+  background: none; border: none; border-right: 1px solid #c3cee2;
+  padding: 9px 16px; font-size: 12.5px; font-weight: 700; color: #3a4a68;
+  cursor: default;
+}
+button.tab { cursor: pointer; font-family: inherit; }
+.tab.active { background: #f5f8fd; color: var(--v2-navy-700); box-shadow: inset 0 -2px 0 var(--v2-primary); }
+.tabs .spacer { flex: 1; }
+
+/* ── Tables — bordered grid look, matches the demo's table.grid ── */
+.card > .table-responsive > .table,
+.table {
+  border: 1px solid var(--v2-border-3);
+  background: var(--v2-surface);
+  font-size: 12.5px;
+}
+.table thead th, .table-light th {
+  background: linear-gradient(#e9edf3,#d7dee9) !important;
+  color: #16233f;
+  font-weight: 700;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 12px;
+  border-bottom: 1px solid var(--v2-border-3) !important;
+  border-right: 1px solid var(--v2-border);
+  padding: 8px 10px;
+  white-space: nowrap;
+}
+.table > :not(caption) > * > * {
+  border-right: 1px solid #eef2f9;
+  border-bottom-color: #e2e9f4;
+  padding: 7px 10px;
+  color: var(--v2-fg);
+}
+/* !important + cell-level box-shadow because Bootstrap 5.3 paints each
+   CELL's own background/accent via --bs-table-bg / an inset box-shadow
+   trick (for border-radius compatibility) that otherwise sits on top of
+   a plain background-color set on the <tr> itself. */
+.table tbody tr:nth-child(even) { background: #f6f9fd !important; }
+.table tbody tr:nth-child(even) > * { box-shadow: inset 0 0 0 9999px #f6f9fd; }
+.table tbody tr:hover { background: #dcebff !important; }
+.table tbody tr:hover > * { box-shadow: inset 0 0 0 9999px #dcebff; }
+
+/* ── table.grid — the demo's OWN selector, copied verbatim, so the exact
+   same rule the demo uses exists here too (in addition to the .table
+   rules above, which already cover every real table via its shared
+   "table grid" classes). ── */
+table.grid {
+  width: 100%; min-width: 900px; border-collapse: collapse;
+  background: #fff; border: 1px solid #b9c6de; font-size: 12.5px;
+}
+table.grid th {
+  background: linear-gradient(#e9edf3,#d7dee9); color: #16233f; text-align: left;
+  padding: 8px 10px; border-bottom: 1px solid #b9c6de; border-right: 1px solid #cdd8ea;
+  font-size: 12px; white-space: nowrap;
+}
+table.grid td {
+  padding: 7px 10px; border-bottom: 1px solid #e2e9f4; border-right: 1px solid #eef2f9;
+  color: #1c2b45; white-space: nowrap;
+}
+table.grid tbody tr:nth-child(even) { background: #f6f9fd; }
+table.grid tbody tr:hover { background: #dcebff; cursor: pointer; }
+
+/* Demo's table.grid has NO rounded corners and sits with nothing but its
+   own border around it. When a card exists ONLY to wrap a table (the
+   `<div class="card"><div class="table-responsive"><table>` pattern used
+   on every list page), drop the card's own border/radius so the table's
+   border is the only frame — otherwise a rounded white box shows through
+   around a square-cornered table, which reads as "off" vs the demo. */
+.card:has(> .table-responsive:only-child) {
+  border: none; border-radius: 0; background: transparent; box-shadow: none;
+}
+.table { border-radius: 0 !important; }
+
+/* Status pills — same look as the demo's .pill (rounded, bold, tinted) */
+.badge-soft {
+  border-radius: 10px !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  padding: 2px 8px !important;
+}
+
+/* ── KPI / stat tiles — .kpi/.kpirow copied verbatim from the demo;
+   .stat/.value/.label (the app's own names) get the same numbers too,
+   since some dashboard widgets still use those classes. ── */
+.kpirow { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 18px; }
+.kpi, .stat {
+  flex: 1; min-width: 180px; background: #fff; border: 1px solid #b9c6de;
+  border-radius: 6px; padding: 14px 16px; box-shadow: 0 1px 3px rgba(0,0,0,.08);
+}
+.kpi .num, .stat .value { font-size: 26px; font-weight: 800; color: #163a7a; margin-top: 2px; }
+.kpi .lbl, .stat .label { font-size: 11.5px; font-weight: 700; color: #5c6b88; text-transform: uppercase; letter-spacing: .4px; }
+
+/* ── Alerts / flash messages — flat tone bars ────────────────── */
+.alert { border-radius: var(--v2-radius-sm); }
+
+/* ── Main content padding — tighter, denser (old-software feel) */
+.tpt-main { background: #eef3fb !important; }
+
+/* ── Retro action toolbar — matches the demo's .toolbar/.tbtn pixel
+   for pixel: pale gradient bar, thin dividers between buttons, and a
+   muted/inert look for buttons that don't apply on the current page
+   (rendered via tpt_toolbar()'s "off" state instead of being hidden,
+   so the toolbar's shape never jumps between pages). Sticks below the
+   sticky topbar so it stays visible while a long list scrolls. ── */
+.retro-toolbar {
+  /* Exact values from the demo's .toolbar — border-BOTTOM only (no full
+     box/radius around it), 2px gap between buttons. */
+  display: flex; align-items: stretch; flex-wrap: wrap;
+  background: linear-gradient(#fbfcfe,#eef1f6) !important;
+  border-bottom: 1px solid #c7d2e3;
+  padding: 6px 10px; gap: 2px;
+  margin-bottom: 0;
+}
+/* Only the PRIMARY toolbar at the top of a page sticks below the topbar
+   while a long list/form scrolls — a second (e.g. bottom Save/Cancel) bar
+   on the same page stays in normal flow so the two don't collide. */
+.retro-toolbar.is-sticky {
+  position: sticky; top: 105px; z-index: 1010;
+  box-shadow: 0 2px 6px rgba(15,23,42,.06);
+}
+/* Search/filter controls a page passes via tpt_toolbar()'s "extra" option —
+   pinned to the right on desktop; wraps and un-pins on narrow screens so it
+   never forces the toolbar wider than the viewport. */
+.retro-toolbar-extra { margin-left: auto; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+@media (max-width: 767.98px) {
+  .retro-toolbar-extra { margin-left: 0; flex-basis: 100%; }
+}
+/* NOTE: deliberately no ":not(.retro-tbtn)" auto-margin rule here — several
+   buttons (Delete, Cancel, Handover) are wrapped in their own <form> for the
+   POST+CSRF, and a form-wrapper without the retro-tbtn class would get
+   pushed to the far right by such a rule, opening a gap before it and
+   splitting the button row. Each "push right" spot (the 'extra' slot, the
+   merged global controls) sets margin-left:auto itself instead. */
+a.retro-tbtn, button.retro-tbtn, div.retro-tbtn {
+  display: flex !important; flex-direction: column; align-items: center; justify-content: center;
+  gap: 4px; width: 70px; padding: 6px 4px !important;
+  color: #26364f !important; font-size: 11px !important; font-weight: 600 !important;
+  border: none !important; border-right: 1px solid #d7dfec !important; border-radius: 4px !important;
+  background: transparent !important; box-shadow: none !important;
+  text-decoration: none; line-height: 1.1; cursor: pointer;
+}
+.retro-toolbar > .retro-tbtn:last-of-type, .retro-toolbar > form:last-of-type .retro-tbtn { border-right: none !important; }
+a.retro-tbtn:hover, button.retro-tbtn:hover { background: #e2ebfb !important; }
+.retro-tbtn i.bi { font-size: 18px; }
+.retro-tbtn.retro-primary i.bi { color: var(--v2-primary); }
+.retro-tbtn.retro-danger i.bi { color: var(--v2-danger); }
+.retro-tbtn-off, .retro-tbtn-off i.bi {
+  color: #b9c2d6 !important; cursor: default !important;
+}
+.retro-tbtn-off:hover { background: transparent !important; }
+
+/* ── Hub landing pages (Transportation/Accounts/Administration) — a grid
+   of cards linking to the real pages, matching the retro demo's
+   "Select a master to open" / "Other modules" grids. ── */
+/* Exact values from the demo's .masterlinks/.mastercard (devtools). */
+.masterlinks { display: flex; gap: 16px; flex-wrap: wrap; }
+.mastercard {
+  width: 220px; background: #fff; border: 1px solid #b9c6de; border-radius: 6px;
+  padding: 18px; text-align: center; text-decoration: none; color: #163a7a;
+  box-shadow: 0 1px 3px rgba(0,0,0,.08);
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+}
+.mastercard:hover { background: #e2ebfb; color: #163a7a; }
+.mastercard-icon { font-size: 30px; margin-bottom: 8px; }
+.mastercard-label { font-weight: 700; font-size: 13.5px; }
+.mastercard-desc { font-size: 11px; color: #6b7b9a; margin-top: 4px; }
+
+/* ── Retro detail/record view — label:value boxes + side panel, matching
+   the demo's client/booking detail pages. Namespaced retro-row/retro-field/
+   retro-box (NOT .row/.field/.box) so nothing here collides with Bootstrap's
+   own .row grid used everywhere else in the app. ── */
+.retro-detail { display: flex; gap: 0; align-items: flex-start; }
+.retro-detail-main, .formwrap { flex: 1; min-width: 0; padding: 18px 20px; background: #eef3fb; overflow-y: auto; min-height: 0; }
+.retro-detail-side {
+  width: 250px; flex: 0 0 250px; background: #eef3fb; border-left: 1px solid #cdd8ea; padding: 16px 16px 0;
+  display: flex; flex-direction: column; overflow-y: auto; min-height: 0;
+}
+@media (max-width: 991.98px) {
+  .retro-detail { flex-direction: column; }
+  .retro-detail-side { width: 100%; flex: none; padding-left: 0; padding-top: 16px; border-left: none; border-top: 1px solid #cdd8ea; }
+}
+
+/* ── Fixed shell (opt-in via body.retro-fixed-shell, set by controllers
+   that pass render(..., retroFixedShell: true)) — matches the demo
+   exactly: sidebar/topbar/titlebar/toolbar/tabs never move, and ONLY the
+   page's own table or form content scrolls, inside its own bounded box.
+   Pages that haven't been rebuilt with a proper .gridwrap/.formwrap yet
+   must NOT get this class, or their content would be clipped instead of
+   scrollable — see BaseController::render()'s doc comment. ── */
+/* Body itself is NOT height:100vh — it holds the banner (normal flow)
+   PLUS .tpt-app; capping body at 100vh while .tpt-app also asks for a
+   full 100vh would push everything below the banner's own height off
+   the bottom edge, hidden by this same overflow:hidden. Only .tpt-app
+   is bounded, and by "100vh minus the banner", matching how the sidebar
+   is already offset (see .tpt-sidebar's top/height above). */
+body.retro-fixed-shell { overflow: hidden; }
+body.retro-fixed-shell .tpt-app { height: calc(100vh - 52px); }
+body.retro-fixed-shell .tpt-main { height: calc(100vh - 52px); overflow: hidden; }
+body.retro-fixed-shell .tpt-content {
+  flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden; padding: 0;
+}
+body.retro-fixed-shell .tpt-content > .alert { margin: 10px 16px 0; flex: 0 0 auto; }
+body.retro-fixed-shell .retro-toolbar { position: static; flex: 0 0 auto; }
+body.retro-fixed-shell .win-titlebar { position: static; flex: 0 0 auto; }
+body.retro-fixed-shell .tabs { position: static; flex: 0 0 auto; }
+body.retro-fixed-shell .gridwrap { flex: 1; min-height: 0; overflow: auto; padding: 16px 18px; }
+/* bookings/index wraps its .gridwrap in a <form> (for the bulk-select bar) —
+   that form needs to be the bounded flex column instead, so .gridwrap's
+   flex:1 has a parent to actually fill. */
+body.retro-fixed-shell .tpt-content > form:has(> .gridwrap),
+body.retro-fixed-shell .tpt-content > form:has(> .tab-content) {
+  flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden;
+}
+body.retro-fixed-shell .tab-content { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+body.retro-fixed-shell .tab-content > .active { display: flex !important; flex-direction: column; flex: 1; min-height: 0; }
+body.retro-fixed-shell .retro-detail { flex: 1; min-height: 0; align-items: stretch; }
+@media (max-width: 991.98px) {
+  /* No room for a fixed shell on a small screen — fall back to the whole
+     page scrolling normally, same as every other (non-retro) page. */
+  body.retro-fixed-shell { height: auto; overflow: visible; }
+  body.retro-fixed-shell .tpt-app,
+  body.retro-fixed-shell .tpt-main { height: auto; overflow: visible; }
+  body.retro-fixed-shell .tpt-content { overflow: visible; }
+  body.retro-fixed-shell .gridwrap { overflow: visible; }
+  body.retro-fixed-shell .tab-content > .active { display: block !important; }
+}
+.retro-row { display: flex; gap: 22px; margin-bottom: 12px; flex-wrap: wrap; }
+.retro-field { display: flex; align-items: center; gap: 8px; }
+.retro-field label { font-size: 12.5px; font-weight: 700; color: var(--v2-navy-700); white-space: nowrap; margin: 0; }
+.retro-box {
+  background: #fff; border: 1px solid var(--v2-border-2); border-radius: 3px;
+  padding: 4px 8px; font-size: 12.5px; color: var(--v2-fg); min-width: 90px;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,.05);
+}
+.retro-box.wide { min-width: 190px; }
+.retro-box.xwide { min-width: 260px; }
+.retro-box.narrow { min-width: 55px; text-align: right; }
+.retro-box.empty { color: var(--v2-fg-subtle); }
+.retro-particulars {
+  background: #fff; border: 1px solid var(--v2-border-2); border-radius: 3px;
+  padding: 8px 10px; font-size: 12.5px; color: var(--v2-fg); min-height: 46px; width: 100%;
+}
+
+/* ── Editable version of the same boxes — Add/Edit forms use real
+   <input>/<select>/<textarea class="retro-box|retro-particulars"> so
+   New/Edit look exactly like the read-only View page, just editable. ── */
+input.retro-box, select.retro-box, textarea.retro-box, textarea.retro-particulars {
+  font-family: inherit; outline: none; box-sizing: border-box;
+  -webkit-appearance: none; appearance: none; width: auto;
+}
+input.retro-box:focus, select.retro-box:focus, textarea.retro-box:focus, textarea.retro-particulars:focus {
+  border-color: var(--v2-primary); box-shadow: 0 0 0 2px rgba(47,111,224,.18);
+}
+select.retro-box {
+  background-image: linear-gradient(45deg, transparent 50%, #5c6b88 50%), linear-gradient(135deg, #5c6b88 50%, transparent 50%);
+  background-position: calc(100% - 14px) center, calc(100% - 9px) center;
+  background-size: 5px 5px, 5px 5px; background-repeat: no-repeat; padding-right: 22px;
+}
+textarea.retro-particulars { display: block; resize: vertical; }
+.retro-required { color: #b3261e; }
+.retro-formerr {
+  background: #fde8e6; border: 1px solid #f0b8b0; color: #a13a2f;
+  padding: 8px 12px; border-radius: 4px; font-size: 12px; margin-bottom: 12px;
+}
+/* Small inline "+" add-new-lookup button next to a field, matching the
+   demo's .addbtn (e.g. next to Company Name — add a client on the fly). */
+.retro-addbtn {
+  width: 22px; height: 22px; border-radius: 3px; background: linear-gradient(#4f8cf7,#2f6fe0);
+  color: #fff; font-weight: 900; font-size: 13px; display: inline-flex; align-items: center;
+  justify-content: center; box-shadow: 0 1px 2px rgba(0,0,0,.3); border: none; flex: 0 0 auto;
+}
+.retro-checkline { display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--v2-fg); }
+.retro-checkline input[type=checkbox] { width: 15px; height: 15px; accent-color: var(--v2-primary); }
+
+/* Tab bar + record navigator (List · Record N · total · Prev/Next) */
+.recordnav { display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--v2-fg-muted); flex-wrap: wrap; }
+.recordnav a { color: var(--v2-primary); text-decoration: none; font-weight: 700; }
+.recordnav a.disabled { color: var(--v2-border-2); pointer-events: none; }
+
+.remarksbox {
+  background: #fff; border: 1px solid var(--v2-border-2); border-radius: 3px;
+  padding: 8px 10px; font-size: 12.5px; color: var(--v2-fg); min-height: 90px;
+}
+.retro-detail-side h4 { margin: 0 0 8px; color: var(--v2-navy-700); font-size: 13px; text-decoration: underline; }
+
+/* Decorative sunset panel — purely visual, matches the demo's classic-app feel */
+.scenic {
+  margin-top: 14px; flex: 1; min-height: 220px; border-radius: 4px; overflow: hidden;
+  background: linear-gradient(180deg,#2b3a55 0%,#6b5a6e 25%,#d98f5f 48%,#f6c785 58%,#16202f 76%,#0a0f18 100%);
+  position: relative; box-shadow: inset 0 0 0 1px var(--v2-border);
+}
+.scenic .sun {
+  position: absolute; left: 50%; top: 52%; width: 70px; height: 70px; margin-left: -35px; margin-top: -35px;
+  border-radius: 50%; background: radial-gradient(circle, #fff2c9, #ffd27a 60%, rgba(255,210,122,0) 72%);
+}
+.scenic .box1, .scenic .box2, .scenic .box3 { position: absolute; bottom: 26%; height: 26px; border-radius: 2px; box-shadow: 0 2px 4px rgba(0,0,0,.4); }
+.scenic .box1 { left: 12%; width: 60px; background: #c0392b; }
+.scenic .box2 { left: 30%; width: 48px; background: #2471a3; }
+.scenic .box3 { left: 46%; width: 70px; background: #e6b325; }
+
+/* Clickable grid rows — clicking anywhere on a row opens its detail page,
+   like the demo (edit/delete icons stop propagation so they still work). */
+.table tbody tr.row-link { cursor: pointer; }
+
+/* ── Print — the toolbar's Print button just calls window.print() on
+   whatever page is open, so every retro-fixed-shell page needs its own
+   print stylesheet or it prints the dark sidebar/banner/toolbar chrome
+   instead of the actual data. Hide all app-shell navigation, let the
+   fixed-shell's screen-only height/overflow locks go back to natural
+   flowing pages, and keep only the page title + real content (table rows,
+   record detail, form field values) — the parts someone printing a page
+   actually wants on paper. Dedicated print documents (dispatch LR/trip
+   sheet, payroll payslip) already have their own @media print and are
+   unaffected since they don't use body.retro-fixed-shell chrome. ── */
+@media print {
+  .retro-banner, .tpt-sidebar, .tpt-topbar, .retro-toolbar, .tabs,
+  .skip-to-main, .recordnav, .masterlinks, .scenic,
+  #tptGlobalControls, #tptBannerControls {
+    display: none !important;
+  }
+  body.retro-fixed-shell,
+  body.retro-fixed-shell .tpt-app,
+  body.retro-fixed-shell .tpt-main,
+  body.retro-fixed-shell .tpt-content,
+  body.retro-fixed-shell .gridwrap,
+  body.retro-fixed-shell .formwrap,
+  body.retro-fixed-shell .tab-content,
+  body.retro-fixed-shell .tab-content > .active,
+  body.retro-fixed-shell .retro-detail {
+    height: auto !important; min-height: 0 !important; overflow: visible !important; flex: none !important;
+  }
+  .tpt-main, .tpt-content { margin: 0 !important; padding: 0 !important; }
+  .win-titlebar { position: static !important; }
+  table.grid { min-width: 0 !important; }
+  .gridwrap table.grid thead th { position: static !important; }
+}

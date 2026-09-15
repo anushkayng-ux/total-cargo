@@ -15,11 +15,11 @@ class CalendarController extends BaseController
         $clients = $db->table('clients')->select('id, company_name')->where('status', 1)->where('deleted_at', null)->orderBy('company_name', 'ASC')->get()->getResultArray();
 
         return $this->render('calendar/index', [
-            'pageTitle' => 'Calendar',
+            'pageTitle' => 'Operational Calendar [Reports]',
             'users'     => $users,
             'clients'   => $clients,
             'me'        => $this->auth->id(),
-        ]);
+        ], retroFixedShell: true);
     }
 
     /**

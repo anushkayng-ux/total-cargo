@@ -1,33 +1,33 @@
-<div class="d-flex align-items-center mb-3 gap-2 flex-wrap">
-  <h5 class="m-0"><?= esc($pageTitle) ?></h5>
-  <?php if (!empty($pager)): ?><span class="badge bg-secondary ms-2"><?= $pager->getTotal() ?> total</span><?php endif; ?>
+<?php
+$f = $filters;
+$extra = '<form method="get" class="d-flex align-items-center gap-2 flex-wrap m-0">'
+    . '<input class="form-control form-control-sm" style="width:180px;" type="text" name="q" value="' . esc($f['search'] ?? '') . '" placeholder="Reference, vendor, bill no…">'
+    . '<select class="form-select form-select-sm" style="width:auto;" name="mode"><option value="">All Modes</option>';
+foreach (['NEFT','RTGS','IMPS','UPI','Cheque','Cash','Other'] as $m) {
+    $extra .= '<option' . (($f['mode'] ?? '') === $m ? ' selected' : '') . '>' . $m . '</option>';
+}
+$extra .= '</select>'
+    . '<input class="form-control form-control-sm" style="width:140px;" type="date" name="from" value="' . esc($f['from'] ?? '') . '">'
+    . '<input class="form-control form-control-sm" style="width:140px;" type="date" name="to" value="' . esc($f['to'] ?? '') . '">'
+    . '<button class="btn btn-sm btn-outline-dark">Apply</button>'
+    . '<a class="btn btn-sm btn-light" href="' . site_url('vendor-payments') . '">Clear</a>'
+    . '</form>';
+
+echo tpt_toolbar([
+    'close_href' => site_url('dashboard'),
+    'extra'      => $extra,
+    'auth'       => $auth,
+]);
+?>
+<div class="tabs">
+  <div class="tab active">All Vendor Payments</div>
+  <div class="spacer"></div>
+  <div class="recordnav"><?= (int) ($pager->getTotal() ?: count($rows)) ?> total records</div>
 </div>
 
-<form method="get" class="card mb-3"><div class="card-body p-3">
-  <div class="row g-2 align-items-end">
-    <div class="col-md-4"><label class="form-label" style="font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;color:#6b7280;font-weight:600;">Search</label>
-      <input class="form-control form-control-sm" type="text" name="q" value="<?= esc($filters['search'] ?? '') ?>" placeholder="Reference, vendor, bill no, notes…"></div>
-    <div class="col-md-2"><label class="form-label" style="font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;color:#6b7280;font-weight:600;">Mode</label>
-      <select class="form-select form-select-sm" name="mode">
-        <option value="">All</option>
-        <?php foreach (['NEFT','RTGS','IMPS','UPI','Cheque','Cash','Other'] as $m): ?>
-          <option <?= ($filters['mode'] ?? '') === $m ? 'selected' : '' ?>><?= $m ?></option>
-        <?php endforeach; ?>
-      </select></div>
-    <div class="col-md-2"><label class="form-label" style="font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;color:#6b7280;font-weight:600;">From</label>
-      <input class="form-control form-control-sm" type="date" name="from" value="<?= esc($filters['from'] ?? '') ?>"></div>
-    <div class="col-md-2"><label class="form-label" style="font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;color:#6b7280;font-weight:600;">To</label>
-      <input class="form-control form-control-sm" type="date" name="to" value="<?= esc($filters['to'] ?? '') ?>"></div>
-    <div class="col-md-2 d-flex gap-1">
-      <button class="btn btn-sm btn-primary"><i class="bi bi-funnel"></i> Apply</button>
-      <a class="btn btn-sm btn-light" href="<?= site_url('vendor-payments') ?>">Clear</a>
-    </div>
-  </div>
-</div></form>
-
-<div class="card">
+<div class="gridwrap">
   <div class="table-responsive">
-    <table class="table mobile-cards mb-0" data-tpt-cols="vendor-payments">
+    <table class="table grid mobile-cards mb-0" data-tpt-cols="vendor-payments">
       <thead><tr><th data-col="date">Date</th><th data-col="vendor">Vendor</th><th data-col="bill">Bill</th><th class="text-end" data-col="amount">Amount</th><th data-col="mode">Mode</th><th data-col="reference">Reference</th><th data-col="actions"></th></tr></thead>
       <tbody>
         <?php if (empty($rows)): ?><tr><td colspan="7" class="text-center text-muted">No payments.</td></tr><?php endif; ?>
@@ -49,5 +49,5 @@
       </tbody>
     </table>
   </div>
+  <?php if (!empty($pager)): ?><div class="mt-3"><?= $pager->links() ?></div><?php endif; ?>
 </div>
-<?php if (!empty($pager)): ?><div class="mt-3"><?= $pager->links() ?></div><?php endif; ?>

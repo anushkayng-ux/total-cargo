@@ -35,11 +35,11 @@ class GstReturnsController extends BaseController
         $to   = (string) ($this->request->getGet('to')   ?: date('Y-m-t',  strtotime('last day of last month')));
         $summary = $this->summary($from, $to);
         return $this->render('gst_returns/index', [
-            'pageTitle' => 'GST Returns',
+            'pageTitle' => 'GST Returns [Accounts]',
             'from'      => $from,
             'to'        => $to,
             'summary'   => $summary,
-        ]);
+        ], retroFixedShell: true);
     }
 
     /** GSTR-1 — per-invoice rows. Format: GSTIN-friendly column names. */

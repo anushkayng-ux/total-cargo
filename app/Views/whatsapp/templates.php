@@ -1,13 +1,26 @@
-<div class="d-flex align-items-center mb-3 gap-2 flex-wrap">
-  <h5 class="m-0"><?= esc($pageTitle) ?></h5>
-  <button class="ms-auto btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#waTestModal"><i class="bi bi-send-check"></i> Test send</button>
-  <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#tplModal" onclick="openTpl()"><i class="bi bi-plus-lg"></i> New Template</button>
+<?php
+$extra = '<button class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#waTestModal"><i class="bi bi-send-check"></i> Test send</button>';
+echo tpt_toolbar([
+    'new_href'       => null,
+    'close_href'     => site_url('dashboard'),
+    'extra'          => $extra,
+    'auth'           => $auth,
+]);
+?>
+<div class="tabs">
+  <a class="tab" href="<?= site_url('whatsapp/logs') ?>">Message Logs</a>
+  <a class="tab" href="<?= site_url('whatsapp/inbox') ?>">Inbox</a>
+  <div class="tab active">Templates</div>
+  <div class="spacer"></div>
+  <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#tplModal" onclick="openTpl()" style="margin-right:10px;"><i class="bi bi-plus-lg"></i> New Template</button>
 </div>
 
-<div class="alert" style="font-size:.85rem;">
-  Templates defined here are local drafts used for <strong>preview and variable mapping</strong>.
-  For real WhatsApp sending you must also create and approve the matching template in
-  <a href="https://business.facebook.com/wa/manage/message-templates/" target="_blank">Meta WA Manager</a> under the same <code>template_name</code>.
+<div class="formwrap" style="flex:0 0 auto;">
+  <div class="alert" style="font-size:.85rem;margin-bottom:0;">
+    Templates defined here are local drafts used for <strong>preview and variable mapping</strong>.
+    For real WhatsApp sending you must also create and approve the matching template in
+    <a href="https://business.facebook.com/wa/manage/message-templates/" target="_blank">Meta WA Manager</a> under the same <code>template_name</code>.
+  </div>
 </div>
 
 <!-- Test send modal — fires a plaintext WA message via WhatsAppService -->
@@ -29,9 +42,9 @@
   </form>
 </div></div>
 
-<div class="card">
+<div class="gridwrap">
   <div class="table-responsive">
-    <table class="table mb-0" data-tpt-cols="wa-templates">
+    <table class="table grid mb-0" data-tpt-cols="wa-templates">
       <thead>
         <tr><th data-col="key">Key</th><th data-col="audience">Audience</th><th data-col="meta-name">Meta Name</th><th data-col="lang">Lang</th><th data-col="body">Body</th><th data-col="status">Status</th><th class="text-end" data-col="actions">Actions</th></tr>
       </thead>

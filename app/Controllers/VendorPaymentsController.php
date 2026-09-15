@@ -39,11 +39,11 @@ class VendorPaymentsController extends BaseController
 
         $rows = $q->paginate($perPage);
         return $this->render('vendor_payments/index', [
-            'pageTitle' => 'Vendor Payments',
+            'pageTitle' => 'Vendor Payment Master [Accounts] — List',
             'rows'      => $rows,
             'pager'     => $model->pager,
             'filters'   => compact('search','mode','from','to','perPage'),
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function store()

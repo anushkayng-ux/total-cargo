@@ -28,15 +28,15 @@ class TripsController extends BaseController
         $model = $this->filteredQuery($search, $status, $pod, $docket);
 
         return $this->render('trips/index', [
-            'pageTitle' => $docket === 'pending' ? 'Create Docket — Trips without LR' : 'Trips',
+            'pageTitle' => $docket === 'pending' ? 'Trip Master [Transportation] — Create Docket' : 'Trip Master [Transportation] — List',
             'rows'      => $model->paginate($this->perPage()),
-            'pager'     => (new TripModel())->pager,
+            'pager'     => $model->pager,
             'search'    => $search,
             'status'    => $status,
             'pod'       => $pod,
             'docket'    => $docket,
             'statuses'  => TripModel::STATUSES,
-        ]);
+        ], retroFixedShell: true);
     }
 
     /** GET /trips/export — honors q/status/pod filters from the list page */
@@ -130,7 +130,7 @@ class TripsController extends BaseController
             ->where('status', 1)->orderBy('company_name')->findAll();
 
         return $this->render('trips/show', [
-            'pageTitle'   => 'Trip ' . $row['trip_no'],
+            'pageTitle'   => 'Trip Master [Transportation]',
             'row'         => $row,
             'booking'     => $bookingRow,
             'clientsForParty' => $clientsForParty,
@@ -152,7 +152,7 @@ class TripsController extends BaseController
             'advanceTotals'  => (new \App\Models\TripAdvanceModel())->totalsForTrip($id),
             'driverMessages' => $driverMessages,
             'feedback'       => $db->table('trip_feedback')->where('trip_id', $id)->get()->getRowArray(),
-        ]);
+        ], retroFixedShell: true);
     }
 
     /**

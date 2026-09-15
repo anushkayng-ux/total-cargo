@@ -1,12 +1,20 @@
-<div class="d-flex align-items-center mb-3 gap-2 flex-wrap">
-  <h5 class="m-0"><?= esc($pageTitle) ?></h5>
-  <span class="text-muted ms-2" style="font-size:.85rem;">Where the margin is leaking vs. where it's being recovered.</span>
-  <a class="ms-auto btn btn-sm btn-light" href="<?= site_url('reports') ?>"><i class="bi bi-arrow-left"></i> All Reports</a>
+<?= tpt_toolbar([
+    'close_href' => site_url('reports'),
+    'auth'       => $auth,
+]) ?>
+<div class="tabs">
+  <div class="tab active">Expense Category Summary</div>
+  <div class="spacer"></div>
+  <div class="recordnav"><?= count($rows) ?> categories</div>
 </div>
 
-<div class="card">
+<div class="formwrap" style="flex:0 0 auto;">
+  <p class="text-muted mb-0" style="font-size:.85rem;">Where the margin is leaking vs. where it's being recovered.</p>
+</div>
+
+<div class="gridwrap">
   <div class="table-responsive">
-    <table class="table mb-0">
+    <table class="table grid mb-0">
       <thead>
         <tr><th>Category</th><th class="text-end">Entries</th><th class="text-end">Internal</th><th class="text-end">Billable</th><th class="text-end">Unbilled</th><th class="text-end">Total</th><th>Recovery</th></tr>
       </thead>

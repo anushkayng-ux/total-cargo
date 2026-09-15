@@ -9,75 +9,63 @@ $kin = $kin ?? [];
 // Always render at least 1 row so users see the inputs even on a new profile.
 if (empty($kin)) $kin = [['relation'=>'','name'=>'','phone'=>'','alt_phone'=>'','email'=>'','address'=>'','is_emergency_contact'=>0]];
 
-$renderRow = function (array $row) use ($relations) {
+$renderKinRow = function (array $row) use ($relations) {
     ob_start();
     ?>
-    <div class="kin-row card mb-2" style="border:1px solid #e5e7eb;background:#fafbfc;">
-      <div class="card-body p-3">
-        <div class="row g-2 align-items-end">
-          <div class="col-md-2">
-            <label class="form-label" style="font-size:.74rem;text-transform:uppercase;letter-spacing:.04em;color:#6b7280;font-weight:600;">Relation *</label>
-            <select class="form-select form-select-sm" name="kin_relation[]" required>
-              <option value="">— pick —</option>
-              <?php foreach ($relations as $r): ?>
-                <option value="<?= esc($r) ?>" <?= ($row['relation'] ?? '') === $r ? 'selected' : '' ?>><?= esc($r) ?></option>
-              <?php endforeach; ?>
-            </select>
-          </div>
-          <div class="col-md-3">
-            <label class="form-label" style="font-size:.74rem;text-transform:uppercase;letter-spacing:.04em;color:#6b7280;font-weight:600;">Name *</label>
-            <input class="form-control form-control-sm" type="text" name="kin_name[]" maxlength="150" placeholder="e.g. Suresh Kumar" value="<?= esc($row['name'] ?? '') ?>">
-          </div>
-          <div class="col-md-2">
-            <label class="form-label" style="font-size:.74rem;text-transform:uppercase;letter-spacing:.04em;color:#6b7280;font-weight:600;">Phone *</label>
-            <input class="form-control form-control-sm" type="tel" name="kin_phone[]" maxlength="30" placeholder="10-digit mobile" value="<?= esc($row['phone'] ?? '') ?>">
-          </div>
-          <div class="col-md-2">
-            <label class="form-label" style="font-size:.74rem;text-transform:uppercase;letter-spacing:.04em;color:#6b7280;font-weight:600;">Alt phone</label>
-            <input class="form-control form-control-sm" type="tel" name="kin_alt_phone[]" maxlength="30" value="<?= esc($row['alt_phone'] ?? '') ?>">
-          </div>
-          <div class="col-md-3">
-            <label class="form-label" style="font-size:.74rem;text-transform:uppercase;letter-spacing:.04em;color:#6b7280;font-weight:600;">Email</label>
-            <input class="form-control form-control-sm" type="email" name="kin_email[]" maxlength="150" value="<?= esc($row['email'] ?? '') ?>">
-          </div>
-          <div class="col-md-10">
-            <label class="form-label" style="font-size:.74rem;text-transform:uppercase;letter-spacing:.04em;color:#6b7280;font-weight:600;">Address (optional)</label>
-            <input class="form-control form-control-sm" type="text" name="kin_address[]" maxlength="400" placeholder="Their address, city" value="<?= esc($row['address'] ?? '') ?>">
-          </div>
-          <div class="col-md-2 d-flex flex-column align-items-end gap-2">
-            <div class="form-check" style="font-size:.82rem;">
-              <input class="form-check-input" type="checkbox" name="kin_is_emergency[<?= rand(0, 99999) ?>]" value="1" <?= !empty($row['is_emergency_contact']) ? 'checked' : '' ?> onchange="this.name='kin_is_emergency['+ (Array.from(document.querySelectorAll('.kin-row')).indexOf(this.closest('.kin-row'))) +']'">
-              <label class="form-check-label" title="Call this person first in an emergency">
-                <i class="bi bi-star-fill" style="color:#f59e0b;"></i> Emergency
-              </label>
-            </div>
-            <button type="button" class="btn btn-sm btn-light text-danger" onclick="this.closest('.kin-row').remove()">
-              <i class="bi bi-trash"></i> Remove
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+    <tr class="kin-row">
+      <td>
+        <select class="retro-box" style="width:100%;" name="kin_relation[]" required>
+          <option value="">— pick —</option>
+          <?php foreach ($relations as $r): ?>
+            <option value="<?= esc($r) ?>" <?= ($row['relation'] ?? '') === $r ? 'selected' : '' ?>><?= esc($r) ?></option>
+          <?php endforeach; ?>
+        </select>
+      </td>
+      <td><input class="retro-box" style="width:100%;" type="text" name="kin_name[]" maxlength="150" placeholder="e.g. Suresh Kumar" value="<?= esc($row['name'] ?? '') ?>"></td>
+      <td><input class="retro-box" style="width:100%;" type="tel" name="kin_phone[]" maxlength="30" placeholder="10-digit mobile" value="<?= esc($row['phone'] ?? '') ?>"></td>
+      <td><input class="retro-box" style="width:100%;" type="tel" name="kin_alt_phone[]" maxlength="30" value="<?= esc($row['alt_phone'] ?? '') ?>"></td>
+      <td><input class="retro-box" style="width:100%;" type="email" name="kin_email[]" maxlength="150" value="<?= esc($row['email'] ?? '') ?>"></td>
+      <td><input class="retro-box" style="width:100%;" type="text" name="kin_address[]" maxlength="400" placeholder="Their address, city" value="<?= esc($row['address'] ?? '') ?>"></td>
+      <td class="text-center">
+        <input type="checkbox" name="kin_is_emergency[<?= rand(0, 99999) ?>]" value="1" title="Call this person first in an emergency" <?= !empty($row['is_emergency_contact']) ? 'checked' : '' ?> onchange="this.name='kin_is_emergency['+ (Array.from(document.querySelectorAll('.kin-row')).indexOf(this.closest('.kin-row'))) +']'">
+      </td>
+      <td class="text-center">
+        <button type="button" class="retro-tbtn" style="width:auto;flex-direction:row;padding:2px 6px;" onclick="this.closest('.kin-row').remove()" aria-label="Remove"><i class="bi bi-trash"></i></button>
+      </td>
+    </tr>
     <?php
     return ob_get_clean();
 };
 ?>
 
-<div id="kin-rows-container">
-  <?php foreach ($kin as $row) echo $renderRow($row); ?>
+<div class="gridwrap" style="padding:0;flex:0 0 auto;">
+  <table class="table grid mb-0">
+    <thead>
+      <tr>
+        <th>Relation *</th><th>Name *</th><th>Phone *</th><th>Alt phone</th><th>Email</th><th>Address</th>
+        <th style="width:80px;" title="Call this person first in an emergency"><i class="bi bi-star-fill" style="color:#f59e0b;"></i> Emerg.</th>
+        <th style="width:50px;"></th>
+      </tr>
+    </thead>
+    <tbody id="kin-rows-container">
+      <?php foreach ($kin as $row) echo $renderKinRow($row); ?>
+    </tbody>
+  </table>
 </div>
 
-<button type="button" class="btn btn-sm btn-light" id="addKinBtn"><i class="bi bi-plus-circle"></i> Add another family contact</button>
+<div class="retro-row" style="margin-top:10px;">
+  <button type="button" class="retro-tbtn" style="width:auto;flex-direction:row;" id="addKinBtn"><i class="bi bi-plus-lg"></i>Add another family contact</button>
+</div>
 
 <script>
 (function () {
-  const tpl = <?= json_encode($renderRow([
+  const tpl = <?= json_encode($renderKinRow([
       'relation' => '', 'name' => '', 'phone' => '', 'alt_phone' => '',
       'email' => '', 'address' => '', 'is_emergency_contact' => 0,
   ])) ?>;
   document.getElementById('addKinBtn')?.addEventListener('click', function () {
     const c = document.getElementById('kin-rows-container');
-    const wrap = document.createElement('div');
+    const wrap = document.createElement('tbody');
     wrap.innerHTML = tpl.trim();
     c.appendChild(wrap.firstChild);
   });
@@ -94,7 +82,7 @@ $renderRow = function (array $row) use ($relations) {
     if (e.target.matches('.kin-row input[type="checkbox"]')) reindexEmergencyCheckboxes();
   });
   document.addEventListener('click', (e) => {
-    if (e.target.closest('.kin-row .btn-light.text-danger')) {
+    if (e.target.closest('.kin-row .retro-tbtn')) {
       setTimeout(reindexEmergencyCheckboxes, 0);
     }
   });

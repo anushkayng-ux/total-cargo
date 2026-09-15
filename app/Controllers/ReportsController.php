@@ -16,8 +16,8 @@ class ReportsController extends BaseController
     public function index()
     {
         return $this->render('reports/index', [
-            'pageTitle' => 'Reports',
-        ]);
+            'pageTitle' => 'Reports Hub',
+        ], retroFixedShell: true);
     }
 
     /**
@@ -68,8 +68,7 @@ class ReportsController extends BaseController
 
         $apOutstanding = (float) ($db->table('vendor_bills')
             ->selectSum('balance_due', 'total')
-            ->whereIn('bill_status', ['Issued','Partially Paid'])
-            ->where('deleted_at', null)
+            ->whereIn('status', ['Issued','Partially Paid'])
             ->get()->getRow('total') ?? 0);
 
         $overdueAr = (int) $db->table('invoices')
@@ -134,7 +133,7 @@ class ReportsController extends BaseController
             ->get()->getResultArray();
 
         return $this->render('reports/executive', [
-            'pageTitle'      => 'Executive Dashboard',
+            'pageTitle'      => 'Executive Dashboard [Reports]',
             'revMtd'         => $revMtd,
             'revYtd'         => $revYtd,
             'marMtd'         => $marMtd,
@@ -150,7 +149,7 @@ class ReportsController extends BaseController
             'recentTrips'    => $recentTrips,
             'monStart'       => $monStart,
             'yrStart'        => $yrStart,
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function profitability()
@@ -165,14 +164,14 @@ class ReportsController extends BaseController
         ];
         $result = Analytics::profitability($filters);
         return $this->render('reports/profitability', [
-            'pageTitle' => 'Profitability',
+            'pageTitle' => 'Profitability [Reports]',
             'rows'      => $result['rows'],
             'totals'    => $result['totals'],
             'filters'   => $filters,
             'clients'   => (new ClientModel())->orderBy('company_name')->findAll(),
             'vendors'   => (new VendorModel())->orderBy('company_name')->findAll(),
             'statuses'  => BookingModel::STATUSES,
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function receivables()
@@ -186,12 +185,13 @@ class ReportsController extends BaseController
         $bucket   = (string) $this->request->getGet('bucket');
         $filtered = $bucket ? $this->filterByBucket($rows, 'balance_due', 'due_date', $bucket) : $rows;
         return $this->render('reports/aging', [
-            'pageTitle' => 'Receivables Aging',
-            'kind'      => 'receivables',
-            'rows'      => $filtered,
-            'aging'     => $aging,
-            'bucket'    => $bucket,
-        ]);
+            'pageTitle'   => 'Receivables Aging [Reports]',
+            'reportLabel' => 'Receivables Aging',
+            'kind'        => 'receivables',
+            'rows'        => $filtered,
+            'aging'       => $aging,
+            'bucket'      => $bucket,
+        ], retroFixedShell: true);
     }
 
     public function payables()
@@ -204,12 +204,13 @@ class ReportsController extends BaseController
         $bucket   = (string) $this->request->getGet('bucket');
         $filtered = $bucket ? $this->filterByBucket($rows, 'balance_due', 'due_date', $bucket) : $rows;
         return $this->render('reports/aging', [
-            'pageTitle' => 'Payables Aging',
-            'kind'      => 'payables',
-            'rows'      => $filtered,
-            'aging'     => $aging,
-            'bucket'    => $bucket,
-        ]);
+            'pageTitle'   => 'Payables Aging [Reports]',
+            'reportLabel' => 'Payables Aging',
+            'kind'        => 'payables',
+            'rows'        => $filtered,
+            'aging'       => $aging,
+            'bucket'      => $bucket,
+        ], retroFixedShell: true);
     }
 
     /**
@@ -238,9 +239,9 @@ class ReportsController extends BaseController
     public function leadFunnel()
     {
         return $this->render('reports/lead_funnel', [
-            'pageTitle' => 'Lead Funnel',
+            'pageTitle' => 'Lead Funnel [Reports]',
             'funnel'    => Analytics::leadFunnel(),
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function tripExpenses()
@@ -277,13 +278,13 @@ class ReportsController extends BaseController
         }
 
         return $this->render('reports/trip_expenses', [
-            'pageTitle'  => 'Trip Expenses',
+            'pageTitle'  => 'Trip Expenses [Reports]',
             'rows'       => $rows,
             'totals'     => $totals,
             'filters'    => $filters,
             'categories' => (new TripExpenseCategoryModel())->active(),
             'vendors'    => (new VendorModel())->orderBy('company_name')->findAll(),
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function unbilledBillable()
@@ -299,10 +300,10 @@ class ReportsController extends BaseController
         foreach ($rows as $r) $total += (float) $r['amount'];
 
         return $this->render('reports/unbilled_billable', [
-            'pageTitle' => 'Unbilled Billable Expenses',
+            'pageTitle' => 'Unbilled Billable Expenses [Reports]',
             'rows'      => $rows,
             'total'     => $total,
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function expenseCategories()
@@ -321,9 +322,9 @@ class ReportsController extends BaseController
             ->get()->getResultArray();
 
         return $this->render('reports/expense_categories', [
-            'pageTitle' => 'Expense Categories Summary',
+            'pageTitle' => 'Expense Categories Summary [Reports]',
             'rows'      => $rows,
-        ]);
+        ], retroFixedShell: true);
     }
 
     /**
@@ -384,13 +385,13 @@ class ReportsController extends BaseController
         ", [$fromDt, $toDt])->getResultArray();
 
         return $this->render('reports/email_analytics', [
-            'pageTitle'   => 'Email Analytics',
+            'pageTitle'   => 'Email Analytics [Reports]',
             'from'        => $from,
             'to'          => $to,
             'totals'      => $totals,
             'daily'       => $daily,
             'perTemplate' => $perTemplate,
-        ]);
+        ], retroFixedShell: true);
     }
 
     /**
@@ -518,7 +519,7 @@ class ReportsController extends BaseController
         ", [$fromDt, $toDt])->getResultArray();
 
         return $this->render('reports/sop_kpis', [
-            'pageTitle'         => 'SOP / TAT KPIs',
+            'pageTitle'         => 'SOP / TAT KPIs [Reports]',
             'from'              => $from,
             'to'                => $to,
             'bookingApproval'   => $bookingApproval,
@@ -527,6 +528,6 @@ class ReportsController extends BaseController
             'podCollection'     => $podCollection,
             'invoiceIssuance'   => $invoiceIssuance,
             'perUser'           => $perUser,
-        ]);
+        ], retroFixedShell: true);
     }
 }

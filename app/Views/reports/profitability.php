@@ -1,54 +1,51 @@
-<div class="d-flex align-items-center mb-3 gap-2 flex-wrap">
-  <h5 class="m-0"><?= esc($pageTitle) ?></h5>
-  <a class="ms-auto btn btn-sm btn-light" href="<?= site_url('reports') ?>"><i class="bi bi-arrow-left"></i> All Reports</a>
+<?php
+$extra = '<form method="get" class="d-flex align-items-center gap-2 flex-wrap m-0" action="' . site_url('reports/profitability') . '">'
+    . '<input class="form-control form-control-sm" style="width:140px;" type="date" name="from" value="' . esc($filters['from']) . '">'
+    . '<input class="form-control form-control-sm" style="width:140px;" type="date" name="to" value="' . esc($filters['to']) . '">'
+    . '<select class="form-select form-select-sm" name="client_id" style="width:auto;"><option value="">All Clients</option>';
+foreach ($clients as $c) {
+    $extra .= '<option value="' . (int) $c['id'] . '"' . ((int) $filters['client_id'] === (int) $c['id'] ? ' selected' : '') . '>' . esc($c['company_name']) . '</option>';
+}
+$extra .= '</select>'
+    . '<select class="form-select form-select-sm" name="vendor_id" style="width:auto;"><option value="">All Vendors</option>';
+foreach ($vendors as $v) {
+    $extra .= '<option value="' . (int) $v['id'] . '"' . ((int) $filters['vendor_id'] === (int) $v['id'] ? ' selected' : '') . '>' . esc($v['company_name']) . '</option>';
+}
+$extra .= '</select>'
+    . '<select class="form-select form-select-sm" name="status" style="width:auto;"><option value="">All Status</option>';
+foreach ($statuses as $s) {
+    $extra .= '<option value="' . esc($s) . '"' . ($filters['status'] === $s ? ' selected' : '') . '>' . esc($s) . '</option>';
+}
+$extra .= '</select>'
+    . '<button class="btn btn-sm btn-outline-dark">Filter</button>'
+    . '<a class="btn btn-sm btn-light" href="' . site_url('reports/profitability') . '">Reset</a>'
+    . '</form>';
+?>
+<?= tpt_toolbar([
+    'close_href' => site_url('reports'),
+    'extra'      => $extra,
+    'auth'       => $auth,
+]) ?>
+<div class="tabs">
+  <div class="tab active">Profitability</div>
+  <div class="spacer"></div>
+  <div class="recordnav"><?= count($rows) ?> bookings</div>
 </div>
 
-<div class="card mb-3">
-  <div class="card-body">
-    <form class="row g-2" method="get" action="<?= site_url('reports/profitability') ?>">
-      <div class="col-md-2"><label class="form-label">From</label>
-        <input type="date" class="form-control form-control-sm" name="from" value="<?= esc($filters['from']) ?>"></div>
-      <div class="col-md-2"><label class="form-label">To</label>
-        <input type="date" class="form-control form-control-sm" name="to" value="<?= esc($filters['to']) ?>"></div>
-      <div class="col-md-3"><label class="form-label">Client</label>
-        <select class="form-select form-select-sm" name="client_id">
-          <option value="">All</option>
-          <?php foreach ($clients as $c): ?>
-            <option value="<?= $c['id'] ?>" <?= (int)$filters['client_id'] === (int)$c['id'] ? 'selected' : '' ?>><?= esc($c['company_name']) ?></option>
-          <?php endforeach; ?>
-        </select></div>
-      <div class="col-md-3"><label class="form-label">Vendor</label>
-        <select class="form-select form-select-sm" name="vendor_id">
-          <option value="">All</option>
-          <?php foreach ($vendors as $v): ?>
-            <option value="<?= $v['id'] ?>" <?= (int)$filters['vendor_id'] === (int)$v['id'] ? 'selected' : '' ?>><?= esc($v['company_name']) ?></option>
-          <?php endforeach; ?>
-        </select></div>
-      <div class="col-md-2"><label class="form-label">Status</label>
-        <select class="form-select form-select-sm" name="status">
-          <option value="">All</option>
-          <?php foreach ($statuses as $s): ?>
-            <option value="<?= esc($s) ?>" <?= $filters['status'] === $s ? 'selected' : '' ?>><?= esc($s) ?></option>
-          <?php endforeach; ?>
-        </select></div>
-      <div class="col-12"><button class="btn btn-sm btn-primary">Apply</button>
-        <a class="btn btn-sm btn-light" href="<?= site_url('reports/profitability') ?>">Reset</a></div>
-    </form>
+<div class="formwrap" style="flex:0 0 auto;">
+  <div class="row g-3">
+    <div class="col-6 col-md-2"><div class="stat"><span class="label">Sell</span><span class="value">₹<?= number_format((float) $totals['sell'], 0) ?></span></div></div>
+    <div class="col-6 col-md-2"><div class="stat"><span class="label">Buy</span><span class="value">₹<?= number_format((float) $totals['buy'], 0) ?></span></div></div>
+    <div class="col-6 col-md-2"><div class="stat"><span class="label">Booked Margin</span><span class="value">₹<?= number_format((float) $totals['margin'], 0) ?></span></div></div>
+    <div class="col-6 col-md-2"><div class="stat"><span class="label">Internal Exp</span><span class="value">₹<?= number_format((float) ($totals['internal_exp'] ?? 0), 0) ?></span></div></div>
+    <div class="col-6 col-md-2"><div class="stat"><span class="label">Billable Recovered</span><span class="value">₹<?= number_format((float) ($totals['billable_recovered'] ?? 0), 0) ?></span></div></div>
+    <div class="col-6 col-md-2"><div class="stat"><span class="label">True Margin</span><span class="value">₹<?= number_format((float) ($totals['true_margin'] ?? 0), 0) ?></span><small class="text-muted" style="font-size:.7rem;"><?= esc($totals['true_margin_pct'] ?? 0) ?>%</small></div></div>
   </div>
 </div>
 
-<div class="row g-3 mb-3">
-  <div class="col-6 col-md-2"><div class="stat"><span class="label">Sell</span><span class="value">₹<?= number_format((float) $totals['sell'], 0) ?></span></div></div>
-  <div class="col-6 col-md-2"><div class="stat"><span class="label">Buy</span><span class="value">₹<?= number_format((float) $totals['buy'], 0) ?></span></div></div>
-  <div class="col-6 col-md-2"><div class="stat"><span class="label">Booked Margin</span><span class="value">₹<?= number_format((float) $totals['margin'], 0) ?></span></div></div>
-  <div class="col-6 col-md-2"><div class="stat"><span class="label">Internal Exp</span><span class="value">₹<?= number_format((float) ($totals['internal_exp'] ?? 0), 0) ?></span></div></div>
-  <div class="col-6 col-md-2"><div class="stat"><span class="label">Billable Recovered</span><span class="value">₹<?= number_format((float) ($totals['billable_recovered'] ?? 0), 0) ?></span></div></div>
-  <div class="col-6 col-md-2"><div class="stat"><span class="label">True Margin</span><span class="value">₹<?= number_format((float) ($totals['true_margin'] ?? 0), 0) ?></span><small class="text-muted" style="font-size:.7rem;"><?= esc($totals['true_margin_pct'] ?? 0) ?>%</small></div></div>
-</div>
-
-<div class="card">
+<div class="gridwrap">
   <div class="table-responsive">
-    <table class="table mb-0">
+    <table class="table grid mb-0">
       <thead>
         <tr><th>Booking</th><th>Route</th><th>Client</th><th>Vendor</th><th class="text-end">Buy</th><th class="text-end">Sell</th><th class="text-end">Margin</th><th class="text-end">Int Exp</th><th class="text-end">Recov.</th><th class="text-end">True M.</th><th>Status</th></tr>
       </thead>

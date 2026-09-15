@@ -1,17 +1,24 @@
-<div class="d-flex align-items-center mb-3 gap-2 flex-wrap">
-  <h5 class="m-0"><?= esc($pageTitle) ?></h5>
-  <span class="text-muted ms-2" style="font-size:.85rem;">Billable expenses that have not yet been added to a client invoice — this is revenue leakage.</span>
-  <a class="ms-auto btn btn-sm btn-light" href="<?= site_url('reports') ?>"><i class="bi bi-arrow-left"></i> All Reports</a>
+<?= tpt_toolbar([
+    'close_href' => site_url('reports'),
+    'auth'       => $auth,
+]) ?>
+<div class="tabs">
+  <div class="tab active">Unbilled Billable Expenses</div>
+  <div class="spacer"></div>
+  <div class="recordnav"><?= count($rows) ?> entries · ₹<?= number_format((float) $total, 0) ?></div>
 </div>
 
-<div class="row g-3 mb-3">
-  <div class="col-6 col-md-3"><div class="stat"><span class="label">Unbilled Total</span><span class="value">₹<?= number_format((float) $total, 0) ?></span></div></div>
-  <div class="col-6 col-md-3"><div class="stat"><span class="label">Entries</span><span class="value"><?= count($rows) ?></span></div></div>
+<div class="formwrap" style="flex:0 0 auto;">
+  <p class="text-muted mb-0" style="font-size:.85rem;">Billable expenses that have not yet been added to a client invoice — this is revenue leakage.</p>
+  <div class="row g-3 mt-0">
+    <div class="col-6 col-md-3"><div class="stat"><span class="label">Unbilled Total</span><span class="value">₹<?= number_format((float) $total, 0) ?></span></div></div>
+    <div class="col-6 col-md-3"><div class="stat"><span class="label">Entries</span><span class="value"><?= count($rows) ?></span></div></div>
+  </div>
 </div>
 
-<div class="card">
+<div class="gridwrap">
   <div class="table-responsive">
-    <table class="table mb-0">
+    <table class="table grid mb-0">
       <thead>
         <tr><th>Date</th><th>Trip</th><th>Client</th><th>Category</th><th>Description</th><th class="text-end">Amount</th><th class="text-end"></th></tr>
       </thead>

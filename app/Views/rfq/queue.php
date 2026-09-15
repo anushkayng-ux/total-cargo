@@ -1,15 +1,24 @@
 <?php /** @var array $rows */ ?>
-<div class="d-flex align-items-center mb-3 gap-2 flex-wrap">
-  <h5 class="m-0"><?= esc($pageTitle) ?></h5>
-  <span class="badge bg-danger"><?= count($rows) ?> waiting</span>
-  <a class="ms-auto btn btn-sm btn-light" href="<?= site_url('rfq') ?>"><i class="bi bi-list-ul"></i> All RFQs</a>
+<?= tpt_toolbar([
+    'new_href'       => site_url('rfq/create'),
+    'new_item_label' => 'New RFQ',
+    'close_href'     => site_url('dashboard'),
+    'extra'          => '<a class="btn btn-sm btn-outline-dark" href="' . site_url('rfq') . '"><i class="bi bi-list-ul"></i> All RFQs</a>',
+    'auth'           => $auth,
+]) ?>
+<div class="tabs">
+  <div class="tab active">Purchase Inbox</div>
+  <div class="spacer"></div>
+  <div class="recordnav"><?= count($rows) ?> waiting</div>
 </div>
 
-<p class="text-muted" style="font-size:.9rem;">Queries Sales has sent to Purchase that don't have an RFQ yet. Create one and dispatch to vendors in a click.</p>
+<div class="formwrap" style="flex:0 0 auto;padding-bottom:0;">
+  <p class="text-muted mb-0" style="font-size:.9rem;">Queries Sales has sent to Purchase that don't have an RFQ yet. Create one and dispatch to vendors in a click.</p>
+</div>
 
-<div class="card">
+<div class="gridwrap">
   <div class="table-responsive">
-    <table class="table table-hover align-middle mb-0" data-tpt-cols="rfq-queue">
+    <table class="table grid table-hover align-middle mb-0" data-tpt-cols="rfq-queue">
       <thead class="table-light">
         <tr>
           <th data-col="lead">Lead</th>
@@ -37,7 +46,7 @@
                   'Urgent' => 'bg-danger', 'High' => 'bg-warning text-dark', default => 'bg-secondary',
               };
             ?>
-            <tr>
+            <tr class="row-link" data-href="<?= site_url('leads/' . $r['id']) ?>">
               <td data-col="lead"><a href="<?= site_url('leads/' . $r['id']) ?>"><code><?= esc($r['lead_no'] ?? ('#' . $r['id'])) ?></code></a></td>
               <td data-col="route"><?= esc($route ?: '—') ?></td>
               <td data-col="vehicle"><?= esc($r['vehicle_type_required'] ?: '—') ?></td>

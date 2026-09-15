@@ -31,14 +31,14 @@ class InvoicesController extends BaseController
         $model = $this->filteredQuery($search, $status, $due);
 
         return $this->render('invoices/index', [
-            'pageTitle' => 'Invoices',
+            'pageTitle' => 'Invoice Master [Accounts] — List',
             'rows'      => $model->paginate($this->perPage()),
-            'pager'     => (new InvoiceModel())->pager,
+            'pager'     => $model->pager,
             'search'    => $search,
             'status'    => $status,
             'due'       => $due,
             'statuses'  => InvoiceModel::STATUSES,
-        ]);
+        ], retroFixedShell: true);
     }
 
     /** GET /invoices/export — honors the same q/status/due filters as index */
@@ -272,14 +272,14 @@ class InvoicesController extends BaseController
     private function renderForm(?array $row, array $prefill = []): string
     {
         return $this->render('invoices/form', [
-            'pageTitle' => $row ? 'Edit Invoice' : 'New Invoice',
+            'pageTitle' => $row ? 'Invoice Master [Accounts] — Edit' : 'Invoice Master [Accounts] — New',
             'row'       => $row,
             'prefill'   => $prefill,
             'clients'   => (new ClientModel())->where('status', 1)->orderBy('company_name')->findAll(),
             'bookings'  => (new BookingModel())->orderBy('id', 'DESC')->limit(100)->findAll(),
             'trips'     => (new TripModel())->orderBy('id', 'DESC')->limit(100)->findAll(),
             'settings'  => (new SettingModel())->getAllGrouped(),
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function store()
@@ -487,7 +487,7 @@ class InvoicesController extends BaseController
         if (!$row) return redirect()->to(site_url('invoices'))->with('error', 'Not found.');
 
         return $this->render('invoices/show', [
-            'pageTitle' => 'Invoice ' . $row['invoice_no'],
+            'pageTitle' => 'Invoice Master [Accounts]',
             'row'       => $row,
             'items'     => (new InvoiceItemModel())->forInvoice($id),
             'receipts'  => (new ReceiptModel())->forInvoice($id),
@@ -496,7 +496,7 @@ class InvoicesController extends BaseController
             'settings'  => (new SettingModel())->getAllGrouped(),
             'waService' => new WhatsAppService(),
             'clearTax'  => new ClearTaxService(),
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function finalize(int $id)

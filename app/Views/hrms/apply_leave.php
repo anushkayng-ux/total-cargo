@@ -1,43 +1,41 @@
-<div class="d-flex flex-wrap align-items-center gap-2 mb-3">
-  <h5 class="m-0"><i class="bi bi-calendar-plus"></i> Apply for Leave</h5>
-  <a class="btn btn-sm btn-light ms-auto" href="<?= site_url('hrms/leaves') ?>"><i class="bi bi-arrow-left"></i> Back to my leaves</a>
+<?= tpt_toolbar([
+    'save_form'   => 'applyLeaveForm',
+    'close_href'  => site_url('hrms/leaves'),
+    'auth'        => $auth,
+]) ?>
+
+<div class="tabs">
+  <div class="tab active">Apply for Leave</div>
+  <div class="spacer"></div>
 </div>
 
-<form method="post" action="<?= site_url('hrms/leaves/apply') ?>" class="card">
-  <?= csrf_field() ?>
-  <div class="card-body">
-    <div class="row g-3">
-      <div class="col-md-6">
-        <label class="form-label">Leave type *</label>
-        <select class="form-select" name="leave_type_id" required>
+<div class="formwrap">
+  <form id="applyLeaveForm" method="post" action="<?= site_url('hrms/leaves/apply') ?>">
+    <?= csrf_field() ?>
+    <div class="retro-row">
+      <div class="retro-field" style="width:46%;"><label>Leave Type <span class="retro-required">*</span> :</label>
+        <select class="retro-box xwide" style="width:100%;" name="leave_type_id" required>
           <option value="">— select —</option>
           <?php foreach ($types as $t): ?>
             <option value="<?= (int) $t['id'] ?>"><?= esc($t['code']) ?> — <?= esc($t['name']) ?> (<?= esc((string) $t['default_annual_quota']) ?>/yr)</option>
           <?php endforeach; ?>
         </select>
       </div>
-      <div class="col-md-3">
-        <label class="form-label">From date *</label>
-        <input class="form-control" type="date" name="from_date" required>
-      </div>
-      <div class="col-md-3">
-        <label class="form-label">To date *</label>
-        <input class="form-control" type="date" name="to_date" required>
-      </div>
-      <div class="col-12">
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" id="is_half_day" name="is_half_day" value="1">
-          <label class="form-check-label" for="is_half_day">Half-day leave</label>
-        </div>
-      </div>
-      <div class="col-12">
-        <label class="form-label">Reason</label>
-        <textarea class="form-control" rows="3" name="reason" placeholder="Briefly explain the reason for this leave"></textarea>
+      <div class="retro-field"><label>From Date <span class="retro-required">*</span> :</label><input type="date" class="retro-box" name="from_date" required></div>
+      <div class="retro-field"><label>To Date <span class="retro-required">*</span> :</label><input type="date" class="retro-box" name="to_date" required></div>
+    </div>
+    <div class="retro-row">
+      <label class="retro-checkline"><input type="checkbox" id="is_half_day" name="is_half_day" value="1"> Half-day leave</label>
+    </div>
+    <div class="retro-row" style="align-items:flex-start;">
+      <div class="retro-field" style="width:100%;"><label style="white-space:nowrap;">Reason :</label>
+        <textarea class="retro-box retro-particulars" style="width:100%;" rows="3" name="reason" placeholder="Briefly explain the reason for this leave"></textarea>
       </div>
     </div>
-  </div>
-  <div class="card-footer">
-    <button class="btn btn-primary"><i class="bi bi-send"></i> Submit application</button>
-    <a class="btn btn-light" href="<?= site_url('hrms/leaves') ?>">Cancel</a>
-  </div>
-</form>
+
+    <div class="retro-toolbar mt-3" style="position:static;">
+      <button type="submit" class="retro-tbtn retro-primary"><i class="bi bi-send"></i>Submit Application</button>
+      <a class="retro-tbtn" href="<?= site_url('hrms/leaves') ?>"><i class="bi bi-x-circle"></i>Close</a>
+    </div>
+  </form>
+</div>

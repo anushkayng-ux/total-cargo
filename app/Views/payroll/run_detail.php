@@ -1,27 +1,36 @@
-<?php $fmt = fn($n) => '₹' . number_format((float) $n, 0); ?>
-<div class="d-flex flex-wrap align-items-center gap-2 mb-3">
-  <h5 class="m-0"><i class="bi bi-cash-coin"></i> Payroll — <?= esc(date('F Y', mktime(0,0,0,(int)$run['pay_period_month'],1,(int)$run['pay_period_year']))) ?></h5>
-  <?php $cls = match($run['run_status']) { 'Draft' => 'warning', 'Finalised' => 'primary', 'Paid' => 'success', default => 'light' }; ?>
-  <span class="badge bg-<?= $cls ?> text-<?= $cls === 'warning' ? 'dark' : 'light' ?>"><?= esc($run['run_status']) ?></span>
-  <a class="btn btn-sm btn-light ms-auto" href="<?= site_url('payroll') ?>"><i class="bi bi-arrow-left"></i> All runs</a>
-  <?php if ($run['run_status'] === 'Draft'): ?>
-    <form method="post" action="<?= site_url('payroll/' . (int) $run['id'] . '/finalise') ?>" class="d-inline" onsubmit="return confirm('Finalise this run? After finalisation, lines cannot be recomputed.');">
-      <?= csrf_field() ?>
-      <button class="btn btn-sm btn-primary"><i class="bi bi-check2-square"></i> Finalise</button>
-    </form>
-  <?php endif; ?>
+<?php
+$fmt = fn($n) => '₹' . number_format((float) $n, 0);
+$cls = match($run['run_status']) { 'Draft' => 'warning', 'Finalised' => 'primary', 'Paid' => 'success', default => 'light' };
+$extra = $run['run_status'] === 'Draft'
+    ? '<form method="post" action="' . site_url('payroll/' . (int) $run['id'] . '/finalise') . '" class="d-inline" data-confirm="Finalise this run? After finalisation, lines cannot be recomputed.">' . csrf_field() . '<button class="btn btn-sm btn-primary"><i class="bi bi-check2-square"></i> Finalise</button></form>'
+    : '';
+?>
+<?= tpt_toolbar([
+    'close_href' => site_url('payroll'),
+    'extra'      => $extra,
+    'auth'       => $auth,
+]) ?>
+<div class="tabs">
+  <div class="tab active">Payroll Run</div>
+  <div class="spacer"></div>
+  <div class="recordnav">
+    <a href="<?= site_url('payroll') ?>"><i class="bi bi-list"></i> All Runs</a> &middot;
+    <?= esc(date('F Y', mktime(0,0,0,(int)$run['pay_period_month'],1,(int)$run['pay_period_year']))) ?> &middot;
+    <span class="badge bg-<?= $cls ?> text-<?= $cls === 'warning' ? 'dark' : 'light' ?>"><?= esc($run['run_status']) ?></span>
+  </div>
 </div>
 
-<div class="row g-3 mb-3">
-  <div class="col-md-4"><div class="card"><div class="card-body"><div class="text-muted small">Total gross</div><div style="font-size:1.4rem;font-weight:700;"><?= $fmt($run['total_gross']) ?></div></div></div></div>
-  <div class="col-md-4"><div class="card"><div class="card-body"><div class="text-muted small">Total deductions</div><div style="font-size:1.4rem;font-weight:700;"><?= $fmt($run['total_deductions']) ?></div></div></div></div>
-  <div class="col-md-4"><div class="card"><div class="card-body"><div class="text-muted small">Total net</div><div style="font-size:1.4rem;font-weight:700;color:#065f46;"><?= $fmt($run['total_net']) ?></div></div></div></div>
+<div class="formwrap" style="flex:0 0 auto;">
+  <div class="row g-3">
+    <div class="col-md-4"><div class="stat"><span class="label">Total gross</span><span class="value"><?= $fmt($run['total_gross']) ?></span></div></div>
+    <div class="col-md-4"><div class="stat"><span class="label">Total deductions</span><span class="value"><?= $fmt($run['total_deductions']) ?></span></div></div>
+    <div class="col-md-4"><div class="stat"><span class="label">Total net</span><span class="value" style="color:#065f46;"><?= $fmt($run['total_net']) ?></span></div></div>
+  </div>
 </div>
 
-<div class="card">
-  <div class="card-header"><i class="bi bi-list"></i> Employee lines</div>
+<div class="gridwrap">
   <div class="table-responsive">
-    <table class="table table-sm align-middle mb-0">
+    <table class="table grid mb-0">
       <thead>
         <tr>
           <th>Employee</th><th class="text-end">Days paid</th><th class="text-end">LOP</th>

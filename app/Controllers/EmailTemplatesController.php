@@ -11,17 +11,17 @@ class EmailTemplatesController extends BaseController
     {
         $rows = (new EmailTemplateModel())->orderBy('audience_type')->orderBy('template_key')->find();
         return $this->render('email_templates/index', [
-            'pageTitle' => 'Email Templates',
+            'pageTitle' => 'Email Templates [Communication] — List',
             'rows'      => $rows,
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function create()
     {
         return $this->render('email_templates/form', [
-            'pageTitle' => 'New Email Template',
+            'pageTitle' => 'Email Templates [Communication] — New',
             'row'       => null,
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function store()
@@ -45,9 +45,9 @@ class EmailTemplatesController extends BaseController
         $row = (new EmailTemplateModel())->find($id);
         if (!$row) return redirect()->to(site_url('email-templates'))->with('error', 'Not found.');
         return $this->render('email_templates/form', [
-            'pageTitle' => 'Edit ' . $row['template_key'],
+            'pageTitle' => 'Email Templates [Communication] — Edit',
             'row'       => $row,
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function update(int $id)

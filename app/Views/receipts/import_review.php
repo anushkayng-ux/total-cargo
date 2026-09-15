@@ -1,16 +1,28 @@
-<h5 class="mb-3"><i class="bi bi-bank"></i> <?= esc($pageTitle) ?></h5>
+<?= tpt_toolbar([
+    'close_href'  => site_url('receipts'),
+    'auth'        => $auth,
+]) ?>
+<div class="tabs">
+  <div class="tab active">Review Import</div>
+  <div class="spacer"></div>
+  <?php if (!empty($proposed)): ?><div class="recordnav"><?= count($proposed) ?> rows parsed</div><?php endif; ?>
+</div>
 
 <?php if (empty($proposed)): ?>
-  <div class="alert alert-light border">Nothing to review. <a href="<?= site_url('receipts/import') ?>">Upload another CSV.</a></div>
+  <div class="formwrap">
+    <div class="alert alert-light border">Nothing to review. <a href="<?= site_url('receipts/import') ?>">Upload another CSV.</a></div>
+  </div>
 <?php else: ?>
 
-<form method="post" action="<?= site_url('receipts/import/confirm') ?>">
+<form method="post" action="<?= site_url('receipts/import/confirm') ?>" id="importReviewForm">
   <?= csrf_field() ?>
-  <p class="text-muted">Review the matches below. <strong>Tick</strong> the rows you want to import as receipts. High-confidence matches are pre-selected.</p>
+  <div class="formwrap" style="flex:0 0 auto;">
+    <p class="text-muted mb-0">Review the matches below. <strong>Tick</strong> the rows you want to import as receipts. High-confidence matches are pre-selected.</p>
+  </div>
 
-  <div class="card">
+  <div class="gridwrap">
     <div class="table-responsive">
-      <table class="table mb-0">
+      <table class="table grid mb-0">
         <thead>
           <tr>
             <th style="width:36px;"><input type="checkbox" id="selAllImport" aria-label="Select all"></th>
@@ -68,14 +80,12 @@
       </table>
     </div>
   </div>
-
-  <div class="mt-3 d-flex gap-2">
-    <button class="btn btn-primary" type="submit" data-confirm="Create receipts for the selected rows?">
-      <i class="bi bi-check2-circle"></i> Import selected
-    </button>
-    <a class="btn btn-light" href="<?= site_url('receipts/import') ?>">Cancel</a>
-  </div>
 </form>
+
+<div class="retro-toolbar mt-3" style="position:static;">
+  <button type="submit" form="importReviewForm" class="retro-tbtn retro-primary" data-confirm="Create receipts for the selected rows?"><i class="bi bi-check2-circle"></i>Import Selected</button>
+  <a class="retro-tbtn" href="<?= site_url('receipts/import') ?>"><i class="bi bi-x-circle"></i>Close</a>
+</div>
 
 <script>
 document.getElementById('selAllImport')?.addEventListener('change', function (e) {

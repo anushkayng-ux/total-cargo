@@ -22,12 +22,12 @@ class PayrollController extends BaseController
         $pagerHtml = service('pager')->setPath('payroll')->makeLinks($page, $perPage, $total, 'default_full');
 
         return $this->render('payroll/runs', [
-            'pageTitle' => 'Payroll Runs',
+            'pageTitle' => 'Payroll [HRMS] — List',
             'rows'      => $rows,
             'pagerHtml' => $pagerHtml,
             'perPage'   => $perPage,
             'total'     => $total,
-        ]);
+        ], retroFixedShell: true);
     }
 
     /**
@@ -191,10 +191,10 @@ class PayrollController extends BaseController
             ->orderBy('u.name', 'ASC')
             ->get()->getResultArray();
         return $this->render('payroll/run_detail', [
-            'pageTitle' => 'Payroll · ' . date('F Y', mktime(0,0,0,(int)$run['pay_period_month'],1,(int)$run['pay_period_year'])),
+            'pageTitle' => 'Payroll [HRMS]',
             'run'       => $run,
             'lines'     => $lines,
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function finaliseRun(int $id)

@@ -20,14 +20,14 @@ class LeadsController extends BaseController
         $model   = $this->filteredQuery($filters);
 
         return $this->render('leads/index', [
-            'pageTitle' => 'Leads',
+            'pageTitle' => 'Lead Master [Sales & Operations] — List',
             'rows'      => $model->paginate($this->perPage()),
-            'pager'     => (new LeadModel())->pager,
+            'pager'     => $model->pager,
             'filters'   => $filters,
             'sources'   => (new LeadSourceModel())->where('status', 1)->orderBy('source_name')->findAll(),
             'users'     => (new UserModel())->where('status', 1)->orderBy('name')->findAll(),
             'statuses'  => LeadModel::STATUSES,
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function export()
@@ -91,13 +91,13 @@ class LeadsController extends BaseController
     public function create()
     {
         return $this->render('leads/form', [
-            'pageTitle' => 'Add Lead',
+            'pageTitle' => 'Lead Master [Sales & Operations] — New',
             'row'       => null,
             'sources'   => (new LeadSourceModel())->where('status', 1)->orderBy('source_name')->findAll(),
             'clients'   => (new ClientModel())->where('status', 1)->orderBy('company_name')->findAll(),
             'users'     => (new UserModel())->where('status', 1)->orderBy('name')->findAll(),
             'statuses'  => LeadModel::STATUSES,
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function store()
@@ -146,13 +146,13 @@ class LeadsController extends BaseController
         if (!$row) return redirect()->to(site_url('leads'))->with('error', 'Lead not found.');
 
         return $this->render('leads/show', [
-            'pageTitle' => 'Lead ' . ($row['lead_no'] ?? ''),
+            'pageTitle' => 'Lead Master [Sales & Operations]',
             'row'       => $row,
             'followups' => (new LeadFollowupModel())->forLead($id),
             'history'   => (new LeadStatusHistoryModel())->forLead($id),
             'statuses'  => LeadModel::STATUSES,
             'users'     => (new UserModel())->where('status', 1)->orderBy('name')->findAll(),
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function edit(int $id)
@@ -161,13 +161,13 @@ class LeadsController extends BaseController
         if (!$row) return redirect()->to(site_url('leads'))->with('error', 'Lead not found.');
 
         return $this->render('leads/form', [
-            'pageTitle' => 'Edit Lead',
+            'pageTitle' => 'Lead Master [Sales & Operations] — Edit',
             'row'       => $row,
             'sources'   => (new LeadSourceModel())->where('status', 1)->orderBy('source_name')->findAll(),
             'clients'   => (new ClientModel())->where('status', 1)->orderBy('company_name')->findAll(),
             'users'     => (new UserModel())->where('status', 1)->orderBy('name')->findAll(),
             'statuses'  => LeadModel::STATUSES,
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function update(int $id)

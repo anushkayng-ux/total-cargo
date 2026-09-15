@@ -35,23 +35,23 @@ class VendorBillsController extends BaseController
         }
 
         return $this->render('vendor_bills/index', [
-            'pageTitle' => 'Vendor Bills',
+            'pageTitle' => 'Vendor Bill Master [Accounts] — List',
             'rows'      => $query->paginate($this->perPage()),
             'pager'     => $model->pager,
             'search'    => $search,
             'status'    => $status,
             'statuses'  => VendorBillModel::STATUSES,
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function create()
     {
         return $this->render('vendor_bills/form', [
-            'pageTitle' => 'New Vendor Bill',
+            'pageTitle' => 'Vendor Bill Master [Accounts] — New',
             'row'       => null,
             'vendors'   => (new VendorModel())->where('status', 1)->orderBy('company_name')->findAll(),
             'trips'     => (new TripModel())->orderBy('id', 'DESC')->limit(100)->findAll(),
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function createFromTrip(int $tripId)
@@ -64,11 +64,11 @@ class VendorBillsController extends BaseController
             'trip_id'   => $tripId,
         ];
         return $this->render('vendor_bills/form', [
-            'pageTitle' => 'Vendor Bill from Trip',
+            'pageTitle' => 'Vendor Bill Master [Accounts] — New',
             'row'       => null, 'prefill' => $pre,
             'vendors'   => (new VendorModel())->where('status', 1)->orderBy('company_name')->findAll(),
             'trips'     => (new TripModel())->orderBy('id', 'DESC')->limit(100)->findAll(),
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function store()
@@ -120,11 +120,11 @@ class VendorBillsController extends BaseController
         if (!$row) return redirect()->to(site_url('vendor-bills'))->with('error', 'Not found.');
 
         return $this->render('vendor_bills/show', [
-            'pageTitle' => 'Vendor Bill ' . ($row['bill_no'] ?: '#' . $id),
+            'pageTitle' => 'Vendor Bill Master [Accounts]',
             'row'       => $row,
             'payments'  => (new VendorPaymentModel())->forBill($id),
             'billDoc'   => !empty($row['document_id']) ? (new DocumentModel())->find((int) $row['document_id']) : null,
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function edit(int $id)
@@ -133,12 +133,12 @@ class VendorBillsController extends BaseController
         if (!$row) return redirect()->to(site_url('vendor-bills'))->with('error', 'Not found.');
         $existingDoc = !empty($row['document_id']) ? (new DocumentModel())->find((int) $row['document_id']) : null;
         return $this->render('vendor_bills/form', [
-            'pageTitle'   => 'Edit Vendor Bill',
+            'pageTitle'   => 'Vendor Bill Master [Accounts] — Edit',
             'row'         => $row,
             'existingDoc' => $existingDoc,
             'vendors'     => (new VendorModel())->where('status', 1)->orderBy('company_name')->findAll(),
             'trips'       => (new TripModel())->orderBy('id', 'DESC')->limit(100)->findAll(),
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function update(int $id)

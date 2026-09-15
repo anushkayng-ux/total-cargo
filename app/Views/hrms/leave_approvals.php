@@ -1,11 +1,21 @@
-<div class="d-flex flex-wrap align-items-center gap-2 mb-3">
-  <h5 class="m-0"><i class="bi bi-clipboard-check"></i> Leave Approvals</h5>
-  <a class="btn btn-sm btn-light ms-auto" href="<?= site_url('hrms/team') ?>"><i class="bi bi-people"></i> Team</a>
+<?php
+$extra = '<a class="btn btn-sm btn-outline-dark" href="' . site_url('hrms/team') . '"><i class="bi bi-people"></i> Team</a>';
+
+echo tpt_toolbar([
+    'close_href' => site_url('dashboard'),
+    'extra'      => $extra,
+    'auth'       => $auth,
+]);
+?>
+<div class="tabs">
+  <div class="tab active">Leave Approvals</div>
+  <div class="spacer"></div>
+  <div class="recordnav"><?= count($rows) ?> applications</div>
 </div>
 
-<div class="card">
+<div class="gridwrap">
   <div class="table-responsive">
-    <table class="table table-sm align-middle mb-0" data-tpt-cols="leave_approvals">
+    <table class="table grid align-middle mb-0" data-tpt-cols="leave_approvals">
       <thead><tr><th data-col="employee">Employee</th><th data-col="type">Type</th><th data-col="from">From</th><th data-col="to">To</th><th data-col="days">Days</th><th data-col="reason">Reason</th><th data-col="status">Status</th><th data-col="decision" class="text-end">Decision</th></tr></thead>
       <tbody>
         <?php if (empty($rows)): ?>
@@ -13,9 +23,9 @@
         <?php endif; ?>
         <?php foreach ($rows as $r):
           $cls = match($r['status']) {
-            'Pending' => 'warning', 'Approved' => 'success',
-            'Rejected'=> 'danger',  'Cancelled' => 'secondary',
-            default   => 'light',
+            'Pending' => 'badge-warn', 'Approved' => 'badge-ok',
+            'Rejected'=> 'badge-danger',  'Cancelled' => '',
+            default   => '',
           };
         ?>
           <tr>
@@ -25,14 +35,14 @@
             <td data-col="to"><?= esc(date('d-m', strtotime($r['to_date']))) ?></td>
             <td data-col="days"><?= esc((string) $r['days']) ?></td>
             <td data-col="reason" style="max-width:240px;"><?= esc(mb_strimwidth($r['reason'] ?? '', 0, 80, '…')) ?></td>
-            <td data-col="status"><span class="badge bg-<?= $cls ?> text-<?= $cls === 'warning' ? 'dark' : 'light' ?>"><?= esc($r['status']) ?></span></td>
+            <td data-col="status"><span class="badge-soft <?= $cls ?>"><?= esc($r['status']) ?></span></td>
             <td data-col="decision" class="text-end">
               <?php if ($r['status'] === 'Pending'): ?>
-                <form method="post" action="<?= site_url('hrms/leaves/' . (int) $r['id'] . '/decide') ?>" class="d-inline">
+                <form method="post" action="<?= site_url('hrms/leaves/' . (int) $r['id'] . '/decide') ?>" class="d-inline-flex align-items-center gap-1">
                   <?= csrf_field() ?>
-                  <input type="text" name="approver_notes" placeholder="Notes (optional)" class="form-control form-control-sm d-inline-block" style="width:150px;">
-                  <button name="action" value="approve" class="btn btn-sm btn-success"><i class="bi bi-check-lg"></i></button>
-                  <button name="action" value="reject"  class="btn btn-sm btn-danger" onclick="return confirm('Reject this leave?');"><i class="bi bi-x-lg"></i></button>
+                  <input type="text" name="approver_notes" placeholder="Notes (optional)" class="retro-box" style="width:150px;">
+                  <button name="action" value="approve" class="retro-tbtn retro-primary" style="width:auto;flex-direction:row;padding:3px 8px;"><i class="bi bi-check-lg"></i></button>
+                  <button name="action" value="reject"  class="retro-tbtn retro-danger" style="width:auto;flex-direction:row;padding:3px 8px;" onclick="return confirm('Reject this leave?');"><i class="bi bi-x-lg"></i></button>
                 </form>
               <?php else: ?>
                 <small class="text-muted"><?= esc(date('d-m', strtotime($r['approved_at'] ?? $r['updated_at']))) ?></small>

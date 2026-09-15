@@ -40,9 +40,9 @@ class DashboardController extends BaseController
         // Compliance is small + user-relevant — keep fresh
         $payload['compliance'] = (new ComplianceTracker())->summary(60);
         $payload['widgetsOn']  = $widgets;
-        $payload['pageTitle']  = 'Dashboard';
+        $payload['pageTitle']  = 'General Masters [Home]';
 
-        return $this->render('dashboard/index', $payload);
+        return $this->render('dashboard/index', $payload, retroFixedShell: true);
     }
 
     public function widgets()
@@ -68,7 +68,10 @@ class DashboardController extends BaseController
         return redirect()->to(site_url('dashboard'))->with('success', 'Widgets updated.');
     }
 
-    /** Loads widgetID => bool map. Empty/missing => all widgets enabled. */
+    /** Widgets shown by default for a user who has never opened Customise widgets. */
+    private const DEFAULT_WIDGETS = ['kpis', 'compliance'];
+
+    /** Loads widgetID => bool map. Empty/missing => the compact default set. */
     private function loadWidgetPrefs(): array
     {
         $row = \Config\Database::connect()->table('user_prefs')
@@ -76,14 +79,18 @@ class DashboardController extends BaseController
             ->get()->getRowArray();
         $picked = $row ? json_decode((string) $row['pref_value'], true) : null;
         $all    = array_keys(self::WIDGET_CATALOG);
-        if (!is_array($picked)) return array_fill_keys($all, true);
+        if (!is_array($picked)) {
+            $on = array_fill_keys($all, false);
+            foreach (self::DEFAULT_WIDGETS as $k) if (isset($on[$k])) $on[$k] = true;
+            return $on;
+        }
         $on = array_fill_keys($all, false);
         foreach ($picked as $k) if (isset($on[$k])) $on[$k] = true;
         return $on;
     }
 
     public const WIDGET_CATALOG = [
-        'kpis'        => 'Top KPI cards (trips, revenue, leads, pending)',
+        'kpis'        => 'Top KPI cards (revenue, trips, receivables, unpaid invoices)',
         'compliance'  => 'Compliance — expiring documents (drivers + vehicles)',
         'revenue'     => 'Monthly revenue chart',
         'funnel'      => 'Lead funnel',

@@ -4,62 +4,74 @@ $action = $isEdit ? site_url('vendor-bills/' . $row['id']) : site_url('vendor-bi
 $pre    = $prefill ?? [];
 $v = function ($k, $d = '') use ($row, $pre) { return old($k, $row[$k] ?? $pre[$k] ?? $d); };
 ?>
-<h5 class="mb-3"><?= esc($pageTitle) ?></h5>
-<div class="card"><div class="card-body">
-<form method="post" action="<?= $action ?>" enctype="multipart/form-data">
+<?= tpt_toolbar([
+    'save_form'      => 'vendorBillForm',
+    'delete_href'    => $isEdit ? site_url('vendor-bills/' . $row['id'] . '/delete') : null,
+    'delete_confirm' => 'Delete this vendor bill?',
+    'close_href'     => site_url('vendor-bills'),
+    'auth'           => $auth,
+]) ?>
+
+<div class="tabs">
+  <div class="tab active">Bill Details</div>
+  <div class="spacer"></div>
+</div>
+
+<form id="vendorBillForm" method="post" action="<?= $action ?>" enctype="multipart/form-data">
   <?= csrf_field() ?>
-  <div class="row g-3">
-    <div class="col-md-6"><label class="form-label">Vendor <span class="text-danger">*</span></label>
-      <select class="form-select" name="vendor_id" required>
-        <option value="">— Select —</option>
-        <?php foreach ($vendors as $vn): ?>
-          <option value="<?= $vn['id'] ?>" <?= (int)$v('vendor_id') === (int)$vn['id'] ? 'selected' : '' ?>><?= esc($vn['company_name']) ?></option>
-        <?php endforeach; ?>
-      </select>
+  <div class="formwrap">
+    <div class="retro-row">
+      <div class="retro-field" style="width:48%;"><label>Vendor <span class="retro-required">*</span> :</label>
+        <select class="retro-box" style="width:100%;" name="vendor_id" required>
+          <option value="">— Select —</option>
+          <?php foreach ($vendors as $vn): ?>
+            <option value="<?= $vn['id'] ?>" <?= (int) $v('vendor_id') === (int) $vn['id'] ? 'selected' : '' ?>><?= esc($vn['company_name']) ?></option>
+          <?php endforeach; ?>
+        </select>
+      </div>
+      <div class="retro-field" style="width:48%;margin-left:auto;"><label>Trip :</label>
+        <select class="retro-box" style="width:100%;" name="trip_id">
+          <option value="">—</option>
+          <?php foreach ($trips as $t): ?>
+            <option value="<?= $t['id'] ?>" <?= (int) $v('trip_id') === (int) $t['id'] ? 'selected' : '' ?>>
+              <?= esc($t['trip_no']) ?> · <?= esc($t['vehicle_number']) ?>
+            </option>
+          <?php endforeach; ?>
+        </select>
+      </div>
     </div>
-    <div class="col-md-6"><label class="form-label">Trip</label>
-      <select class="form-select" name="trip_id">
-        <option value="">—</option>
-        <?php foreach ($trips as $t): ?>
-          <option value="<?= $t['id'] ?>" <?= (int)$v('trip_id') === (int)$t['id'] ? 'selected' : '' ?>>
-            <?= esc($t['trip_no']) ?> · <?= esc($t['vehicle_number']) ?>
-          </option>
-        <?php endforeach; ?>
-      </select>
+    <div class="retro-row">
+      <div class="retro-field"><label>Bill No :</label><input class="retro-box wide" name="bill_no" value="<?= esc($v('bill_no')) ?>"></div>
+      <div class="retro-field"><label>Bill Date :</label><input type="date" class="retro-box" name="bill_date" value="<?= esc($v('bill_date', date('Y-m-d'))) ?>" required></div>
+      <div class="retro-field"><label>Bill Amount (INR) :</label><input type="number" step="0.01" class="retro-box" name="bill_amount" value="<?= esc($v('bill_amount', '0')) ?>" required></div>
+      <div class="retro-field"><label>Due Date :</label><input type="date" class="retro-box" name="due_date" value="<?= esc($v('due_date')) ?>"></div>
+    </div>
+    <div class="retro-row" style="align-items:flex-start;">
+      <div class="retro-field" style="width:100%;"><label style="white-space:nowrap;">Notes :</label>
+        <textarea class="retro-box retro-particulars" name="notes" rows="2" style="width:100%;"><?= esc($v('notes')) ?></textarea>
+      </div>
     </div>
 
-    <div class="col-md-3"><label class="form-label">Bill No</label>
-      <input class="form-control" name="bill_no" value="<?= esc($v('bill_no')) ?>"></div>
-    <div class="col-md-3"><label class="form-label">Bill Date</label>
-      <input type="date" class="form-control" name="bill_date" value="<?= esc($v('bill_date', date('Y-m-d'))) ?>" required></div>
-    <div class="col-md-3"><label class="form-label">Bill Amount (INR)</label>
-      <input type="number" step="0.01" class="form-control" name="bill_amount" value="<?= esc($v('bill_amount', '0')) ?>" required></div>
-    <div class="col-md-3"><label class="form-label">Due Date</label>
-      <input type="date" class="form-control" name="due_date" value="<?= esc($v('due_date')) ?>"></div>
-
-    <div class="col-12"><label class="form-label">Notes</label>
-      <textarea class="form-control" name="notes" rows="2"><?= esc($v('notes')) ?></textarea></div>
-
-    <div class="col-12"><hr class="mt-1 mb-0"><small class="text-muted">Bill copy (optional)</small></div>
-    <div class="col-md-8">
-      <label class="form-label">Upload vendor bill (PDF / image)</label>
-      <input type="file" class="form-control" name="bill_file" accept="image/*,.pdf">
-      <small class="text-muted">Up to 10 MB. Leave blank to keep any previously uploaded copy.</small>
+    <h6 class="mb-2 mt-3 text-muted" style="font-size:.82rem;text-transform:uppercase;letter-spacing:.5px;">Bill Copy (optional)</h6>
+    <div class="retro-row">
+      <div class="retro-field" style="width:60%;"><label style="white-space:nowrap;">Upload (PDF/image) :</label>
+        <input type="file" class="retro-box" style="width:100%;" name="bill_file" accept="image/*,.pdf">
+      </div>
     </div>
+    <div style="font-size:11px;color:var(--v2-fg-muted);margin-top:-6px;">Up to 10 MB. Leave blank to keep any previously uploaded copy.</div>
     <?php if ($isEdit && !empty($existingDoc)): ?>
-      <div class="col-md-4 d-flex align-items-end">
-        <div class="w-100" style="font-size:.85rem;">
-          <div class="text-muted">Current bill copy</div>
-          <a class="btn btn-sm btn-light mt-1 w-100 text-start" target="_blank" href="<?= site_url('vendor-bills/' . $row['id'] . '/bill-file') ?>">
+      <div class="retro-row" style="margin-top:10px;">
+        <div class="retro-field"><label>Current copy :</label>
+          <a class="btn btn-sm btn-light" target="_blank" href="<?= site_url('vendor-bills/' . $row['id'] . '/bill-file') ?>">
             <i class="bi bi-file-earmark-pdf"></i> <?= esc($existingDoc['original_file_name']) ?>
           </a>
         </div>
       </div>
     <?php endif; ?>
   </div>
-  <div class="mt-3 d-flex gap-2">
-    <button class="btn btn-primary" type="submit">Save</button>
-    <a class="btn btn-light" href="<?= site_url('vendor-bills') ?>">Cancel</a>
+
+  <div class="retro-toolbar mt-3" style="position:static;">
+    <button type="submit" class="retro-tbtn retro-primary"><i class="bi bi-save-fill"></i>Save</button>
+    <a class="retro-tbtn" href="<?= site_url('vendor-bills') ?>"><i class="bi bi-x-circle"></i>Close</a>
   </div>
 </form>
-</div></div>

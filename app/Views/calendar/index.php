@@ -1,46 +1,50 @@
-<div class="d-flex flex-wrap align-items-center gap-2 mb-3">
-  <h5 class="m-0">Operational Calendar</h5>
-  <div class="ms-auto d-flex gap-2 flex-wrap" style="font-size:.85rem;">
-    <span class="badge" style="background:#d4a017;">Lead</span>
-    <span class="badge" style="background:#1d6cb1;">Booking</span>
-    <span class="badge" style="background:#166c3b;">Trip</span>
-  </div>
+<?php
+$extra = '<span class="badge" style="background:#d4a017;">Lead</span>'
+    . '<span class="badge" style="background:#1d6cb1;">Booking</span>'
+    . '<span class="badge" style="background:#166c3b;">Trip</span>';
+echo tpt_toolbar([
+    'close_href' => site_url('dashboard'),
+    'extra'      => $extra,
+    'auth'       => $auth,
+]);
+?>
+<div class="tabs">
+  <div class="tab active">Operational Calendar</div>
+  <div class="spacer"></div>
 </div>
 
-<div class="card">
-  <div class="card-body">
-    <form id="cal-filters" class="row g-2 mb-3">
-      <div class="col-12 col-md-4">
-        <label class="form-label" style="font-size:.85rem;">Assigned to</label>
-        <select id="f-user" class="form-select form-select-sm">
-          <option value="<?= (int) $me ?>">Just me</option>
-          <option value="">Everyone</option>
-          <?php foreach ($users as $u): ?>
-            <option value="<?= (int) $u['id'] ?>"><?= esc($u['name']) ?></option>
-          <?php endforeach; ?>
-        </select>
+<div class="formwrap">
+  <form id="cal-filters" class="row g-2 mb-3">
+    <div class="col-12 col-md-4">
+      <label class="form-label" style="font-size:.85rem;">Assigned to</label>
+      <select id="f-user" class="form-select form-select-sm">
+        <option value="<?= (int) $me ?>">Just me</option>
+        <option value="">Everyone</option>
+        <?php foreach ($users as $u): ?>
+          <option value="<?= (int) $u['id'] ?>"><?= esc($u['name']) ?></option>
+        <?php endforeach; ?>
+      </select>
+    </div>
+    <div class="col-12 col-md-4">
+      <label class="form-label" style="font-size:.85rem;">Client</label>
+      <select id="f-client" class="form-select form-select-sm">
+        <option value="">All clients</option>
+        <?php foreach ($clients as $c): ?>
+          <option value="<?= (int) $c['id'] ?>"><?= esc($c['company_name']) ?></option>
+        <?php endforeach; ?>
+      </select>
+    </div>
+    <div class="col-12 col-md-4">
+      <label class="form-label" style="font-size:.85rem;">Show</label>
+      <div class="d-flex gap-3 align-items-center" style="padding-top:.4rem;">
+        <label><input type="checkbox" class="cal-type" value="lead" checked> Leads</label>
+        <label><input type="checkbox" class="cal-type" value="booking" checked> Bookings</label>
+        <label><input type="checkbox" class="cal-type" value="trip" checked> Trips</label>
       </div>
-      <div class="col-12 col-md-4">
-        <label class="form-label" style="font-size:.85rem;">Client</label>
-        <select id="f-client" class="form-select form-select-sm">
-          <option value="">All clients</option>
-          <?php foreach ($clients as $c): ?>
-            <option value="<?= (int) $c['id'] ?>"><?= esc($c['company_name']) ?></option>
-          <?php endforeach; ?>
-        </select>
-      </div>
-      <div class="col-12 col-md-4">
-        <label class="form-label" style="font-size:.85rem;">Show</label>
-        <div class="d-flex gap-3 align-items-center" style="padding-top:.4rem;">
-          <label><input type="checkbox" class="cal-type" value="lead" checked> Leads</label>
-          <label><input type="checkbox" class="cal-type" value="booking" checked> Bookings</label>
-          <label><input type="checkbox" class="cal-type" value="trip" checked> Trips</label>
-        </div>
-      </div>
-    </form>
+    </div>
+  </form>
 
-    <div id="staff-calendar"></div>
-  </div>
+  <div id="staff-calendar"></div>
 </div>
 
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">

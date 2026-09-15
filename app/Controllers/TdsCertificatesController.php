@@ -31,11 +31,11 @@ class TdsCertificatesController extends BaseController
         ];
 
         return $this->render('tds_certificates/index', [
-            'pageTitle' => 'TDS Certificates (Form 16A)',
+            'pageTitle' => 'TDS Certificates [Accounts] — List',
             'rows'      => $rows,
             'pager'     => $model->pager,
             'totals'    => $totals,
-        ]);
+        ], retroFixedShell: true);
     }
 
     /** Recompute expected TDS per client × FY-quarter from finalized invoices. */

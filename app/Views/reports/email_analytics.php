@@ -10,37 +10,46 @@ $bounceRate  = $pct($t['bounced']    ?? 0, $t['sent']      ?? 0);
 $complaintR  = $pct($t['complained'] ?? 0, $t['delivered'] ?? $t['sent'] ?? 0);
 $unsubRate   = $pct($t['unsubscribed'] ?? 0, $t['delivered'] ?? $t['sent'] ?? 0);
 $deliverRate = $pct($t['delivered']  ?? 0, $t['sent']      ?? 0);
+
+$extra = '<form method="get" class="d-flex align-items-center gap-2 flex-wrap m-0">'
+    . '<input class="form-control form-control-sm" style="width:150px;" type="date" name="from" value="' . esc($from) . '">'
+    . '<input class="form-control form-control-sm" style="width:150px;" type="date" name="to" value="' . esc($to) . '">'
+    . '<button class="btn btn-sm btn-outline-dark">Apply</button></form>';
 ?>
-<h5 class="mb-3"><?= esc($pageTitle) ?></h5>
-
-<form method="get" class="row g-2 mb-3 align-items-end">
-  <div class="col-6 col-md-3"><label class="form-label" style="font-size:.85rem;">From</label><input type="date" class="form-control form-control-sm" name="from" value="<?= esc($from) ?>"></div>
-  <div class="col-6 col-md-3"><label class="form-label" style="font-size:.85rem;">To</label><input type="date" class="form-control form-control-sm" name="to" value="<?= esc($to) ?>"></div>
-  <div class="col-md-2"><button class="btn btn-sm btn-light w-100">Apply</button></div>
-</form>
-
-<div class="row g-3 mb-3">
-  <div class="col-6 col-md-2"><div class="stat-card"><span class="label">Total</span><span class="value"><?= (int) ($t['total']   ?? 0) ?></span></div></div>
-  <div class="col-6 col-md-2"><div class="stat-card"><span class="label">Sent</span><span class="value"><?= (int) ($t['sent']    ?? 0) ?></span></div></div>
-  <div class="col-6 col-md-2"><div class="stat-card"><span class="label">Delivered</span><span class="value"><?= $deliverRate ?>%</span><small class="text-muted" style="font-size:.7rem;"><?= (int) ($t['delivered'] ?? 0) ?> msgs</small></div></div>
-  <div class="col-6 col-md-2"><div class="stat-card"><span class="label">Open rate</span><span class="value"><?= $openRate ?>%</span><small class="text-muted" style="font-size:.7rem;"><?= (int) ($t['opened'] ?? 0) ?> opens</small></div></div>
-  <div class="col-6 col-md-2"><div class="stat-card"><span class="label">Click rate</span><span class="value"><?= $clickRate ?>%</span><small class="text-muted" style="font-size:.7rem;"><?= (int) ($t['clicked'] ?? 0) ?> clicks</small></div></div>
-  <div class="col-6 col-md-2"><div class="stat-card"><span class="label">Queued</span><span class="value"><?= (int) ($t['queued'] ?? 0) ?></span></div></div>
-  <div class="col-6 col-md-3"><div class="stat-card"><span class="label">Bounce rate</span><span class="value" style="<?= $bounceRate > 5 ? 'color:#b00020' : '' ?>"><?= $bounceRate ?>%</span></div></div>
-  <div class="col-6 col-md-3"><div class="stat-card"><span class="label">Spam complaints</span><span class="value" style="<?= $complaintR > 0.1 ? 'color:#b00020' : '' ?>"><?= $complaintR ?>%</span></div></div>
-  <div class="col-6 col-md-3"><div class="stat-card"><span class="label">Unsub rate</span><span class="value"><?= $unsubRate ?>%</span></div></div>
-  <div class="col-6 col-md-3"><div class="stat-card"><span class="label">Failed / Suppressed</span><span class="value"><?= (int) ($t['failed'] ?? 0) + (int) ($t['suppressed'] ?? 0) ?></span></div></div>
+<?= tpt_toolbar([
+    'close_href' => site_url('reports'),
+    'extra'      => $extra,
+    'auth'       => $auth,
+]) ?>
+<div class="tabs">
+  <div class="tab active">Email Analytics</div>
+  <div class="spacer"></div>
+  <div class="recordnav"><?= esc($from) ?> – <?= esc($to) ?></div>
 </div>
 
-<div class="card mb-3">
-  <div class="card-header">Daily volume</div>
-  <div class="card-body"><canvas id="emailDailyChart" height="100"></canvas></div>
+<div class="formwrap" style="flex:0 0 auto;">
+  <div class="row g-3 mb-3">
+    <div class="col-6 col-md-2"><div class="stat"><span class="label">Total</span><span class="value"><?= (int) ($t['total']   ?? 0) ?></span></div></div>
+    <div class="col-6 col-md-2"><div class="stat"><span class="label">Sent</span><span class="value"><?= (int) ($t['sent']    ?? 0) ?></span></div></div>
+    <div class="col-6 col-md-2"><div class="stat"><span class="label">Delivered</span><span class="value"><?= $deliverRate ?>%</span><small class="text-muted" style="font-size:.7rem;"><?= (int) ($t['delivered'] ?? 0) ?> msgs</small></div></div>
+    <div class="col-6 col-md-2"><div class="stat"><span class="label">Open rate</span><span class="value"><?= $openRate ?>%</span><small class="text-muted" style="font-size:.7rem;"><?= (int) ($t['opened'] ?? 0) ?> opens</small></div></div>
+    <div class="col-6 col-md-2"><div class="stat"><span class="label">Click rate</span><span class="value"><?= $clickRate ?>%</span><small class="text-muted" style="font-size:.7rem;"><?= (int) ($t['clicked'] ?? 0) ?> clicks</small></div></div>
+    <div class="col-6 col-md-2"><div class="stat"><span class="label">Queued</span><span class="value"><?= (int) ($t['queued'] ?? 0) ?></span></div></div>
+    <div class="col-6 col-md-3"><div class="stat"><span class="label">Bounce rate</span><span class="value" style="<?= $bounceRate > 5 ? 'color:#b00020' : '' ?>"><?= $bounceRate ?>%</span></div></div>
+    <div class="col-6 col-md-3"><div class="stat"><span class="label">Spam complaints</span><span class="value" style="<?= $complaintR > 0.1 ? 'color:#b00020' : '' ?>"><?= $complaintR ?>%</span></div></div>
+    <div class="col-6 col-md-3"><div class="stat"><span class="label">Unsub rate</span><span class="value"><?= $unsubRate ?>%</span></div></div>
+    <div class="col-6 col-md-3"><div class="stat"><span class="label">Failed / Suppressed</span><span class="value"><?= (int) ($t['failed'] ?? 0) + (int) ($t['suppressed'] ?? 0) ?></span></div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">Daily volume</div>
+    <div class="card-body"><canvas id="emailDailyChart" height="100"></canvas></div>
+  </div>
 </div>
 
-<div class="card">
-  <div class="card-header">Per-template performance</div>
+<div class="gridwrap">
   <div class="table-responsive">
-    <table class="table table-sm align-middle mb-0">
+    <table class="table grid mb-0">
       <thead><tr><th>Template</th><th class="text-end">Sent</th><th class="text-end">Open %</th><th class="text-end">Click %</th><th class="text-end">Bounce %</th><th class="text-end">Spam %</th></tr></thead>
       <tbody>
       <?php if (empty($perTemplate)): ?>

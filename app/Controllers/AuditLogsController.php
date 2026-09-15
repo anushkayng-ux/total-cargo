@@ -44,7 +44,7 @@ class AuditLogsController extends BaseController
         $users   = $db->table('users')->select('id, name')->orderBy('name')->get()->getResultArray();
 
         return $this->render('audit_logs/index', [
-            'pageTitle' => 'Audit Logs',
+            'pageTitle' => 'Audit Logs [Administration] — List',
             'rows'      => $rows,
             'total'     => $total,
             'page'      => $page,
@@ -53,7 +53,7 @@ class AuditLogsController extends BaseController
             'modules'   => array_values(array_filter($modules)),
             'actions'   => array_values(array_filter($actions)),
             'users'     => $users,
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function show(int $id)
@@ -67,8 +67,8 @@ class AuditLogsController extends BaseController
         if (!$row) return redirect()->to(site_url('audit-logs'))->with('error', 'Not found.');
 
         return $this->render('audit_logs/show', [
-            'pageTitle' => 'Audit Log #' . $id,
+            'pageTitle' => 'Audit Logs [Administration]',
             'row'       => $row,
-        ]);
+        ], retroFixedShell: true);
     }
 }

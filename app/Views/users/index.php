@@ -1,16 +1,26 @@
-<?php $pageTitle = $pageTitle ?? 'Users'; ?>
-<div class="d-flex align-items-center mb-3 gap-2 flex-wrap">
-  <h5 class="m-0"><?= esc($pageTitle) ?></h5>
-  <form class="ms-auto d-flex gap-2" method="get" action="<?= site_url('users') ?>">
-    <input type="text" name="q" class="form-control form-control-sm" placeholder="Search name/email/mobile" value="<?= esc($search) ?>">
-    <button class="btn btn-sm btn-outline-dark">Search</button>
-  </form>
-  <a class="btn btn-sm btn-primary" href="<?= site_url('users/create') ?>"><i class="bi bi-plus-lg"></i> Add User</a>
+<?php
+$pageTitle = $pageTitle ?? 'Users';
+$extra = '<form class="d-flex align-items-center gap-2 m-0" method="get" action="' . site_url('users') . '">'
+    . '<input type="text" name="q" class="form-control form-control-sm" placeholder="Search name/email/mobile" value="' . esc($search) . '">'
+    . '<button class="btn btn-sm btn-outline-dark">Search</button></form>';
+
+echo tpt_toolbar([
+    'new_href'       => site_url('users/create'),
+    'new_item_label' => 'Add User',
+    'close_href'     => site_url('dashboard'),
+    'extra'          => $extra,
+    'auth'           => $auth,
+]);
+?>
+<div class="tabs">
+  <div class="tab active">All Users</div>
+  <div class="spacer"></div>
+  <div class="recordnav"><?= (int) ($pager->getTotal() ?: count($users)) ?> total records</div>
 </div>
 
-<div class="card">
+<div class="gridwrap">
   <div class="table-responsive">
-    <table class="table mb-0" data-tpt-cols="users">
+    <table class="table grid mb-0" data-tpt-cols="users">
       <thead>
         <tr>
           <th data-col="name">Name</th><th data-col="email">Email</th><th data-col="mobile">Mobile</th><th data-col="role">Role</th><th data-col="status">Status</th><th data-col="last-login">Last Login</th><th class="text-end" data-col="actions">Actions</th>
@@ -21,7 +31,7 @@
           <tr><td colspan="7" class="text-center text-muted">No users.</td></tr>
         <?php endif; ?>
         <?php foreach ($users as $u): ?>
-          <tr>
+          <tr class="row-link" data-href="<?= site_url('users/' . $u['id'] . '/edit') ?>">
             <td data-col="name" data-label="Name"><?= esc($u['name']) ?></td>
             <td data-col="email" data-label="Email"><?= esc($u['email']) ?></td>
             <td data-col="mobile" data-label="Mobile"><?= esc($u['mobile']) ?></td>
@@ -48,8 +58,5 @@
       </tbody>
     </table>
   </div>
+  <?php if (!empty($pager)): ?><div class="mt-3"><?= $pager->links() ?></div><?php endif; ?>
 </div>
-
-<?php if (!empty($pager)): ?>
-  <div class="mt-3"><?= $pager->links() ?></div>
-<?php endif; ?>

@@ -1,25 +1,32 @@
-<?php $fmt = fn($n) => '₹' . number_format((float) $n, 0); ?>
-<div class="d-flex flex-wrap align-items-center gap-2 mb-3">
-  <h5 class="m-0"><i class="bi bi-cash-coin"></i> Payroll Runs</h5>
-  <form method="post" action="<?= site_url('payroll/new') ?>" class="ms-auto d-flex gap-2 align-items-center">
-    <?= csrf_field() ?>
-    <select class="form-select form-select-sm" name="month" style="width:auto;">
-      <?php for ($m = 1; $m <= 12; $m++): ?>
-        <option value="<?= $m ?>" <?= $m == (int) date('n') ? 'selected' : '' ?>><?= date('F', mktime(0,0,0,$m,1)) ?></option>
-      <?php endfor; ?>
-    </select>
-    <select class="form-select form-select-sm" name="year" style="width:auto;">
-      <?php for ($y = (int) date('Y'); $y >= (int) date('Y') - 2; $y--): ?>
-        <option value="<?= $y ?>"><?= $y ?></option>
-      <?php endfor; ?>
-    </select>
-    <button class="btn btn-primary btn-sm" type="submit"><i class="bi bi-calculator"></i> New / Recompute</button>
-  </form>
+<?php
+$fmt = fn($n) => '₹' . number_format((float) $n, 0);
+$extra = '<form method="post" action="' . site_url('payroll/new') . '" class="d-flex gap-2 align-items-center m-0">'
+    . csrf_field()
+    . '<select class="form-select form-select-sm" name="month" style="width:auto;">';
+for ($m = 1; $m <= 12; $m++) {
+    $extra .= '<option value="' . $m . '"' . ($m == (int) date('n') ? ' selected' : '') . '>' . date('F', mktime(0,0,0,$m,1)) . '</option>';
+}
+$extra .= '</select><select class="form-select form-select-sm" name="year" style="width:auto;">';
+for ($y = (int) date('Y'); $y >= (int) date('Y') - 2; $y--) {
+    $extra .= '<option value="' . $y . '">' . $y . '</option>';
+}
+$extra .= '</select><button class="btn btn-primary btn-sm" type="submit"><i class="bi bi-calculator"></i> New / Recompute</button></form>';
+
+echo tpt_toolbar([
+    'close_href' => site_url('dashboard'),
+    'extra'      => $extra,
+    'auth'       => $auth,
+]);
+?>
+<div class="tabs">
+  <div class="tab active">Payroll Runs</div>
+  <div class="spacer"></div>
+  <div class="recordnav"><?= count($rows) ?> total records</div>
 </div>
 
-<div class="card">
+<div class="gridwrap">
   <div class="table-responsive">
-    <table class="table table-sm align-middle mb-0" data-tpt-cols="payroll_runs">
+    <table class="table grid mb-0" data-tpt-cols="payroll_runs">
       <thead><tr><th data-col="period">Period</th><th data-col="status">Status</th><th data-col="gross" class="text-end">Gross</th><th data-col="deductions" class="text-end">Deductions</th><th data-col="net" class="text-end">Net</th><th data-col="finalised">Finalised</th><th data-col="actions" class="text-end">Actions</th></tr></thead>
       <tbody>
         <?php if (empty($rows)): ?>
@@ -28,7 +35,7 @@
         <?php foreach ($rows as $r):
           $cls = match($r['run_status']) { 'Draft' => 'warning', 'Finalised' => 'primary', 'Paid' => 'success', default => 'light' };
         ?>
-          <tr>
+          <tr class="row-link" data-href="<?= site_url('payroll/' . (int) $r['id']) ?>">
             <td data-col="period"><?= esc(date('F Y', mktime(0,0,0,(int)$r['pay_period_month'],1,(int)$r['pay_period_year']))) ?></td>
             <td data-col="status"><span class="badge bg-<?= $cls ?> text-<?= $cls === 'warning' ? 'dark' : 'light' ?>"><?= esc($r['run_status']) ?></span></td>
             <td data-col="gross" class="text-end"><?= $fmt($r['total_gross']) ?></td>
@@ -43,5 +50,5 @@
       </tbody>
     </table>
   </div>
+  <?php if (!empty($pagerHtml)): ?><div class="mt-3"><?= $pagerHtml ?></div><?php endif; ?>
 </div>
-<?php if (!empty($pagerHtml)): ?><div class="mt-3"><?= $pagerHtml ?></div><?php endif; ?>

@@ -17,60 +17,45 @@ $verCls = fn($s) => match ((string) $s) {
     'Rejected' => 'badge-soft badge-danger',
     default    => 'badge-soft badge-warn',
 };
+$anyFilter = ($search !== '' || $module !== '' || $type !== '' || $verified !== '');
+
+$extra = '<form method="get" action="' . site_url('documents') . '" class="d-flex align-items-center gap-2 flex-wrap m-0">'
+    . '<input type="text" name="q" class="form-control form-control-sm" style="width:170px;" placeholder="file name / remarks" value="' . esc($search) . '">'
+    . '<select name="module" class="form-select form-select-sm" style="width:auto;"><option value="">All Modules</option>';
+foreach ($modules as $m) {
+    $extra .= '<option value="' . esc($m) . '"' . ($module === $m ? ' selected' : '') . '>' . esc(ucfirst(str_replace('_', ' ', $m))) . '</option>';
+}
+$extra .= '</select><select name="type" class="form-select form-select-sm" style="width:auto;"><option value="">All Types</option>';
+foreach ($types as $t) {
+    $extra .= '<option value="' . esc($t) . '"' . ($type === $t ? ' selected' : '') . '>' . esc($t) . '</option>';
+}
+$extra .= '</select><select name="verified" class="form-select form-select-sm" style="width:auto;"><option value="">Any Status</option>'
+    . '<option value="Pending"' . ($verified === 'Pending' ? ' selected' : '') . '>Pending</option>'
+    . '<option value="Verified"' . ($verified === 'Verified' ? ' selected' : '') . '>Verified</option>'
+    . '<option value="Rejected"' . ($verified === 'Rejected' ? ' selected' : '') . '>Rejected</option>'
+    . '</select>'
+    . '<button class="btn btn-sm btn-outline-dark">Filter</button>';
+if ($anyFilter) {
+    $extra .= '<a class="btn btn-sm btn-light" href="' . site_url('documents') . '" title="Reset"><i class="bi bi-x-lg"></i></a>';
+}
+$extra .= '</form>';
+
+echo tpt_toolbar([
+    'close_href' => site_url('dashboard'),
+    'extra'      => $extra,
+    'auth'       => $auth,
+]);
 ?>
-<?php $anyFilter = ($search !== '' || $module !== '' || $type !== '' || $verified !== ''); ?>
-<div class="d-flex align-items-center mb-3 gap-2 flex-wrap">
-  <h5 class="m-0"><?= esc($pageTitle) ?></h5>
-  <?php if ($anyFilter): ?>
-    <span class="badge-soft ms-1">Filtered</span>
-  <?php endif; ?>
+<div class="tabs">
+  <div class="tab active">All Documents</div>
+  <?php if ($anyFilter): ?><span class="badge-soft" style="margin-left:10px;">Filtered</span><?php endif; ?>
+  <div class="spacer"></div>
+  <div class="recordnav"><?= (int) ($pager->getTotal() ?: count($rows)) ?> total records</div>
 </div>
 
-<div class="card mb-3"><div class="card-body">
-  <form method="get" action="<?= site_url('documents') ?>" class="row g-2 align-items-end">
-    <div class="col-md-4 col-lg-4">
-      <label class="form-label">Search</label>
-      <input type="text" name="q" class="form-control form-control-sm" placeholder="file name / remarks" value="<?= esc($search) ?>">
-    </div>
-    <div class="col-md-3 col-lg-2">
-      <label class="form-label">Module</label>
-      <select name="module" class="form-select form-select-sm">
-        <option value="">All</option>
-        <?php foreach ($modules as $m): ?>
-          <option value="<?= esc($m) ?>" <?= $module === $m ? 'selected' : '' ?>><?= esc(ucfirst(str_replace('_', ' ', $m))) ?></option>
-        <?php endforeach; ?>
-      </select>
-    </div>
-    <div class="col-md-3 col-lg-2">
-      <label class="form-label">Type</label>
-      <select name="type" class="form-select form-select-sm">
-        <option value="">All</option>
-        <?php foreach ($types as $t): ?>
-          <option value="<?= esc($t) ?>" <?= $type === $t ? 'selected' : '' ?>><?= esc($t) ?></option>
-        <?php endforeach; ?>
-      </select>
-    </div>
-    <div class="col-md-2 col-lg-2">
-      <label class="form-label">Status</label>
-      <select name="verified" class="form-select form-select-sm">
-        <option value="">Any</option>
-        <option value="Pending"  <?= $verified === 'Pending'  ? 'selected' : '' ?>>Pending</option>
-        <option value="Verified" <?= $verified === 'Verified' ? 'selected' : '' ?>>Verified</option>
-        <option value="Rejected" <?= $verified === 'Rejected' ? 'selected' : '' ?>>Rejected</option>
-      </select>
-    </div>
-    <div class="col-md-12 col-lg-2 d-flex gap-2">
-      <button class="btn btn-sm btn-primary w-100">Filter</button>
-      <?php if ($anyFilter): ?>
-        <a class="btn btn-sm btn-light" href="<?= site_url('documents') ?>" title="Reset"><i class="bi bi-x-lg"></i></a>
-      <?php endif; ?>
-    </div>
-  </form>
-</div></div>
-
-<div class="card">
+<div class="gridwrap">
   <div class="table-responsive">
-    <table class="table mb-0" data-tpt-cols="documents">
+    <table class="table grid mobile-cards mb-0" data-tpt-cols="documents">
       <thead>
         <tr>
           <th data-col="id">#</th><th data-col="module">Module</th><th data-col="type">Type</th><th data-col="file">File</th>
@@ -133,5 +118,5 @@ $verCls = fn($s) => match ((string) $s) {
       </tbody>
     </table>
   </div>
+  <?php if (!empty($pager)): ?><div class="mt-3"><?= $pager->links() ?></div><?php endif; ?>
 </div>
-<?php if (!empty($pager)): ?><div class="mt-3"><?= $pager->links() ?></div><?php endif; ?>

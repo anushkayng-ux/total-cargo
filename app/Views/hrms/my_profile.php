@@ -1,124 +1,96 @@
-<div class="d-flex flex-wrap align-items-center gap-2 mb-3">
-  <h5 class="m-0"><i class="bi bi-person-badge"></i> My Profile</h5>
-  <?php if (!empty($profile['profile_completed'])): ?>
-    <span class="badge bg-success ms-2"><i class="bi bi-check-circle-fill"></i> Profile complete</span>
-  <?php else: ?>
-    <span class="badge bg-warning text-dark ms-2"><i class="bi bi-exclamation-circle-fill"></i> Incomplete</span>
-  <?php endif; ?>
+<?= tpt_toolbar([
+    'save_form'  => 'profileForm',
+    'close_href' => site_url('dashboard'),
+    'auth'       => $auth,
+]) ?>
+
+<div class="tabs" id="profileTabs">
+  <button type="button" class="tab active" data-bs-toggle="tab" data-bs-target="#prof-personal">Personal Details</button>
+  <button type="button" class="tab" data-bs-toggle="tab" data-bs-target="#prof-kin">Next of Kin</button>
+  <div class="spacer"></div>
+  <div class="recordnav">
+    <?php if (!empty($profile['profile_completed'])): ?>
+      <span class="badge-soft badge-ok"><i class="bi bi-check-circle-fill"></i> Profile complete</span>
+    <?php else: ?>
+      <span class="badge-soft badge-warn"><i class="bi bi-exclamation-circle-fill"></i> Incomplete</span>
+    <?php endif; ?>
+  </div>
 </div>
 
-<form method="post" action="<?= site_url('hrms/profile') ?>">
+<form id="profileForm" method="post" action="<?= site_url('hrms/profile') ?>">
   <?= csrf_field() ?>
+  <div class="tab-content">
 
-  <div class="card mb-3">
-    <div class="card-header"><i class="bi bi-card-text"></i> Identity</div>
-    <div class="card-body">
-      <div class="row g-3">
-        <div class="col-md-6">
-          <label class="form-label">Full name</label>
-          <input class="form-control" type="text" value="<?= esc($user['name']) ?>" disabled>
-          <div class="form-text">Managed by HR — contact admin to update.</div>
+    <div class="tab-pane fade show active" id="prof-personal">
+      <div class="formwrap">
+        <div class="retro-row">
+          <div class="retro-field"><label>Full Name :</label><div class="retro-box wide empty"><?= esc($user['name']) ?></div></div>
+          <div class="retro-field"><label>Work Email :</label><div class="retro-box wide empty"><?= esc($user['email']) ?></div></div>
         </div>
-        <div class="col-md-6">
-          <label class="form-label">Work email</label>
-          <input class="form-control" type="email" value="<?= esc($user['email']) ?>" disabled>
+        <div class="retro-row" style="margin-top:-6px;">
+          <div class="retro-field" style="color:var(--v2-fg-muted);font-size:11.5px;">Name and email are managed by HR — contact admin to update.</div>
         </div>
-        <div class="col-md-4">
-          <label class="form-label">Date of birth</label>
-          <input class="form-control" type="date" name="date_of_birth" value="<?= esc($profile['date_of_birth'] ?? '') ?>">
+
+        <div class="retro-row">
+          <div class="retro-field"><label>Date of Birth :</label><input type="date" class="retro-box" name="date_of_birth" value="<?= esc($profile['date_of_birth'] ?? '') ?>"></div>
+          <div class="retro-field"><label>Gender :</label>
+            <select class="retro-box" name="gender">
+              <option value="">—</option>
+              <?php foreach (['Male','Female','Other'] as $g): ?>
+                <option value="<?= $g ?>" <?= ($profile['gender'] ?? '') === $g ? 'selected' : '' ?>><?= $g ?></option>
+              <?php endforeach; ?>
+            </select>
+          </div>
+          <div class="retro-field"><label>Marital Status :</label>
+            <select class="retro-box" name="marital_status">
+              <option value="">—</option>
+              <?php foreach (['Single','Married','Divorced','Widowed'] as $g): ?>
+                <option value="<?= $g ?>" <?= ($profile['marital_status'] ?? '') === $g ? 'selected' : '' ?>><?= $g ?></option>
+              <?php endforeach; ?>
+            </select>
+          </div>
+          <div class="retro-field"><label>Blood Group :</label><input class="retro-box narrow" type="text" name="blood_group" maxlength="5" value="<?= esc($profile['blood_group'] ?? '') ?>"></div>
         </div>
-        <div class="col-md-4">
-          <label class="form-label">Gender</label>
-          <select class="form-select" name="gender">
-            <option value="">—</option>
-            <?php foreach (['Male','Female','Other'] as $g): ?>
-              <option value="<?= $g ?>" <?= ($profile['gender'] ?? '') === $g ? 'selected' : '' ?>><?= $g ?></option>
-            <?php endforeach; ?>
-          </select>
+
+        <div class="retro-row" style="align-items:flex-start;">
+          <div class="retro-field" style="width:48%;"><label style="white-space:nowrap;">Permanent Address :</label>
+            <textarea class="retro-box retro-particulars" style="width:100%;" rows="3" name="permanent_address"><?= esc($profile['permanent_address'] ?? '') ?></textarea>
+          </div>
+          <div class="retro-field" style="width:48%;margin-left:auto;"><label style="white-space:nowrap;">Current Address :</label>
+            <textarea class="retro-box retro-particulars" style="width:100%;" rows="3" name="current_address"><?= esc($profile['current_address'] ?? '') ?></textarea>
+          </div>
         </div>
-        <div class="col-md-4">
-          <label class="form-label">Marital status</label>
-          <select class="form-select" name="marital_status">
-            <option value="">—</option>
-            <?php foreach (['Single','Married','Divorced','Widowed'] as $g): ?>
-              <option value="<?= $g ?>" <?= ($profile['marital_status'] ?? '') === $g ? 'selected' : '' ?>><?= $g ?></option>
-            <?php endforeach; ?>
-          </select>
+
+        <div class="retro-row">
+          <div class="retro-field"><label>Emergency Contact Name :</label><input class="retro-box wide" type="text" name="emergency_contact_name" value="<?= esc($profile['emergency_contact_name'] ?? '') ?>"></div>
+          <div class="retro-field"><label>Emergency Contact Phone :</label><input class="retro-box wide" type="tel" name="emergency_contact_phone" maxlength="20" value="<?= esc($profile['emergency_contact_phone'] ?? '') ?>"></div>
         </div>
-        <div class="col-md-3">
-          <label class="form-label">Blood group</label>
-          <input class="form-control" type="text" name="blood_group" maxlength="5" value="<?= esc($profile['blood_group'] ?? '') ?>">
+
+        <div class="retro-row">
+          <div class="retro-field"><label>PAN :</label><input class="retro-box wide" type="text" name="pan_no" maxlength="20" value="<?= esc($profile['pan_no'] ?? '') ?>"></div>
+          <div class="retro-field"><label>Aadhaar (last 4) :</label><input class="retro-box narrow" type="text" name="aadhaar_last_4" maxlength="4" value="<?= esc($profile['aadhaar_last_4'] ?? '') ?>"></div>
+          <div class="retro-field"><label>UAN (PF) :</label><input class="retro-box wide" type="text" name="uan_no" maxlength="20" value="<?= esc($profile['uan_no'] ?? '') ?>"></div>
+        </div>
+        <div class="retro-row">
+          <div class="retro-field"><label>Bank Name :</label><input class="retro-box wide" type="text" name="bank_name" value="<?= esc($profile['bank_name'] ?? '') ?>"></div>
+          <div class="retro-field"><label>Account Number :</label><input class="retro-box wide" type="text" name="bank_account_no" value="<?= esc($profile['bank_account_no'] ?? '') ?>"></div>
+          <div class="retro-field"><label>IFSC :</label><input class="retro-box" type="text" name="bank_ifsc" maxlength="20" value="<?= esc($profile['bank_ifsc'] ?? '') ?>"></div>
         </div>
       </div>
     </div>
-  </div>
 
-  <div class="card mb-3">
-    <div class="card-header"><i class="bi bi-geo-alt"></i> Address &amp; emergency contact</div>
-    <div class="card-body">
-      <div class="row g-3">
-        <div class="col-md-6">
-          <label class="form-label">Permanent address</label>
-          <textarea class="form-control" rows="3" name="permanent_address"><?= esc($profile['permanent_address'] ?? '') ?></textarea>
+    <div class="tab-pane fade" id="prof-kin">
+      <div class="formwrap">
+        <div class="retro-row" style="margin-bottom:14px;">
+          <div class="retro-field" style="color:var(--v2-fg-muted);font-size:11.5px;max-width:640px;">Used in case of an emergency. Add as many family contacts as you like.</div>
         </div>
-        <div class="col-md-6">
-          <label class="form-label">Current address</label>
-          <textarea class="form-control" rows="3" name="current_address"><?= esc($profile['current_address'] ?? '') ?></textarea>
-        </div>
-        <div class="col-md-6">
-          <label class="form-label">Emergency contact name</label>
-          <input class="form-control" type="text" name="emergency_contact_name" value="<?= esc($profile['emergency_contact_name'] ?? '') ?>">
-        </div>
-        <div class="col-md-6">
-          <label class="form-label">Emergency contact phone</label>
-          <input class="form-control" type="tel" name="emergency_contact_phone" maxlength="20" value="<?= esc($profile['emergency_contact_phone'] ?? '') ?>">
-        </div>
+        <?= view('hrms/_kin_rows', ['kin' => $kin ?? []]) ?>
       </div>
     </div>
+
   </div>
 
-  <div class="card mb-3">
-    <div class="card-header d-flex align-items-center">
-      <i class="bi bi-people"></i> <span class="ms-1">Next of kin · family</span>
-      <small class="text-muted ms-auto">Used in case of an emergency. Add as many as you like.</small>
-    </div>
-    <div class="card-body">
-      <?= view('hrms/_kin_rows', ['kin' => $kin ?? []]) ?>
-    </div>
+  <div class="retro-toolbar mt-3" style="position:static;">
+    <button type="submit" class="retro-tbtn retro-primary"><i class="bi bi-save-fill"></i>Save Profile</button>
   </div>
-
-  <div class="card mb-3">
-    <div class="card-header"><i class="bi bi-shield-lock"></i> Government IDs &amp; bank</div>
-    <div class="card-body">
-      <div class="row g-3">
-        <div class="col-md-4">
-          <label class="form-label">PAN</label>
-          <input class="form-control" type="text" name="pan_no" maxlength="20" value="<?= esc($profile['pan_no'] ?? '') ?>">
-        </div>
-        <div class="col-md-4">
-          <label class="form-label">Aadhaar (last 4)</label>
-          <input class="form-control" type="text" name="aadhaar_last_4" maxlength="4" value="<?= esc($profile['aadhaar_last_4'] ?? '') ?>">
-          <div class="form-text" style="font-size:.78rem;">Last 4 digits only.</div>
-        </div>
-        <div class="col-md-4">
-          <label class="form-label">UAN (PF)</label>
-          <input class="form-control" type="text" name="uan_no" maxlength="20" value="<?= esc($profile['uan_no'] ?? '') ?>">
-        </div>
-        <div class="col-md-4">
-          <label class="form-label">Bank name</label>
-          <input class="form-control" type="text" name="bank_name" value="<?= esc($profile['bank_name'] ?? '') ?>">
-        </div>
-        <div class="col-md-4">
-          <label class="form-label">Account number</label>
-          <input class="form-control" type="text" name="bank_account_no" value="<?= esc($profile['bank_account_no'] ?? '') ?>">
-        </div>
-        <div class="col-md-4">
-          <label class="form-label">IFSC</label>
-          <input class="form-control" type="text" name="bank_ifsc" maxlength="20" value="<?= esc($profile['bank_ifsc'] ?? '') ?>">
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <button class="btn btn-primary"><i class="bi bi-check2"></i> Save profile</button>
 </form>

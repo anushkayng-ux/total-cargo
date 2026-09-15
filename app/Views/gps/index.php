@@ -19,33 +19,35 @@ foreach ($rows as $r) {
     }
 }
 ?>
-<div class="d-flex align-items-center mb-3 gap-2 flex-wrap">
-  <h5 class="m-0"><?= esc($pageTitle) ?></h5>
-  <?php if (!$service->isConfigured()): ?>
-    <span class="badge-soft badge-warn ms-2">LocoNav API key not set — refresh will no-op</span>
-  <?php endif; ?>
-  <form method="post" action="<?= site_url('gps/refresh-all') ?>" class="ms-auto">
-    <?= csrf_field() ?>
-    <button class="btn btn-sm btn-primary"><i class="bi bi-arrow-clockwise"></i> Refresh All</button>
-  </form>
+<?php
+$extra = !$service->isConfigured() ? '<span class="badge-soft badge-warn">LocoNav API key not set — refresh will no-op</span>' : '';
+$extra .= '<form method="post" action="' . site_url('gps/refresh-all') . '" class="d-inline">' . csrf_field() . '<button class="btn btn-sm btn-primary"><i class="bi bi-arrow-clockwise"></i> Refresh All</button></form>';
+echo tpt_toolbar([
+    'close_href' => site_url('dashboard'),
+    'extra'      => $extra,
+    'auth'       => $auth,
+]);
+?>
+<div class="tabs">
+  <div class="tab active">Fleet Tracker</div>
+  <div class="spacer"></div>
+  <div class="recordnav"><?= count($rows) ?> active trips</div>
 </div>
 
-<div class="card mb-3">
-  <div class="card-body p-0">
-    <div id="map" style="height: 540px; border-radius: 10px;"></div>
-  </div>
+<div class="formwrap" style="padding:0;flex:0 0 auto;">
+  <div id="map" style="height: 540px; border-radius: 0;"></div>
 </div>
 
-<div class="card">
+<div class="gridwrap" style="margin-top:14px;">
   <div class="table-responsive">
-    <table class="table mb-0">
+    <table class="table grid mb-0">
       <thead>
         <tr><th>Trip</th><th>Vehicle</th><th>Client</th><th>Route</th><th>Last Fix</th><th>Speed</th><th>Location</th><th>Status</th><th></th></tr>
       </thead>
       <tbody>
         <?php if (empty($rows)): ?><tr><td colspan="9" class="text-center text-muted">No active trips.</td></tr><?php endif; ?>
         <?php foreach ($rows as $r): ?>
-          <tr>
+          <tr class="row-link" data-href="<?= site_url('gps/trip/' . $r['trip_id']) ?>">
             <td data-label="Trip"><a href="<?= site_url('gps/trip/' . $r['trip_id']) ?>"><code><?= esc($r['trip_no']) ?></code></a></td>
             <td data-label="Vehicle"><code><?= esc($r['vehicle_number']) ?></code></td>
             <td data-label="Client"><?= esc($r['client_company']) ?></td>

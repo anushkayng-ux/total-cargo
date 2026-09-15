@@ -14,10 +14,10 @@ class SettingsController extends BaseController
             ->orderBy('audience', 'ASC')
             ->get()->getResultArray();
         return $this->render('settings/index', [
-            'pageTitle'  => 'Settings',
+            'pageTitle'  => 'Settings [Administration]',
             'grouped'    => (new SettingModel())->getAllGrouped(),
             'alertRules' => $alertRules,
-        ]);
+        ], retroFixedShell: true);
     }
 
     /** Save the alert-rules matrix (event × audience × channel → enabled). */

@@ -9,9 +9,9 @@ class LeadSourcesController extends BaseController
     public function index()
     {
         return $this->render('lead_sources/index', [
-            'pageTitle' => 'Lead Sources',
+            'pageTitle' => 'Lead Source Master [General Masters] — List',
             'rows'      => (new LeadSourceModel())->orderBy('source_name')->findAll(),
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function store()

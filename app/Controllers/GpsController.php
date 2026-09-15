@@ -27,10 +27,10 @@ class GpsController extends BaseController
             ->get()->getResultArray();
 
         return $this->render('gps/index', [
-            'pageTitle' => 'GPS — Fleet Tracker',
+            'pageTitle' => 'GPS Fleet Tracker [Transportation]',
             'rows'      => $rows,
             'service'   => new LocoNavService(),
-        ]);
+        ], retroFixedShell: true);
     }
 
     /** Single-trip live map with trail. */
@@ -47,12 +47,12 @@ class GpsController extends BaseController
             : [];
 
         return $this->render('gps/trip', [
-            'pageTitle' => 'GPS · ' . ($trip['trip_no'] ?? ''),
+            'pageTitle' => 'GPS Fleet Tracker [Transportation]',
             'trip'      => $trip,
             'latest'    => $latest,
             'logs'      => $logs,
             'service'   => new LocoNavService(),
-        ]);
+        ], retroFixedShell: true);
     }
 
     /** Manual refresh for a single trip. */

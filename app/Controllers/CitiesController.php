@@ -29,7 +29,7 @@ class CitiesController extends BaseController
         if ($tier !== '')   $query->where('tier', $tier);
 
         return $this->render('cities/index', [
-            'pageTitle' => 'Cities Master',
+            'pageTitle' => 'City Master [General Masters] — List',
             'rows'      => $query->paginate($perPage),
             'pager'     => $model->pager,
             'filters'   => compact('q', 'state', 'region', 'tier'),
@@ -37,7 +37,7 @@ class CitiesController extends BaseController
             'states'    => (new CityModel())->statesList(),
             'regions'   => CityModel::REGIONS,
             'tiers'     => CityModel::TIERS,
-        ]);
+        ], retroFixedShell: true);
     }
 
     /** GET /cities/create */
@@ -47,11 +47,11 @@ class CitiesController extends BaseController
             return redirect()->to(site_url('cities'))->with('error', 'Not allowed.');
         }
         return $this->render('cities/form', [
-            'pageTitle' => 'Add City',
+            'pageTitle' => 'City Master [General Masters] — New',
             'row'       => null,
             'regions'   => CityModel::REGIONS,
             'tiers'     => CityModel::TIERS,
-        ]);
+        ], retroFixedShell: true);
     }
 
     /** POST /cities/store */
@@ -79,11 +79,11 @@ class CitiesController extends BaseController
         $row = (new CityModel())->find($id);
         if (!$row) return redirect()->to(site_url('cities'))->with('error', 'Not found.');
         return $this->render('cities/form', [
-            'pageTitle' => 'Edit City',
+            'pageTitle' => 'City Master [General Masters] — Edit',
             'row'       => $row,
             'regions'   => CityModel::REGIONS,
             'tiers'     => CityModel::TIERS,
-        ]);
+        ], retroFixedShell: true);
     }
 
     /** POST /cities/{id} */

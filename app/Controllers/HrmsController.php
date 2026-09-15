@@ -19,11 +19,11 @@ class HrmsController extends BaseController
             ->get()->getResultArray();
 
         return $this->render('hrms/my_profile', [
-            'pageTitle' => 'My Profile',
+            'pageTitle' => 'My Profile [HRMS]',
             'user'      => $user,
             'profile'   => $profile,
             'kin'       => $kin,
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function saveProfile()
@@ -131,14 +131,14 @@ class HrmsController extends BaseController
             ->get()->getRowArray();
 
         return $this->render('hrms/my_attendance', [
-            'pageTitle'  => 'My Attendance',
+            'pageTitle'  => 'My Attendance [HRMS]',
             'rows'       => $rows,
             'today'      => $today,
             'year'       => $year,
             'month'      => $month,
             'from'       => $from,
             'to'         => $to,
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function punchIn()
@@ -216,10 +216,10 @@ class HrmsController extends BaseController
             ->where('lb.year', (int) date('Y'))
             ->orderBy('lt.id', 'ASC')->get()->getResultArray();
         return $this->render('hrms/my_leaves', [
-            'pageTitle' => 'My Leaves',
+            'pageTitle' => 'My Leaves [HRMS]',
             'leaves'    => $rows,
             'balances'  => $balances,
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function applyLeaveForm()
@@ -227,9 +227,9 @@ class HrmsController extends BaseController
         $types = \Config\Database::connect()
             ->table('leave_types')->where('status', 1)->orderBy('id', 'ASC')->get()->getResultArray();
         return $this->render('hrms/apply_leave', [
-            'pageTitle' => 'Apply for Leave',
+            'pageTitle' => 'Apply for Leave [HRMS]',
             'types'     => $types,
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function applyLeave()
@@ -320,9 +320,9 @@ class HrmsController extends BaseController
             ->orderBy('u.name', 'ASC')
             ->get()->getResultArray();
         return $this->render('hrms/team', [
-            'pageTitle' => 'Team',
+            'pageTitle' => 'Team [HRMS] — List',
             'rows'      => $rows,
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function employeeEdit(int $id)
@@ -345,13 +345,13 @@ class HrmsController extends BaseController
             ->where('lb.year', (int) date('Y'))
             ->orderBy('lt.id', 'ASC')->get()->getResultArray();
         return $this->render('hrms/employee_edit', [
-            'pageTitle' => 'Employee — ' . $user['name'],
+            'pageTitle' => 'Team [HRMS] — Edit',
             'user'      => $user,
             'profile'   => $profile,
             'components'=> $components,
             'balances'  => $balances,
             'kin'       => $kin,
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function employeeSave(int $id)
@@ -424,9 +424,9 @@ class HrmsController extends BaseController
             ->limit(200)
             ->get()->getResultArray();
         return $this->render('hrms/leave_approvals', [
-            'pageTitle' => 'Leave Approvals',
+            'pageTitle' => 'Leave Approvals [HRMS]',
             'rows'      => $rows,
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function approveLeave(int $id)
@@ -517,10 +517,10 @@ class HrmsController extends BaseController
             ->where('YEAR(holiday_date)', $year)
             ->orderBy('holiday_date', 'ASC')->get()->getResultArray();
         return $this->render('hrms/holidays', [
-            'pageTitle' => 'Holiday Calendar · ' . $year,
+            'pageTitle' => 'Holidays [HRMS] — List',
             'rows'      => $rows,
             'year'      => $year,
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function holidayStore()
@@ -574,9 +574,9 @@ class HrmsController extends BaseController
             ->where('u.status', 1)->where('u.deleted_at', null)
             ->orderBy('u.name', 'ASC')->get()->getResultArray();
         return $this->render('hrms/team_attendance', [
-            'pageTitle' => 'Team Attendance · ' . $date,
+            'pageTitle' => 'Team Attendance [HRMS] — List',
             'rows'      => $rows,
             'date'      => $date,
-        ]);
+        ], retroFixedShell: true);
     }
 }

@@ -27,20 +27,43 @@ class VendorsController extends BaseController
                 ->groupEnd();
         }
         return $this->render('vendors/index', [
-            'pageTitle' => 'Vendors',
+            'pageTitle' => 'Vendor Master [General Masters] — List',
             'rows'      => $query->paginate(20),
             'pager'     => $model->pager,
             'search'    => $search,
-        ]);
+        ], retroFixedShell: true);
+    }
+
+    /** Read-only vendor detail page, matching the retro demo's record view. */
+    public function show(int $id)
+    {
+        $row = (new VendorModel())->find($id);
+        if (!$row) return redirect()->to(site_url('vendors'))->with('error', 'Not found.');
+
+        $db      = \Config\Database::connect();
+        $prevRow = $db->table('vendors')->select('id')->where('id <', $id)->orderBy('id', 'DESC')->get(1)->getRowArray();
+        $nextRow = $db->table('vendors')->select('id')->where('id >', $id)->orderBy('id', 'ASC')->get(1)->getRowArray();
+        $total   = $db->table('vendors')->countAllResults();
+        $routes  = $db->table('vendor_routes')->where('vendor_id', $id)->where('status', 1)->orderBy('id', 'ASC')->get()->getResultArray();
+
+        return $this->render('vendors/show', [
+            'pageTitle' => 'Vendor Master [General Masters]',
+            'row'       => $row,
+            'contacts'  => (new VendorContactModel())->forVendor($id),
+            'routes'    => $routes,
+            'prevId'    => $prevRow['id'] ?? null,
+            'nextId'    => $nextRow['id'] ?? null,
+            'total'     => $total,
+        ], retroFixedShell: true);
     }
 
     public function create()
     {
         return $this->render('vendors/form', [
-            'pageTitle' => 'Add Vendor',
+            'pageTitle' => 'Vendor Master [General Masters] — New',
             'row'       => null,
             'contacts'  => [],
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function store()
@@ -93,13 +116,13 @@ class VendorsController extends BaseController
             elseif (!empty($r['pickup_city']) && !empty($r['drop_city']))$pairs[] = $r;
         }
         return $this->render('vendors/form', [
-            'pageTitle'    => 'Edit Vendor',
+            'pageTitle'    => 'Vendor Master [General Masters] — Edit',
             'row'          => $row,
             'contacts'     => (new VendorContactModel())->forVendor($id),
             'dropCities'   => array_values(array_unique($dropCities)),
             'pickupCities' => array_values(array_unique($pickupCities)),
             'pairs'        => $pairs,
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function update(int $id)

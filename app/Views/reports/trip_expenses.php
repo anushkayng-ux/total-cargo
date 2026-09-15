@@ -1,48 +1,46 @@
-<div class="d-flex align-items-center mb-3 gap-2 flex-wrap">
-  <h5 class="m-0"><?= esc($pageTitle) ?></h5>
-  <a class="ms-auto btn btn-sm btn-light" href="<?= site_url('reports') ?>"><i class="bi bi-arrow-left"></i> All Reports</a>
+<?php
+$extra = '<form method="get" class="d-flex align-items-center gap-2 flex-wrap m-0" action="' . site_url('reports/trip-expenses') . '">'
+    . '<input class="form-control form-control-sm" style="width:140px;" type="date" name="from" value="' . esc($filters['from']) . '">'
+    . '<input class="form-control form-control-sm" style="width:140px;" type="date" name="to" value="' . esc($filters['to']) . '">'
+    . '<select class="form-select form-select-sm" name="category" style="width:auto;"><option value="">All Categories</option>';
+foreach ($categories as $c) {
+    $extra .= '<option value="' . esc($c['name']) . '"' . ($filters['category'] === $c['name'] ? ' selected' : '') . '>' . esc($c['name']) . '</option>';
+}
+$extra .= '</select>'
+    . '<select class="form-select form-select-sm" name="type" style="width:auto;"><option value="">All Types</option>'
+    . '<option value="internal"' . ($filters['type'] === 'internal' ? ' selected' : '') . '>Internal only</option>'
+    . '<option value="billable"' . ($filters['type'] === 'billable' ? ' selected' : '') . '>Billable only</option>'
+    . '</select>'
+    . '<select class="form-select form-select-sm" name="vendor_id" style="width:auto;"><option value="">All Vendors</option>';
+foreach ($vendors as $v) {
+    $extra .= '<option value="' . (int) $v['id'] . '"' . ((int) $filters['vendor_id'] === (int) $v['id'] ? ' selected' : '') . '>' . esc($v['company_name']) . '</option>';
+}
+$extra .= '</select>'
+    . '<button class="btn btn-sm btn-outline-dark">Filter</button></form>';
+?>
+<?= tpt_toolbar([
+    'close_href' => site_url('reports'),
+    'extra'      => $extra,
+    'auth'       => $auth,
+]) ?>
+<div class="tabs">
+  <div class="tab active">Trip Expenses</div>
+  <div class="spacer"></div>
+  <div class="recordnav"><?= count($rows) ?> entries</div>
 </div>
 
-<div class="card mb-3"><div class="card-body">
-  <form class="row g-2 align-items-end" method="get" action="<?= site_url('reports/trip-expenses') ?>">
-    <div class="col-md-2"><label class="form-label">From</label>
-      <input type="date" class="form-control form-control-sm" name="from" value="<?= esc($filters['from']) ?>"></div>
-    <div class="col-md-2"><label class="form-label">To</label>
-      <input type="date" class="form-control form-control-sm" name="to" value="<?= esc($filters['to']) ?>"></div>
-    <div class="col-md-3"><label class="form-label">Category</label>
-      <select name="category" class="form-select form-select-sm">
-        <option value="">All</option>
-        <?php foreach ($categories as $c): ?>
-          <option value="<?= esc($c['name']) ?>" <?= $filters['category'] === $c['name'] ? 'selected' : '' ?>><?= esc($c['name']) ?></option>
-        <?php endforeach; ?>
-      </select></div>
-    <div class="col-md-2"><label class="form-label">Type</label>
-      <select name="type" class="form-select form-select-sm">
-        <option value="">All</option>
-        <option value="internal" <?= $filters['type'] === 'internal' ? 'selected' : '' ?>>Internal only</option>
-        <option value="billable" <?= $filters['type'] === 'billable' ? 'selected' : '' ?>>Billable only</option>
-      </select></div>
-    <div class="col-md-2"><label class="form-label">Vendor</label>
-      <select name="vendor_id" class="form-select form-select-sm">
-        <option value="">All</option>
-        <?php foreach ($vendors as $v): ?>
-          <option value="<?= $v['id'] ?>" <?= (int)$filters['vendor_id'] === (int)$v['id'] ? 'selected' : '' ?>><?= esc($v['company_name']) ?></option>
-        <?php endforeach; ?>
-      </select></div>
-    <div class="col-md-1"><button class="btn btn-sm btn-primary w-100">Filter</button></div>
-  </form>
-</div></div>
-
-<div class="row g-3 mb-3">
-  <div class="col-6 col-md-3"><div class="stat"><span class="label">Internal</span><span class="value">₹<?= number_format((float) $totals['internal'], 0) ?></span></div></div>
-  <div class="col-6 col-md-3"><div class="stat"><span class="label">Billable</span><span class="value">₹<?= number_format((float) $totals['billable'], 0) ?></span></div></div>
-  <div class="col-6 col-md-3"><div class="stat"><span class="label">Unbilled to Client</span><span class="value">₹<?= number_format((float) $totals['unbilled'], 0) ?></span></div></div>
-  <div class="col-6 col-md-3"><div class="stat"><span class="label">Entries</span><span class="value"><?= count($rows) ?></span></div></div>
+<div class="formwrap" style="flex:0 0 auto;">
+  <div class="row g-3">
+    <div class="col-6 col-md-3"><div class="stat"><span class="label">Internal</span><span class="value">₹<?= number_format((float) $totals['internal'], 0) ?></span></div></div>
+    <div class="col-6 col-md-3"><div class="stat"><span class="label">Billable</span><span class="value">₹<?= number_format((float) $totals['billable'], 0) ?></span></div></div>
+    <div class="col-6 col-md-3"><div class="stat"><span class="label">Unbilled to Client</span><span class="value">₹<?= number_format((float) $totals['unbilled'], 0) ?></span></div></div>
+    <div class="col-6 col-md-3"><div class="stat"><span class="label">Entries</span><span class="value"><?= count($rows) ?></span></div></div>
+  </div>
 </div>
 
-<div class="card">
+<div class="gridwrap">
   <div class="table-responsive">
-    <table class="table mb-0">
+    <table class="table grid mb-0">
       <thead>
         <tr><th>Date</th><th>Trip</th><th>Vendor</th><th>Category</th><th>Description</th><th class="text-end">Amount</th><th>Type</th><th>Invoice</th></tr>
       </thead>

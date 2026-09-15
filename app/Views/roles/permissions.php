@@ -4,16 +4,25 @@ foreach ($permissions as $p) {
     $grouped[$p['module_key']][] = $p;
 }
 ?>
-<div class="d-flex align-items-center mb-3 gap-2 flex-wrap">
-  <h5 class="m-0">Permissions · <?= esc($role['role_name']) ?></h5>
-  <a class="ms-auto btn btn-sm btn-light" href="<?= site_url('roles') ?>"><i class="bi bi-arrow-left"></i> Back</a>
+<?= tpt_toolbar([
+    'save_form'   => 'permissionsForm',
+    'close_href'  => site_url('roles'),
+    'auth'        => $auth,
+]) ?>
+<div class="tabs">
+  <div class="tab active">Permissions</div>
+  <div class="spacer"></div>
+  <div class="recordnav">
+    <a href="<?= site_url('roles') ?>"><i class="bi bi-list"></i> List</a> &middot;
+    <?= esc($role['role_name']) ?>
+  </div>
 </div>
 
-<form method="post" action="<?= site_url('roles/' . $role['id'] . '/permissions') ?>">
+<form id="permissionsForm" method="post" action="<?= site_url('roles/' . $role['id'] . '/permissions') ?>">
   <?= csrf_field() ?>
-  <div class="card">
+  <div class="gridwrap">
     <div class="table-responsive">
-      <table class="table mb-0">
+      <table class="table grid mb-0">
         <thead>
           <tr>
             <th style="min-width:220px;">Module</th>
@@ -45,8 +54,9 @@ foreach ($permissions as $p) {
       </table>
     </div>
   </div>
-  <div class="mt-3 d-flex gap-2">
-    <button class="btn btn-primary" type="submit">Save Permissions</button>
-    <a class="btn btn-light" href="<?= site_url('roles') ?>">Cancel</a>
-  </div>
 </form>
+
+<div class="retro-toolbar mt-3" style="position:static;">
+  <button type="submit" form="permissionsForm" class="retro-tbtn retro-primary"><i class="bi bi-save-fill"></i>Save Permissions</button>
+  <a class="retro-tbtn" href="<?= site_url('roles') ?>"><i class="bi bi-x-circle"></i>Close</a>
+</div>

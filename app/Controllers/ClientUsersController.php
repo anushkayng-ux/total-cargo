@@ -27,12 +27,12 @@ class ClientUsersController extends BaseController
             ->find();
 
         return $this->render('clients/portal_users', [
-            'pageTitle' => 'Portal Users · ' . $client['company_name'],
+            'pageTitle' => 'Client Master [General Masters] — Portal Users',
             'client'    => $client,
             'users'     => $users,
             'invites'   => $invites,
             'roles'     => ClientUserModel::ROLES,
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function invite(int $clientId)

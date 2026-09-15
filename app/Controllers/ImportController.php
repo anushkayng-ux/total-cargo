@@ -88,11 +88,11 @@ class ImportController extends BaseController
     public function chooser()
     {
         return $this->render('import/chooser', [
-            'pageTitle'        => 'Import Data',
+            'pageTitle'        => 'Import Data [Administration]',
             'preselected'      => (string) $this->request->getGet('type') ?: 'clients',
             'lastClientImport' => $this->session->get('import_last_summary_clients'),
             'lastVendorImport' => $this->session->get('import_last_summary_vendors'),
-        ]);
+        ], retroFixedShell: true);
     }
 
     /**
@@ -110,10 +110,10 @@ class ImportController extends BaseController
     {
         $type = $this->validType($type);
         return $this->render('import/form', [
-            'pageTitle'    => 'Import ' . ucfirst($type),
+            'pageTitle'    => 'Import Data [Administration] — ' . ucfirst($type),
             'type'         => $type,
             'lastSummary'  => $this->session->get("import_last_summary_$type"),
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function parse(string $type)
@@ -177,12 +177,12 @@ class ImportController extends BaseController
     {
         $type = $this->validType($type);
         return $this->render('import/review', [
-            'pageTitle' => 'Review ' . ucfirst($type) . ' Import',
+            'pageTitle' => 'Import Data [Administration] — ' . ucfirst($type),
             'type'      => $type,
             'rows'      => $this->session->get("import_proposed_$type") ?? [],
             'mapping'   => $this->session->get("import_mapping_$type") ?? [],
             'header'    => $this->session->get("import_header_$type")  ?? [],
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function confirm(string $type)

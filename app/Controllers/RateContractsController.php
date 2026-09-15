@@ -11,25 +11,26 @@ class RateContractsController extends BaseController
 {
     public function index()
     {
-        $rows = (new RateContractModel())->withClient()
+        $model = new RateContractModel();
+        $rows  = $model->withClient()
             ->where('rate_contracts.deleted_at', null)
             ->orderBy('rate_contracts.id', 'DESC')
             ->paginate(25);
         return $this->render('rate_contracts/index', [
-            'pageTitle' => 'Rate Contracts',
+            'pageTitle' => 'Rate Contract Master [Purchase] — List',
             'rows'      => $rows,
-            'pager'     => (new RateContractModel())->pager,
-        ]);
+            'pager'     => $model->pager,
+        ], retroFixedShell: true);
     }
 
     public function create()
     {
         return $this->render('rate_contracts/form', [
-            'pageTitle' => 'New Rate Contract',
+            'pageTitle' => 'Rate Contract Master [Purchase] — New',
             'row'       => null,
             'lanes'     => [],
             'clients'   => (new ClientModel())->where('status', 1)->orderBy('company_name')->findAll(),
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function store()
@@ -59,11 +60,11 @@ class RateContractsController extends BaseController
         $row = (new RateContractModel())->find($id);
         if (!$row) return redirect()->to(site_url('rate-contracts'))->with('error', 'Not found.');
         return $this->render('rate_contracts/form', [
-            'pageTitle' => 'Edit ' . $row['contract_no'],
+            'pageTitle' => 'Rate Contract Master [Purchase] — Edit',
             'row'       => $row,
             'lanes'     => (new RateContractLaneModel())->forContract($id),
             'clients'   => (new ClientModel())->where('status', 1)->orderBy('company_name')->findAll(),
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function update(int $id)

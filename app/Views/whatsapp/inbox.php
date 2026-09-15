@@ -1,10 +1,18 @@
-<div class="d-flex align-items-center mb-3 gap-2 flex-wrap">
-  <h5 class="m-0"><?= esc($pageTitle) ?></h5>
+<?= tpt_toolbar([
+    'close_href' => site_url('dashboard'),
+    'auth'       => $auth,
+]) ?>
+<div class="tabs">
+  <a class="tab" href="<?= site_url('whatsapp/logs') ?>">Message Logs</a>
+  <div class="tab active">Inbox</div>
+  <a class="tab" href="<?= site_url('whatsapp/templates') ?>">Templates</a>
+  <div class="spacer"></div>
+  <div class="recordnav"><?= (int) ($pager->getTotal() ?: count($rows)) ?> total records</div>
 </div>
 
-<div class="card">
+<div class="gridwrap">
   <div class="table-responsive">
-    <table class="table mb-0" data-tpt-cols="wa-inbox">
+    <table class="table grid mb-0" data-tpt-cols="wa-inbox">
       <thead>
         <tr><th data-col="from">From</th><th data-col="type">Type</th><th data-col="text">Text / Caption</th><th data-col="rfq">Matched RFQ</th><th data-col="vendor">Vendor</th><th data-col="processed">Processed</th><th data-col="received">Received</th></tr>
       </thead>
@@ -24,5 +32,5 @@
       </tbody>
     </table>
   </div>
+  <?php if (!empty($pager)): ?><div class="mt-3"><?= $pager->links() ?></div><?php endif; ?>
 </div>
-<?php if (!empty($pager)): ?><div class="mt-3"><?= $pager->links() ?></div><?php endif; ?>

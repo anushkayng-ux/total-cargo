@@ -46,7 +46,7 @@ class SupportController extends BaseController
         }
 
         return $this->render('support/index', [
-            'pageTitle'      => 'Support',
+            'pageTitle'      => 'Support Tickets [Administration] — List',
             'rows'           => $q->paginate(25),
             'pager'          => $model->pager,
             'isAgent'        => $isAgent,
@@ -56,14 +56,14 @@ class SupportController extends BaseController
             'mine'           => $mine,
             'ratingEnabled'  => $this->ratingEnabled(),
             'ratingsSummary' => $isAgent ? $model->ratingsSummary() : null,
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function create()
     {
         return $this->render('support/form', [
-            'pageTitle' => 'Raise a support ticket',
-        ]);
+            'pageTitle' => 'Support Tickets [Administration] — New',
+        ], retroFixedShell: true);
     }
 
     public function store()
@@ -112,13 +112,13 @@ class SupportController extends BaseController
         }
 
         return $this->render('support/show', [
-            'pageTitle'     => 'Ticket ' . $row['ticket_no'],
+            'pageTitle'     => 'Support Tickets [Administration] — ' . $row['ticket_no'],
             'row'           => $row,
             'replies'       => (new SupportTicketReplyModel())->thread($id),
             'isAgent'       => $isAgent,
             'agents'        => $agents,
             'ratingEnabled' => $this->ratingEnabled(),
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function reply(int $id)

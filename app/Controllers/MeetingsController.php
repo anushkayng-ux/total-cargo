@@ -19,18 +19,18 @@ class MeetingsController extends BaseController
         if ($scope !== 'team' || !$isManager) $q = $q->where('m.user_id', $userId);
         $rows = $q->get()->getResultArray();
         return $this->render('meetings/index', [
-            'pageTitle' => 'Meetings',
+            'pageTitle' => 'Meetings [HRMS] — List',
             'rows'      => $rows,
             'isManager' => $isManager,
             'scope'     => $scope === 'team' && $isManager ? 'team' : 'mine',
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function create()
     {
         return $this->render('meetings/create', [
-            'pageTitle' => 'Plan a Meeting',
-        ]);
+            'pageTitle' => 'Meetings [HRMS] — New',
+        ], retroFixedShell: true);
     }
 
     public function store()
@@ -73,12 +73,12 @@ class MeetingsController extends BaseController
         $events = $db->table('meeting_events')->where('meeting_id', $id)->orderBy('occurred_at', 'ASC')->get()->getResultArray();
         $owner  = $db->table('users')->where('id', (int) $row['user_id'])->get()->getRowArray();
         return $this->render('meetings/show', [
-            'pageTitle' => 'Meeting · ' . $row['title'],
+            'pageTitle' => 'Meetings [HRMS]',
             'row'       => $row,
             'events'    => $events,
             'owner'     => $owner,
             'pwaUrl'    => $row['pwa_token'] ? site_url('m/' . $row['pwa_token']) : null,
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function update(int $id)

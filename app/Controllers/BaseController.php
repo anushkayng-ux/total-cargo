@@ -12,7 +12,7 @@ abstract class BaseController extends Controller
 {
     protected $session;
     protected Auth $auth;
-    protected $helpers = ['form', 'url', 'menu', 'number', 'branding', 'datetime'];
+    protected $helpers = ['form', 'url', 'menu', 'toolbar', 'number', 'branding', 'datetime'];
 
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
     {
@@ -21,11 +21,21 @@ abstract class BaseController extends Controller
         $this->auth    = new Auth();
     }
 
-    protected function render(string $view, array $data = [], string $layout = 'layouts/app'): string
+    /**
+     * @param bool $retroFixedShell Opt this page into the demo's fixed-shell
+     *   layout: sidebar/topbar/toolbar/tabs never move, and only the page's
+     *   own content (table or form) scrolls inside its own bounded box —
+     *   matching total-cargo-demo instead of the normal whole-page scroll.
+     *   Only pages already rebuilt with the retro toolbar/tabs should set
+     *   this; every other (not yet retro-styled) page must keep normal
+     *   page scrolling, so this defaults to false.
+     */
+    protected function render(string $view, array $data = [], string $layout = 'layouts/app', bool $retroFixedShell = false): string
     {
-        $data['auth']        = $this->auth;
-        $data['currentUser'] = $this->auth->user();
-        $data['viewFile']    = $view;
+        $data['auth']            = $this->auth;
+        $data['currentUser']     = $this->auth->user();
+        $data['viewFile']        = $view;
+        $data['retroFixedShell'] = $retroFixedShell;
         return view($layout, $data);
     }
 

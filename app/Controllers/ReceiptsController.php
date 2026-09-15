@@ -35,11 +35,11 @@ class ReceiptsController extends BaseController
 
         $rows = $q->paginate($perPage);
         return $this->render('receipts/index', [
-            'pageTitle' => 'Client Receipts',
+            'pageTitle' => 'Client Receipt Master [Accounts] — List',
             'rows'      => $rows,
             'pager'     => $model->pager,
             'filters'   => compact('search','mode','from','to','perPage'),
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function store()

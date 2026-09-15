@@ -22,20 +22,42 @@ class VehiclesController extends BaseController
                 ->groupEnd();
         }
         return $this->render('vehicles/index', [
-            'pageTitle' => 'Vehicles',
+            'pageTitle' => 'Vehicle Master [General Masters] — List',
             'rows'      => $query->paginate(20),
             'pager'     => $model->pager,
             'search'    => $search,
-        ]);
+        ], retroFixedShell: true);
+    }
+
+    /** Read-only vehicle detail page, matching the retro demo's record view. */
+    public function show(int $id)
+    {
+        $row = (new VehicleModel())->select('vehicles.*, vendors.company_name AS vendor_name')
+            ->join('vendors', 'vendors.id = vehicles.vendor_id', 'left')
+            ->find($id);
+        if (!$row) return redirect()->to(site_url('vehicles'))->with('error', 'Not found.');
+
+        $db      = \Config\Database::connect();
+        $prevRow = $db->table('vehicles')->select('id')->where('id <', $id)->orderBy('id', 'DESC')->get(1)->getRowArray();
+        $nextRow = $db->table('vehicles')->select('id')->where('id >', $id)->orderBy('id', 'ASC')->get(1)->getRowArray();
+        $total   = $db->table('vehicles')->countAllResults();
+
+        return $this->render('vehicles/show', [
+            'pageTitle' => 'Vehicle Master [General Masters]',
+            'row'       => $row,
+            'prevId'    => $prevRow['id'] ?? null,
+            'nextId'    => $nextRow['id'] ?? null,
+            'total'     => $total,
+        ], retroFixedShell: true);
     }
 
     public function create()
     {
         return $this->render('vehicles/form', [
-            'pageTitle' => 'Add Vehicle',
+            'pageTitle' => 'Vehicle Master [General Masters] — New',
             'row'       => null,
             'vendors'   => (new VendorModel())->where('status', 1)->orderBy('company_name')->findAll(),
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function store()
@@ -59,10 +81,10 @@ class VehiclesController extends BaseController
         $row = (new VehicleModel())->find($id);
         if (!$row) return redirect()->to(site_url('vehicles'))->with('error', 'Not found.');
         return $this->render('vehicles/form', [
-            'pageTitle' => 'Edit Vehicle',
+            'pageTitle' => 'Vehicle Master [General Masters] — Edit',
             'row'       => $row,
             'vendors'   => (new VendorModel())->where('status', 1)->orderBy('company_name')->findAll(),
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function update(int $id)

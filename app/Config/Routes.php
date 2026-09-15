@@ -84,6 +84,12 @@ $routes->get('dashboard/widgets',  'DashboardController::widgets',   ['filter' =
 $routes->post('dashboard/widgets', 'DashboardController::saveWidgets',['filter' => 'auth:dashboard']);
 $routes->get('compliance',         'ComplianceController::index',    ['filter' => 'auth']);
 
+// Retro-demo hub landing pages — card-grid pages the collapsed sidebar
+// points to (Transportation / Accounts / Administration).
+$routes->get('hub/transportation', 'HubController::transportation', ['filter' => 'auth']);
+$routes->get('hub/accounts',       'HubController::accounts',       ['filter' => 'auth']);
+$routes->get('hub/administration', 'HubController::administration', ['filter' => 'auth']);
+
 // Staff self-service profile + 2FA (open to any logged-in user)
 $routes->group('profile', ['filter' => 'auth'], static function ($routes) {
     $routes->get('/',                  'ProfileController::index');
@@ -161,6 +167,7 @@ $routes->group('clients', ['filter' => 'auth:clients'], static function ($routes
     $routes->post('store',           'ClientsController::store');
     $routes->get('assign-owners',    'ClientsController::assignOwners');
     $routes->post('assign-owners',   'ClientsController::assignOwnersSave');
+    $routes->get('(:num)',           'ClientsController::show/$1');
     $routes->get('(:num)/edit',      'ClientsController::edit/$1');
     $routes->post('(:num)',          'ClientsController::update/$1');
     $routes->post('(:num)/delete',   'ClientsController::delete/$1');
@@ -170,6 +177,7 @@ $routes->group('vendors', ['filter' => 'auth:vendors'], static function ($routes
     $routes->get('/',              'VendorsController::index');
     $routes->get('create',         'VendorsController::create');
     $routes->post('store',         'VendorsController::store');
+    $routes->get('(:num)',         'VendorsController::show/$1');
     $routes->get('(:num)/edit',    'VendorsController::edit/$1');
     $routes->post('(:num)',        'VendorsController::update/$1');
     $routes->post('(:num)/delete', 'VendorsController::delete/$1');
@@ -195,6 +203,7 @@ $routes->group('drivers', ['filter' => 'auth:drivers'], static function ($routes
     $routes->get('/',              'DriversController::index');
     $routes->get('create',         'DriversController::create');
     $routes->post('store',         'DriversController::store');
+    $routes->get('(:num)',         'DriversController::show/$1');
     $routes->get('(:num)/edit',    'DriversController::edit/$1');
     $routes->post('(:num)',        'DriversController::update/$1');
     $routes->post('(:num)/delete',     'DriversController::delete/$1');
@@ -205,6 +214,7 @@ $routes->group('vehicles', ['filter' => 'auth:vehicles'], static function ($rout
     $routes->get('/',              'VehiclesController::index');
     $routes->get('create',         'VehiclesController::create');
     $routes->post('store',         'VehiclesController::store');
+    $routes->get('(:num)',         'VehiclesController::show/$1');
     $routes->get('(:num)/edit',    'VehiclesController::edit/$1');
     $routes->post('(:num)',        'VehiclesController::update/$1');
     $routes->post('(:num)/delete', 'VehiclesController::delete/$1');

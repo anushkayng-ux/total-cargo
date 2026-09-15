@@ -7,6 +7,7 @@
  *     <thead><tr>
  *       <th data-col="code">Code</th>
  *       <th data-col="company">Company</th>
+ *       <th data-col="irn" data-col-default="hidden">IRN</th>
  *       ...
  *     </tr></thead>
  *     <tbody>
@@ -16,6 +17,11 @@
  *       </tr>
  *     </tbody>
  *   </table>
+ *
+ * A `data-col-default="hidden"` header starts hidden for anyone who hasn't
+ * customised this table yet (first-run default — keeps wide tables from
+ * needing horizontal scroll out of the box) — "Show all columns" or ticking
+ * it back on in the dropdown always brings it back, nothing is deleted.
  *
  * The user's chosen hidden-column set is persisted in localStorage under
  * `tpt_cols_<key>`, so their preference survives navigation. Falls back
@@ -33,11 +39,19 @@
       var heads    = Array.prototype.slice.call(table.querySelectorAll('thead th[data-col]'));
       if (!heads.length) return;
 
-      // Read hidden-column set from localStorage
+      // Read hidden-column set from localStorage — if the user has never
+      // customised this table, fall back to each column's own
+      // data-col-default="hidden" so wide tables start lean.
       var hidden = new Set();
-      try {
-        (localStorage.getItem(storeKey) || '').split(',').filter(Boolean).forEach(function (k) { hidden.add(k); });
-      } catch (e) {}
+      var stored = null;
+      try { stored = localStorage.getItem(storeKey); } catch (e) {}
+      if (stored !== null) {
+        stored.split(',').filter(Boolean).forEach(function (k) { hidden.add(k); });
+      } else {
+        heads.forEach(function (th) {
+          if (th.dataset.colDefault === 'hidden') hidden.add(th.dataset.col);
+        });
+      }
 
       // Build toggle UI
       var wrap = document.createElement('div');
@@ -66,16 +80,54 @@
       reset.innerHTML = '<hr class="dropdown-divider my-1"><button type="button" class="dropdown-item text-primary" data-cols-reset style="font-size:.82rem;">Show all columns</button>';
       menu.appendChild(reset);
 
-      // Anchor: try to inject inside the header row above the card, else make one
-      var cardEl = table.closest('.card');
-      var anchor = cardEl && cardEl.previousElementSibling;
-      var isHeaderRow = anchor && (anchor.classList.contains('d-flex') || anchor.classList.contains('flex-wrap'));
-      if (!anchor || !isHeaderRow) {
-        anchor = document.createElement('div');
-        anchor.className = 'd-flex justify-content-end mb-2';
-        cardEl && cardEl.parentNode && cardEl.parentNode.insertBefore(anchor, cardEl);
+      // Anchor: prefer this table's own .tabs > .recordnav (the retro list-page
+      // pattern — record count/back-links live there already), then a
+      // legacy .card's header row, else drop a small bar just above the table.
+      var anchor = null;
+      var gridwrap = table.closest('.gridwrap') || table.closest('.table-responsive');
+      // Walk up the ancestor chain from the gridwrap (it's usually nested a
+      // level or two deep, e.g. inside a bulk-select <form>) checking each
+      // level's preceding siblings for the page's .tabs bar — a plain
+      // previousElementSibling walk on the gridwrap itself would miss it
+      // since .tabs is a sibling of an ANCESTOR, not of .gridwrap directly.
+      var tabsBar = null;
+      var anc = gridwrap;
+      while (anc && !tabsBar && anc !== document.body) {
+        var sib = anc.previousElementSibling;
+        while (sib && !tabsBar) {
+          if (sib.classList && sib.classList.contains('tabs')) tabsBar = sib;
+          sib = sib.previousElementSibling;
+        }
+        anc = anc.parentElement;
       }
-      // Insert BEFORE the primary "Add" button so it groups nicely with other tools
+      if (tabsBar) {
+        anchor = tabsBar.querySelector('.recordnav');
+        if (!anchor) {
+          anchor = document.createElement('div');
+          anchor.className = 'recordnav';
+          tabsBar.appendChild(anchor);
+        }
+      }
+      if (!anchor) {
+        var cardEl = table.closest('.card');
+        var prev = cardEl && cardEl.previousElementSibling;
+        if (prev && (prev.classList.contains('d-flex') || prev.classList.contains('flex-wrap'))) {
+          anchor = prev;
+        } else if (cardEl && cardEl.parentNode) {
+          anchor = document.createElement('div');
+          anchor.className = 'd-flex justify-content-end mb-2';
+          cardEl.parentNode.insertBefore(anchor, cardEl);
+        }
+      }
+      if (!anchor && gridwrap && gridwrap.parentNode) {
+        anchor = document.createElement('div');
+        anchor.className = 'd-flex justify-content-end';
+        anchor.style.padding = '4px 4px 0';
+        gridwrap.parentNode.insertBefore(anchor, gridwrap);
+      }
+      if (!anchor) return; // nowhere sane to put it — bail rather than breaking layout
+
+      // Insert BEFORE the primary "Add" button if this anchor has one, else just append
       var primary = anchor.querySelector('.btn-primary');
       if (primary) anchor.insertBefore(wrap, primary);
       else         anchor.appendChild(wrap);

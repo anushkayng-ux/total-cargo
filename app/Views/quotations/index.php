@@ -1,65 +1,38 @@
-<div class="d-flex align-items-center mb-3 gap-2 flex-wrap">
-  <h5 class="m-0"><?= esc($pageTitle) ?></h5>
-  <?php if (!empty($pager)): ?>
-    <span class="badge bg-secondary ms-2"><?= $pager->getTotal() ?> total</span>
-  <?php endif; ?>
+<?php
+$f = $filters;
+$extra = '<form method="get" class="d-flex align-items-center gap-2 flex-wrap m-0">'
+    . '<input class="form-control form-control-sm" style="width:160px;" type="text" name="q" value="' . esc($f['search'] ?? '') . '" placeholder="Vendor, RFQ no, route…">'
+    . '<input class="form-control form-control-sm" style="width:110px;" type="text" name="rfq_no" value="' . esc($f['rfqNo'] ?? '') . '" placeholder="RFQ no">'
+    . '<select class="form-select form-select-sm" style="width:auto;" name="vendor_id"><option value="">All Vendors</option>';
+foreach (($vendors ?? []) as $v) {
+    $extra .= '<option value="' . (int) $v['id'] . '"' . ((int) ($f['vendorId'] ?? 0) === (int) $v['id'] ? ' selected' : '') . '>' . esc($v['company_name']) . '</option>';
+}
+$extra .= '</select>'
+    . '<select class="form-select form-select-sm" style="width:auto;" name="selected"><option value="">All Status</option>'
+    . '<option value="shortlisted"' . (($f['selected'] ?? '') === 'shortlisted' ? ' selected' : '') . '>Shortlisted</option>'
+    . '<option value="final"' . (($f['selected'] ?? '') === 'final' ? ' selected' : '') . '>Awarded</option>'
+    . '</select>'
+    . '<input class="form-control form-control-sm" style="width:90px;" type="number" step="100" name="min_amount" value="' . esc($f['minAmt'] ?? '') . '" placeholder="Min ₹">'
+    . '<input class="form-control form-control-sm" style="width:90px;" type="number" step="100" name="max_amount" value="' . esc($f['maxAmt'] ?? '') . '" placeholder="Max ₹">'
+    . '<button class="btn btn-sm btn-outline-dark"><i class="bi bi-funnel"></i> Apply</button>'
+    . '<a class="btn btn-sm btn-light" href="' . site_url('quotations') . '"><i class="bi bi-x-circle"></i></a>'
+    . '</form>';
+
+echo tpt_toolbar([
+    'close_href' => site_url('dashboard'),
+    'extra'      => $extra,
+    'auth'       => $auth,
+]);
+?>
+<div class="tabs">
+  <div class="tab active">All Quotations</div>
+  <div class="spacer"></div>
+  <div class="recordnav"><?= (int) ($pager->getTotal() ?: count($rows)) ?> total records</div>
 </div>
 
-<form method="get" class="card mb-3">
-  <div class="card-body p-3">
-    <div class="row g-2 align-items-end">
-      <div class="col-md-4">
-        <label class="form-label" style="font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;color:#6b7280;font-weight:600;">Search</label>
-        <input class="form-control form-control-sm" type="text" name="q" value="<?= esc($filters['search'] ?? '') ?>" placeholder="Vendor, RFQ no, route, remarks…">
-      </div>
-      <div class="col-md-2">
-        <label class="form-label" style="font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;color:#6b7280;font-weight:600;">RFQ no</label>
-        <input class="form-control form-control-sm" type="text" name="rfq_no" value="<?= esc($filters['rfqNo'] ?? '') ?>" placeholder="RFQxxxxx">
-      </div>
-      <div class="col-md-3">
-        <label class="form-label" style="font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;color:#6b7280;font-weight:600;">Vendor</label>
-        <select class="form-select form-select-sm" name="vendor_id">
-          <option value="">All</option>
-          <?php foreach (($vendors ?? []) as $v): ?>
-            <option value="<?= (int) $v['id'] ?>" <?= (int) ($filters['vendorId'] ?? 0) === (int) $v['id'] ? 'selected' : '' ?>><?= esc($v['company_name']) ?></option>
-          <?php endforeach; ?>
-        </select>
-      </div>
-      <div class="col-md-2">
-        <label class="form-label" style="font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;color:#6b7280;font-weight:600;">Status</label>
-        <select class="form-select form-select-sm" name="selected">
-          <option value="">All</option>
-          <option value="shortlisted" <?= ($filters['selected'] ?? '') === 'shortlisted' ? 'selected' : '' ?>>Shortlisted</option>
-          <option value="final"       <?= ($filters['selected'] ?? '') === 'final' ? 'selected' : '' ?>>Awarded</option>
-        </select>
-      </div>
-      <div class="col-md-1">
-        <label class="form-label" style="font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;color:#6b7280;font-weight:600;">Min ₹</label>
-        <input class="form-control form-control-sm" type="number" step="100" name="min_amount" value="<?= esc($filters['minAmt'] ?? '') ?>">
-      </div>
-      <div class="col-md-1">
-        <label class="form-label" style="font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;color:#6b7280;font-weight:600;">Max ₹</label>
-        <input class="form-control form-control-sm" type="number" step="100" name="max_amount" value="<?= esc($filters['maxAmt'] ?? '') ?>">
-      </div>
-    </div>
-    <div class="d-flex gap-2 mt-3">
-      <button class="btn btn-sm btn-primary" type="submit"><i class="bi bi-funnel"></i> Apply filters</button>
-      <a class="btn btn-sm btn-light" href="<?= site_url('quotations') ?>"><i class="bi bi-x-circle"></i> Clear</a>
-      <div class="ms-auto d-flex align-items-center gap-2">
-        <small class="text-muted">Per page</small>
-        <select class="form-select form-select-sm" name="per_page" style="width:auto;" onchange="this.form.submit()">
-          <?php foreach ([25,50,100] as $p): ?>
-            <option value="<?= $p ?>" <?= ($filters['perPage'] ?? 25) === $p ? 'selected' : '' ?>><?= $p ?></option>
-          <?php endforeach; ?>
-        </select>
-      </div>
-    </div>
-  </div>
-</form>
-
-<div class="card">
+<div class="gridwrap">
   <div class="table-responsive">
-    <table class="table mobile-cards mb-0" data-tpt-cols="quotations">
+    <table class="table grid mobile-cards mb-0" data-tpt-cols="quotations">
       <thead>
         <tr><th data-col="rfq">RFQ</th><th data-col="vendor">Vendor</th><th class="text-end" data-col="amount">Amount</th><th data-col="transit">Transit</th><th data-col="source">Source</th><th data-col="status">Status</th><th data-col="created">Created</th></tr>
       </thead>
@@ -68,7 +41,7 @@
           <tr><td colspan="7" class="text-center text-muted py-3">No quotations match the filters.</td></tr>
         <?php endif; ?>
         <?php foreach ($rows as $q): ?>
-          <tr>
+          <tr class="row-link" data-href="<?= site_url('rfq/' . $q['rfq_id']) ?>">
             <td data-col="rfq" data-label="RFQ"><a href="<?= site_url('rfq/' . $q['rfq_id']) ?>"><code><?= esc($q['rfq_no']) ?></code></a><br>
               <small class="text-muted"><?= esc(trim(($q['pickup_city'] ?? '') . ' - ' . ($q['drop_city'] ?? ''), ' -')) ?></small>
             </td>
@@ -90,8 +63,5 @@
       </tbody>
     </table>
   </div>
+  <?php if (!empty($pager)): ?><div class="mt-3"><?= $pager->links() ?></div><?php endif; ?>
 </div>
-
-<?php if (!empty($pager)): ?>
-  <div class="d-flex justify-content-center mt-3"><?= $pager->links() ?></div>
-<?php endif; ?>

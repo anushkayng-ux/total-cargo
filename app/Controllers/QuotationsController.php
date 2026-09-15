@@ -63,12 +63,12 @@ class QuotationsController extends BaseController
             ->get()->getResultArray();
 
         return $this->render('quotations/index', [
-            'pageTitle' => 'Quotations',
+            'pageTitle' => 'Quotations [Sales & Operations] — List',
             'rows'      => $rows,
             'pager'     => $pager,
             'vendors'   => $vendors,
             'filters'   => compact('search','rfqNo','vendorId','selected','minAmt','maxAmt','perPage'),
-        ]);
+        ], retroFixedShell: true);
     }
 
     /** Manually enter a quotation against an RFQ (for phone/email responses). */

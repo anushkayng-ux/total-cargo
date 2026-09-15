@@ -84,20 +84,47 @@ class ClientsController extends BaseController
         if ($ownedIds !== null) $query->whereIn('id', $ownedIds ?: [0]);
 
         return $this->render('clients/index', [
-            'pageTitle' => 'Clients',
+            'pageTitle' => 'Client Master [General Masters] — List',
             'rows'      => $query->paginate(20),
             'pager'     => $model->pager,
             'search'    => $search,
-        ]);
+        ], retroFixedShell: true);
+    }
+
+    /** Read-only client detail page — the retro demo's "Client Master" record view. */
+    public function show(int $id)
+    {
+        $model = new ClientModel();
+        $row   = $model->find($id);
+        if (!$row) return redirect()->to(site_url('clients'))->with('error', 'Client not found.');
+
+        $db = \Config\Database::connect();
+
+        $prevRow = $db->table('clients')->select('id')->where('id <', $id)->orderBy('id', 'DESC')->get(1)->getRowArray();
+        $nextRow = $db->table('clients')->select('id')->where('id >', $id)->orderBy('id', 'ASC')->get(1)->getRowArray();
+        $total   = $db->table('clients')->countAllResults();
+
+        $bookingCount = $db->table('bookings')
+            ->groupStart()->where('consignor_client_id', $id)->orWhere('consignee_client_id', $id)->groupEnd()
+            ->countAllResults();
+
+        return $this->render('clients/show', [
+            'pageTitle'    => 'Client Master [General Masters]',
+            'row'          => $row,
+            'prevId'       => $prevRow['id'] ?? null,
+            'nextId'       => $nextRow['id'] ?? null,
+            'total'        => $total,
+            'bookingCount' => $bookingCount,
+        ], retroFixedShell: true);
     }
 
     public function create()
     {
         return $this->render('clients/form', [
-            'pageTitle' => 'Add Client',
+            'pageTitle' => 'Client Master [General Masters] — New',
             'row'       => null,
             'managers'  => $this->managerOptions(),
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function store()
@@ -158,10 +185,10 @@ class ClientsController extends BaseController
         $row = (new ClientModel())->find($id);
         if (!$row) return redirect()->to(site_url('clients'))->with('error', 'Not found.');
         return $this->render('clients/form', [
-            'pageTitle' => 'Edit Client',
+            'pageTitle' => 'Client Master [General Masters] — Edit',
             'row'       => $row,
             'managers'  => $this->managerOptions(),
-        ]);
+        ], retroFixedShell: true);
     }
 
     /** Account-manager dropdown source: active staff users with names. */

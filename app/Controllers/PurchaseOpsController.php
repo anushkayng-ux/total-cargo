@@ -36,10 +36,10 @@ class PurchaseOpsController extends BaseController
         unset($t);
 
         return $this->render('purchase_ops/advances', [
-            'pageTitle' => 'Driver Advance / Bhatta',
+            'pageTitle' => 'Driver Advance / Bhatta [Purchase]',
             'rows'      => $trips,
             'pager'     => $model->pager,
-        ]);
+        ], retroFixedShell: true);
     }
 
     /** Table of all trips + inline cargo-insurance policy fields. */
@@ -56,9 +56,9 @@ class PurchaseOpsController extends BaseController
         if ($ownedIds !== null) $q->whereIn('bookings.client_id', $ownedIds ?: [0]);
 
         return $this->render('purchase_ops/insurance', [
-            'pageTitle' => 'Cargo Insurance',
+            'pageTitle' => 'Cargo Insurance [Purchase]',
             'rows'      => $q->paginate($this->perPage()),
             'pager'     => $model->pager,
-        ]);
+        ], retroFixedShell: true);
     }
 }

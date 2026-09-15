@@ -1,15 +1,23 @@
 <?php $fmtAmt = fn ($n) => '₹' . number_format((float) $n, 0); ?>
-<div class="d-flex align-items-center mb-3 gap-2 flex-wrap">
-  <h5 class="m-0"><i class="bi bi-shield-shaded"></i> Cargo Insurance</h5>
-  <small class="text-muted">All active trips — click a row to enter/update cargo value + policy details.</small>
+<?= tpt_toolbar([
+    'close_href' => site_url('dashboard'),
+    'auth'       => $auth,
+]) ?>
+<div class="tabs">
+  <div class="tab active">All Active Trips</div>
+  <div class="spacer"></div>
+  <div class="recordnav"><?= (int) ($pager->getTotal() ?: count($rows)) ?> total records</div>
+</div>
+<div class="formwrap" style="flex:0 0 auto;">
+  <p class="text-muted mb-0" style="font-size:.9rem;">Click a row to enter/update cargo value + policy details.</p>
 </div>
 
 <?php if (empty($rows)): ?>
-  <div class="card"><div class="card-body text-center text-muted">No active trips.</div></div>
+  <div class="gridwrap"><div class="text-center text-muted py-4">No active trips.</div></div>
 <?php else: ?>
-  <div class="card">
+  <div class="gridwrap">
     <div class="table-responsive">
-      <table class="table table-hover align-middle mb-0" style="font-size:.9rem;" data-tpt-cols="insurance">
+      <table class="table grid table-hover align-middle mb-0" style="font-size:.9rem;" data-tpt-cols="insurance">
         <thead class="table-light">
           <tr>
             <th style="width:32px;"></th>
@@ -73,9 +81,9 @@
         </tbody>
       </table>
     </div>
+    <?php if (!empty($pager)): ?><div class="mt-3"><?= $pager->links() ?></div><?php endif; ?>
   </div>
 <?php endif; ?>
-<?php if (!empty($pager)): ?><div class="mt-3"><?= $pager->links() ?></div><?php endif; ?>
 
 <script>
 document.querySelectorAll('tr.ins-row').forEach(function (tr) {

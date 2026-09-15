@@ -12,19 +12,29 @@ $typeBadgeClass = static function (?string $t): string {
     return '';
 };
 ?>
-<div class="d-flex align-items-center mb-3 gap-2 flex-wrap">
-  <h5 class="m-0"><i class="bi bi-truck"></i> <?= esc($pageTitle) ?></h5>
-  <form class="ms-auto d-flex gap-2" method="get" action="<?= site_url('vendors') ?>">
-    <input type="text" name="q" class="form-control form-control-sm" placeholder="Search name / mobile / code / type" value="<?= esc($search) ?>" style="min-width:240px;">
-    <button class="btn btn-sm btn-outline-dark"><i class="bi bi-search"></i></button>
-  </form>
-  <a class="btn btn-sm btn-outline-dark" href="<?= site_url('import/vendors') ?>" title="Bulk import from Excel/CSV"><i class="bi bi-upload"></i> Import</a>
-  <a class="btn btn-sm btn-primary" href="<?= site_url('vendors/create') ?>"><i class="bi bi-plus-lg"></i> Add Vendor</a>
+<?php
+$extra = '<a class="btn btn-sm btn-outline-dark" href="' . site_url('import/vendors') . '" title="Bulk import from Excel/CSV"><i class="bi bi-upload"></i> Import</a>'
+    . '<form class="d-flex align-items-center gap-2 m-0" method="get" action="' . site_url('vendors') . '">'
+    . '<input type="text" name="q" class="form-control form-control-sm" placeholder="Search name / mobile / code / type" value="' . esc($search) . '" style="min-width:220px;">'
+    . '<button class="btn btn-sm btn-outline-dark"><i class="bi bi-search"></i></button></form>';
+
+echo tpt_toolbar([
+    'new_href'       => site_url('vendors/create'),
+    'new_item_label' => 'New Vendor',
+    'close_href'     => site_url('dashboard'),
+    'extra'          => $extra,
+    'auth'           => $auth,
+]);
+?>
+<div class="tabs">
+  <div class="tab active">All Vendors</div>
+  <div class="spacer"></div>
+  <div class="recordnav"><?= (int) ($pager->getTotal() ?: count($rows)) ?> total records</div>
 </div>
 
-<div class="card">
+<div class="gridwrap">
   <div class="table-responsive">
-    <table class="table table-hover align-middle mb-0" data-tpt-cols="vendors">
+    <table class="table grid table-hover align-middle mb-0" data-tpt-cols="vendors">
       <thead class="table-light">
         <tr>
           <th data-col="code" style="width:130px;">Code</th>
@@ -49,7 +59,7 @@ $typeBadgeClass = static function (?string $t): string {
           $primaryMobile = $r['primary_contact_mobile'] ?: $r['mobile'];
           $tCls = $typeBadgeClass($r['vendor_type'] ?? '');
         ?>
-          <tr>
+          <tr class="row-link" data-href="<?= site_url('vendors/' . $r['id']) ?>">
             <td data-col="code" data-label="Code"><code class="text-dark"><?= esc($r['vendor_code']) ?></code></td>
 
             <td data-col="company" data-label="Company" class="cell-stack">
@@ -128,6 +138,5 @@ $typeBadgeClass = static function (?string $t): string {
       </tbody>
     </table>
   </div>
+  <?php if (!empty($pager)): ?><div class="mt-3"><?= $pager->links() ?></div><?php endif; ?>
 </div>
-
-<?php if (!empty($pager)): ?><div class="mt-3"><?= $pager->links() ?></div><?php endif; ?>

@@ -31,12 +31,12 @@ class HelpController extends BaseController
         foreach ($allTopics as $t) $byCategory[$t['category']][] = $t;
 
         return $this->render('help/index', [
-            'pageTitle'  => 'Help',
+            'pageTitle'  => 'Help Center',
             'byCategory' => $byCategory,
             'search'     => $search,
             'roleKey'    => $this->currentRoleKey(),
             'isAdmin'    => $this->auth->can('help', 'can_edit'),
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function show(string $slug)
@@ -53,12 +53,12 @@ class HelpController extends BaseController
             ->orderBy('sort_order', 'ASC')->find();
 
         return $this->render('help/show', [
-            'pageTitle' => $row['title'],
+            'pageTitle' => 'Help Center — ' . $row['title'],
             'row'       => $row,
             'rendered'  => tpt_md_render((string) $row['body_md']),
             'siblings'  => $siblings,
             'isAdmin'   => $this->auth->can('help', 'can_edit'),
-        ]);
+        ], retroFixedShell: true);
     }
 
     // ── Admin CRUD (gated by 'help' module .can_add/.can_edit) ─────────
@@ -70,18 +70,18 @@ class HelpController extends BaseController
         }
         $rows = (new HelpTopicModel())->orderBy('category')->orderBy('sort_order')->find();
         return $this->render('help/admin/index', [
-            'pageTitle' => 'Manage Help Topics',
+            'pageTitle' => 'Help [Administration] — List',
             'rows'      => $rows,
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function create()
     {
         if (!$this->auth->can('help', 'can_add')) return redirect()->to(site_url('help'))->with('error', 'Not allowed.');
         return $this->render('help/admin/form', [
-            'pageTitle' => 'New help topic',
+            'pageTitle' => 'Help [Administration] — New',
             'row'       => null,
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function store()
@@ -119,9 +119,9 @@ class HelpController extends BaseController
         $row = (new HelpTopicModel())->find($id);
         if (!$row) return redirect()->to(site_url('help/admin'))->with('error', 'Not found.');
         return $this->render('help/admin/form', [
-            'pageTitle' => 'Edit ' . $row['title'],
+            'pageTitle' => 'Help [Administration] — Edit',
             'row'       => $row,
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function update(int $id)

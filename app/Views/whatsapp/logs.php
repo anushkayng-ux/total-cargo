@@ -1,15 +1,24 @@
-<div class="d-flex align-items-center mb-3 gap-2 flex-wrap">
-  <h5 class="m-0"><?= esc($pageTitle) ?></h5>
-  <?php if (!$service->isConfigured()): ?>
-    <span class="badge-soft badge-warn ms-2">API credentials not set — messages are queued only</span>
-  <?php else: ?>
-    <span class="badge-soft badge-ok ms-2">API configured</span>
-  <?php endif; ?>
+<?php
+$extra = $service->isConfigured()
+    ? '<span class="badge-soft badge-ok">API configured</span>'
+    : '<span class="badge-soft badge-warn">API credentials not set — messages are queued only</span>';
+echo tpt_toolbar([
+    'close_href' => site_url('dashboard'),
+    'extra'      => $extra,
+    'auth'       => $auth,
+]);
+?>
+<div class="tabs">
+  <div class="tab active">Message Logs</div>
+  <a class="tab" href="<?= site_url('whatsapp/inbox') ?>">Inbox</a>
+  <a class="tab" href="<?= site_url('whatsapp/templates') ?>">Templates</a>
+  <div class="spacer"></div>
+  <div class="recordnav"><?= (int) ($pager->getTotal() ?: count($rows)) ?> total records</div>
 </div>
 
-<div class="card">
+<div class="gridwrap">
   <div class="table-responsive">
-    <table class="table mb-0" data-tpt-cols="wa-logs">
+    <table class="table grid mb-0" data-tpt-cols="wa-logs">
       <thead>
         <tr><th data-col="id">ID</th><th data-col="module">Module</th><th data-col="to">To</th><th data-col="template">Template</th><th data-col="type">Type</th><th data-col="status">Status</th><th data-col="sent">Sent</th><th data-col="delivered">Delivered</th><th data-col="error">Error</th></tr>
       </thead>
@@ -42,5 +51,5 @@
       </tbody>
     </table>
   </div>
+  <?php if (!empty($pager)): ?><div class="mt-3"><?= $pager->links() ?></div><?php endif; ?>
 </div>
-<?php if (!empty($pager)): ?><div class="mt-3"><?= $pager->links() ?></div><?php endif; ?>

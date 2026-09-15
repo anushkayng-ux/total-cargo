@@ -26,20 +26,20 @@ class UsersController extends BaseController
         }
 
         return $this->render('users/index', [
-            'pageTitle' => 'Users',
+            'pageTitle' => 'User Master [Administration] — List',
             'users'     => $query->paginate(20),
             'pager'     => $model->pager,
             'search'    => $search,
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function create()
     {
         return $this->render('users/form', [
-            'pageTitle' => 'Add User',
+            'pageTitle' => 'User Master [Administration] — New',
             'user'      => null,
             'roles'     => (new RoleModel())->where('status', 1)->orderBy('role_name')->findAll(),
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function store()
@@ -80,10 +80,10 @@ class UsersController extends BaseController
             return redirect()->to(site_url('users'))->with('error', 'User not found.');
         }
         return $this->render('users/form', [
-            'pageTitle' => 'Edit User',
+            'pageTitle' => 'User Master [Administration] — Edit',
             'user'      => $user,
             'roles'     => (new RoleModel())->where('status', 1)->orderBy('role_name')->findAll(),
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function update(int $id)

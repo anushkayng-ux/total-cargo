@@ -1,16 +1,29 @@
-<?php $fmt = fn($n) => '₹' . number_format((float) $n, 0); ?>
-<h5 class="mb-3">Lane Profitability</h5>
+<?php
+$fmt = fn($n) => '₹' . number_format((float) $n, 0);
 
-<form method="get" class="row g-2 mb-3 align-items-end">
-  <div class="col-6 col-md-3"><label class="form-label" style="font-size:.85rem;">From</label><input type="date" class="form-control form-control-sm" name="from" value="<?= esc($from) ?>"></div>
-  <div class="col-6 col-md-3"><label class="form-label" style="font-size:.85rem;">To</label><input type="date" class="form-control form-control-sm" name="to" value="<?= esc($to) ?>"></div>
-  <div class="col-md-2"><button class="btn btn-sm btn-light w-100">Apply</button></div>
-  <div class="col-md-4 text-muted text-end" style="font-size:.85rem;">Lanes derived from booking <code>route_text</code> — naive split on common delimiters.</div>
-</form>
+$extra = '<form method="get" class="d-flex align-items-center gap-2 flex-wrap m-0">'
+    . '<input class="form-control form-control-sm" style="width:150px;" type="date" name="from" value="' . esc($from) . '">'
+    . '<input class="form-control form-control-sm" style="width:150px;" type="date" name="to" value="' . esc($to) . '">'
+    . '<button class="btn btn-sm btn-outline-dark">Apply</button></form>';
+?>
+<?= tpt_toolbar([
+    'close_href' => site_url('reports'),
+    'extra'      => $extra,
+    'auth'       => $auth,
+]) ?>
+<div class="tabs">
+  <div class="tab active">Lane Profitability</div>
+  <div class="spacer"></div>
+  <div class="recordnav"><?= count($rows) ?> lanes</div>
+</div>
 
-<div class="card">
+<div class="formwrap" style="flex:0 0 auto;">
+  <p class="text-muted mb-0" style="font-size:.85rem;">Lanes derived from booking <code>route_text</code> — naive split on common delimiters.</p>
+</div>
+
+<div class="gridwrap">
   <div class="table-responsive">
-    <table class="table table-sm align-middle mb-0">
+    <table class="table grid mb-0">
       <thead><tr><th>Pickup</th><th>Drop</th><th class="text-end">Trips</th><th class="text-end">Revenue</th><th class="text-end">Buy cost</th><th class="text-end">Margin</th><th class="text-end">Margin %</th></tr></thead>
       <tbody>
       <?php if (empty($rows)): ?>

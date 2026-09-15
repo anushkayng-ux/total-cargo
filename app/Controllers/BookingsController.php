@@ -24,13 +24,13 @@ class BookingsController extends BaseController
         $model  = $this->filteredQuery($search, $status);
 
         return $this->render('bookings/index', [
-            'pageTitle' => 'Bookings',
+            'pageTitle' => 'GR/LR Booking [Transport] — List',
             'rows'      => $model->paginate($this->perPage()),
-            'pager'     => (new BookingModel())->pager,
+            'pager'     => $model->pager,
             'search'    => $search,
             'status'    => $status,
             'statuses'  => BookingModel::STATUSES,
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function export()
@@ -111,11 +111,11 @@ class BookingsController extends BaseController
     public function create()
     {
         return $this->render('bookings/form', [
-            'pageTitle' => 'New Booking',
+            'pageTitle' => 'GR/LR Booking [New]',
             'row'       => null, 'rfq' => null, 'quote' => null, 'lead' => null,
             'clients'   => (new ClientModel())->where('status', 1)->orderBy('company_name')->findAll(),
             'vendors'   => (new VendorModel())->where('status', 1)->orderBy('company_name')->findAll(),
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function store()
@@ -244,16 +244,24 @@ class BookingsController extends BaseController
 
         $trip = (new TripModel())->where('booking_id', $id)->first();
 
+        $db      = \Config\Database::connect();
+        $prevRow = $db->table('bookings')->select('id')->where('id <', $id)->where('deleted_at', null)->orderBy('id', 'DESC')->get(1)->getRowArray();
+        $nextRow = $db->table('bookings')->select('id')->where('id >', $id)->where('deleted_at', null)->orderBy('id', 'ASC')->get(1)->getRowArray();
+        $total   = $db->table('bookings')->where('deleted_at', null)->countAllResults();
+
         return $this->render('bookings/show', [
-            'pageTitle'      => 'Booking ' . $row['booking_no'],
+            'pageTitle'      => 'GR/LR Booking [Transport]',
             'row'            => $row,
             'trip'           => $trip,
+            'prevId'         => $prevRow['id'] ?? null,
+            'nextId'         => $nextRow['id'] ?? null,
+            'total'          => $total,
             'vendors'        => (new VendorModel())->where('status', 1)->orderBy('company_name')->findAll(),
             'staff'          => (new \App\Models\UserModel())->activeList(),
             'threadType'     => 'booking',
             'threadId'       => $id,
             'threadComments' => (new \App\Models\RecordCommentModel())->thread('booking', $id),
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function edit(int $id)
@@ -262,11 +270,11 @@ class BookingsController extends BaseController
         if (!$row) return redirect()->to(site_url('bookings'))->with('error', 'Not found.');
 
         return $this->render('bookings/form', [
-            'pageTitle' => 'Edit Booking ' . $row['booking_no'],
+            'pageTitle' => 'GR/LR Booking [Edit]',
             'row'       => $row, 'rfq' => null, 'quote' => null, 'lead' => null,
             'clients'   => (new ClientModel())->where('status', 1)->orderBy('company_name')->findAll(),
             'vendors'   => (new VendorModel())->where('status', 1)->orderBy('company_name')->findAll(),
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function update(int $id)

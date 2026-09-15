@@ -1,11 +1,20 @@
-<div class="d-flex align-items-center mb-3 gap-2 flex-wrap">
-  <h5 class="m-0"><?= esc($pageTitle) ?></h5>
-  <span class="text-muted ms-2" style="font-size:.85rem;">Higher composite score = better vendor. Includes response rate, response speed, POD rate, rating, cancellation penalty, preferred/blacklist flags.</span>
+<?= tpt_toolbar([
+    'close_href' => site_url('reports'),
+    'auth'       => $auth,
+]) ?>
+<div class="tabs">
+  <div class="tab active">Vendor Scorecard</div>
+  <div class="spacer"></div>
+  <div class="recordnav"><?= count($rows) ?> vendors</div>
 </div>
 
-<div class="card">
+<div class="formwrap" style="flex:0 0 auto;">
+  <p class="text-muted mb-0" style="font-size:.85rem;">Higher composite score = better vendor. Includes response rate, response speed, POD rate, rating, cancellation penalty, preferred/blacklist flags.</p>
+</div>
+
+<div class="gridwrap">
   <div class="table-responsive">
-    <table class="table mb-0">
+    <table class="table grid mb-0">
       <thead>
         <tr>
           <th>#</th><th>Vendor</th>

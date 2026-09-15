@@ -377,7 +377,7 @@ a.stat-link:hover .stat {
 .ts-dropdown .active { background: var(--v2-primary-tone); color: var(--v2-navy-900); }
 
 /* ── Main content area — generous breathing room ────────────── */
-.tpt-main { padding: 24px 28px; background: var(--v2-bg); }
+.tpt-main { padding: 0; background: var(--v2-bg); }
 @media (max-width: 768px) { .tpt-main { padding: 16px; } }
 
 /* ── Utility ────────────────────────────────────────────────── */

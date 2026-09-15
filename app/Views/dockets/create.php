@@ -8,8 +8,6 @@
  * For accounting-heavy entries (buy/sell rate, vendor, expenses, invoice
  * flow) the full Bookings form at /bookings/create is still available.
  */
-// When launched from a trip page, $trip + $booking are pre-set. Values in
-// existing records take priority over `old()` (which is empty on a fresh GET).
 $b = $booking ?? [];
 $t = $trip    ?? [];
 $g = function (string $k, string $bookingKey = null, string $tripKey = null, $d = '') use ($b, $t) {
@@ -25,191 +23,211 @@ if ($rawJson !== '') {
     if (is_array($decoded)) $existingRows = $decoded;
 }
 if (empty($existingRows)) $existingRows = [['no' => '', 'value' => '']];
+
+$pendingCount = count($pending ?? []);
+$extra = '';
+if ($pendingCount > 0 && empty($t['id'])) {
+    $extra = '<a class="btn btn-sm btn-outline-primary" href="' . site_url('dockets/pending') . '"><i class="bi bi-list-check"></i> See all ' . ($pendingCount >= 20 ? '20+' : $pendingCount) . ' trips awaiting docket</a>';
+}
 ?>
-<div class="d-flex align-items-center flex-wrap gap-2 mb-3">
-  <h5 class="m-0"><i class="bi bi-file-earmark-ruled"></i> <?= esc($pageTitle) ?></h5>
-  <?php $pendingCount = count($pending ?? []); ?>
-  <?php if ($pendingCount > 0 && empty($t['id'])): ?>
-    <a href="<?= site_url('dockets/pending') ?>" class="btn btn-sm btn-outline-primary ms-auto">
-      <i class="bi bi-list-check"></i> See all <?= $pendingCount >= 20 ? '20+' : $pendingCount ?> trips awaiting docket
-    </a>
-  <?php endif; ?>
+<?= tpt_toolbar([
+    'save_form'   => 'docketForm',
+    'close_href'  => site_url('trips'),
+    'extra'       => $extra,
+    'auth'        => $auth,
+]) ?>
+
+<div class="tabs" id="docketFormTabs">
+  <button type="button" class="tab active" data-bs-toggle="tab" data-bs-target="#dkt-route">Route &amp; Docket</button>
+  <button type="button" class="tab" data-bs-toggle="tab" data-bs-target="#dkt-parties">Parties</button>
+  <button type="button" class="tab" data-bs-toggle="tab" data-bs-target="#dkt-cargo">Cargo &amp; Details</button>
+  <div class="spacer"></div>
+  <?php if (!empty($t['id'])): ?><div class="recordnav">Trip <?= esc($t['trip_no']) ?></div><?php endif; ?>
 </div>
 
-<?php if (empty($t['id']) && $pendingCount > 0): ?>
-  <!-- Pending picker — shown only when the operator opened this page cold (not from a trip page)
-       and there are trips still waiting for LRs. Picking a row = jump into the pre-filled form. -->
-  <div class="card mb-3" style="border-left:4px solid var(--v2-primary, #2f5eff);">
-    <div class="card-body py-3">
-      <div class="d-flex align-items-center gap-2 mb-2">
-        <strong style="font-size:.95rem;">Pick a trip</strong>
-      </div>
-      <select id="pendingPicker" class="form-select" data-tpt-search>
-        <option value="">— Select trip —</option>
-        <?php foreach ($pending as $p):
-          $bits = array_filter([
-            $p['trip_no'] ?? null,
-            $p['client_company'] ?? null,
-            trim(($p['loading_point'] ?? '') . ' → ' . ($p['unloading_point'] ?? ''), ' →'),
-            !empty($p['loading_date']) ? date('d M', strtotime($p['loading_date'])) : null,
-            !empty($p['vehicle_number']) ? 'Veh ' . $p['vehicle_number'] : null,
-          ]);
-          $label = implode(' · ', $bits);
-        ?>
-          <option value="<?= site_url('dockets/create/' . (int) $p['id']) ?>"><?= esc($label) ?></option>
-        <?php endforeach; ?>
-      </select>
-      <script>
-        (function () {
-          const sel = document.getElementById('pendingPicker');
-          if (!sel) return;
-          sel.addEventListener('change', () => { if (sel.value) window.location.href = sel.value; });
-        })();
-      </script>
-    </div>
-  </div>
-<?php endif; ?>
-
-<div class="card"><div class="card-body">
-<form method="post" action="<?= site_url('dockets/store') ?>">
+<form id="docketForm" method="post" action="<?= site_url('dockets/store') ?>">
   <?= csrf_field() ?>
   <?php if (!empty($t['id'])): ?>
     <input type="hidden" name="trip_id" value="<?= (int) $t['id'] ?>">
   <?php endif; ?>
-  <div class="row g-3">
-    <!-- Row 1: From / To / Date / Docket Number -->
-    <div class="col-md-3"><label class="form-label">From <span class="text-danger">*</span></label>
-      <input class="form-control" name="pickup_city" data-tpt-city value="<?= esc($g('pickup_city', 'pickup_city', 'loading_point')) ?>" placeholder="Loading city…" required autocomplete="off"></div>
-    <div class="col-md-3"><label class="form-label">To <span class="text-danger">*</span></label>
-      <input class="form-control" name="drop_city" data-tpt-city value="<?= esc($g('drop_city', 'drop_city', 'unloading_point')) ?>" placeholder="Delivery city…" required autocomplete="off"></div>
-    <div class="col-md-3"><label class="form-label">Date <span class="text-danger">*</span></label>
-      <input type="date" class="form-control" name="loading_date" value="<?= esc($g('loading_date', 'loading_date', 'loading_date', date('Y-m-d'))) ?>" required></div>
-    <div class="col-md-3"><label class="form-label">Docket / LR Number <span class="text-danger">*</span></label>
-      <input class="form-control" name="lr_no" value="<?= esc($g('lr_no', 'lr_no', 'lr_no')) ?>" placeholder="e.g. 5064" required></div>
 
-    <div class="col-12"><hr class="mt-2 mb-0"></div>
-    <div class="col-md-6"><label class="form-label">Consignor <span class="text-danger">*</span></label>
-      <select class="form-select party-select" name="consignor_client_id" data-target="consignor" required>
-        <option value="">— Select consignor —</option>
-        <?php foreach ($clients as $c): ?>
-          <option value="<?= (int) $c['id'] ?>"
-                  data-name="<?= esc($c['company_name']) ?>"
-                  data-mobile="<?= esc($c['mobile'] ?? '') ?>"
-                  data-address="<?= esc(trim(($c['address'] ?? '') . ' ' . ($c['city'] ?? '') . ' ' . ($c['pincode'] ?? ''))) ?>"
-                  data-gstin="<?= esc($c['gst_no'] ?? '') ?>"
-                  data-state="<?= esc($c['state'] ?? '') ?>"
-                  <?= (int) $g('consignor_client_id') === (int) $c['id'] ? 'selected' : '' ?>>
-            <?= esc($c['company_name']) ?><?= !empty($c['city']) ? ' · ' . esc($c['city']) : '' ?>
-          </option>
-        <?php endforeach; ?>
-      </select>
+  <div class="tab-content">
+
+    <div class="tab-pane fade show active" id="dkt-route">
+      <div class="formwrap">
+        <?php if (empty($t['id']) && $pendingCount > 0): ?>
+          <div class="retro-row" style="margin-bottom:14px;">
+            <div class="retro-field" style="width:100%;"><label style="white-space:nowrap;">Pick a trip :</label>
+              <select id="pendingPicker" class="retro-box xwide" style="min-width:400px;" data-tpt-search>
+                <option value="">— Select trip —</option>
+                <?php foreach ($pending as $p):
+                  $bits = array_filter([
+                    $p['trip_no'] ?? null,
+                    $p['client_company'] ?? null,
+                    trim(($p['loading_point'] ?? '') . ' → ' . ($p['unloading_point'] ?? ''), ' →'),
+                    !empty($p['loading_date']) ? date('d M', strtotime($p['loading_date'])) : null,
+                    !empty($p['vehicle_number']) ? 'Veh ' . $p['vehicle_number'] : null,
+                  ]);
+                  $label = implode(' · ', $bits);
+                ?>
+                  <option value="<?= site_url('dockets/create/' . (int) $p['id']) ?>"><?= esc($label) ?></option>
+                <?php endforeach; ?>
+              </select>
+            </div>
+          </div>
+          <script>
+            (function () {
+              const sel = document.getElementById('pendingPicker');
+              if (!sel) return;
+              sel.addEventListener('change', () => { if (sel.value) window.location.href = sel.value; });
+            })();
+          </script>
+        <?php endif; ?>
+
+        <div class="retro-row">
+          <div class="retro-field"><label>From <span class="retro-required">*</span> :</label><input class="retro-box wide" name="pickup_city" data-tpt-city value="<?= esc($g('pickup_city', 'pickup_city', 'loading_point')) ?>" placeholder="Loading city…" required autocomplete="off"></div>
+          <div class="retro-field"><label>To <span class="retro-required">*</span> :</label><input class="retro-box wide" name="drop_city" data-tpt-city value="<?= esc($g('drop_city', 'drop_city', 'unloading_point')) ?>" placeholder="Delivery city…" required autocomplete="off"></div>
+        </div>
+        <div class="retro-row">
+          <div class="retro-field"><label>Date <span class="retro-required">*</span> :</label><input type="date" class="retro-box" name="loading_date" value="<?= esc($g('loading_date', 'loading_date', 'loading_date', date('Y-m-d'))) ?>" required></div>
+          <div class="retro-field"><label>Docket / LR Number <span class="retro-required">*</span> :</label><input class="retro-box wide" name="lr_no" value="<?= esc($g('lr_no', 'lr_no', 'lr_no')) ?>" placeholder="e.g. 5064" required></div>
+        </div>
+      </div>
     </div>
-    <div class="col-md-6"><label class="form-label">Consignee <span class="text-danger">*</span></label>
-      <select class="form-select party-select" name="consignee_client_id" data-target="consignee" required>
-        <option value="">— Select consignee —</option>
-        <?php foreach ($clients as $c): ?>
-          <option value="<?= (int) $c['id'] ?>"
-                  data-name="<?= esc($c['company_name']) ?>"
-                  data-mobile="<?= esc($c['mobile'] ?? '') ?>"
-                  data-address="<?= esc(trim(($c['address'] ?? '') . ' ' . ($c['city'] ?? '') . ' ' . ($c['pincode'] ?? ''))) ?>"
-                  data-gstin="<?= esc($c['gst_no'] ?? '') ?>"
-                  data-state="<?= esc($c['state'] ?? '') ?>"
-                  <?= (int) $g('consignee_client_id') === (int) $c['id'] ? 'selected' : '' ?>>
-            <?= esc($c['company_name']) ?><?= !empty($c['city']) ? ' · ' . esc($c['city']) : '' ?>
-          </option>
-        <?php endforeach; ?>
-      </select>
+
+    <div class="tab-pane fade" id="dkt-parties">
+      <div class="formwrap">
+        <h6 class="mb-2 text-muted" style="font-size:.85rem;text-transform:uppercase;letter-spacing:.5px;">Consignor</h6>
+        <div class="retro-row">
+          <div class="retro-field" style="width:100%;"><label>Consignor <span class="retro-required">*</span> :</label>
+            <select class="retro-box xwide party-select" name="consignor_client_id" data-target="consignor" required>
+              <option value="">— Select consignor —</option>
+              <?php foreach ($clients as $c): ?>
+                <option value="<?= (int) $c['id'] ?>"
+                        data-name="<?= esc($c['company_name']) ?>"
+                        data-mobile="<?= esc($c['mobile'] ?? '') ?>"
+                        data-address="<?= esc(trim(($c['address'] ?? '') . ' ' . ($c['city'] ?? '') . ' ' . ($c['pincode'] ?? ''))) ?>"
+                        data-gstin="<?= esc($c['gst_no'] ?? '') ?>"
+                        data-state="<?= esc($c['state'] ?? '') ?>"
+                        <?= (int) $g('consignor_client_id') === (int) $c['id'] ? 'selected' : '' ?>>
+                  <?= esc($c['company_name']) ?><?= !empty($c['city']) ? ' · ' . esc($c['city']) : '' ?>
+                </option>
+              <?php endforeach; ?>
+            </select>
+          </div>
+        </div>
+        <div class="retro-row">
+          <div class="retro-field"><label>Mobile :</label><input class="retro-box" id="consignor-mobile-view" name="consignor_mobile" value="<?= esc($g('consignor_mobile')) ?>" readonly></div>
+          <div class="retro-field"><label>GSTIN :</label><input class="retro-box wide" id="consignor-gstin-view" name="consignor_gstin" value="<?= esc($g('consignor_gstin')) ?>" readonly></div>
+        </div>
+        <div class="retro-row">
+          <div class="retro-field" style="width:100%;"><label>Address :</label><input class="retro-box xwide" style="min-width:400px;" id="consignor-address-view" name="consignor_address" value="<?= esc($g('consignor_address')) ?>" readonly></div>
+        </div>
+        <input type="hidden" id="consignor-name-hidden"  name="consignor_name"  value="<?= esc($g('consignor_name')) ?>">
+        <input type="hidden" id="consignor-state-view"   name="consignor_state" value="<?= esc($g('consignor_state')) ?>">
+
+        <hr>
+
+        <h6 class="mb-2 text-muted" style="font-size:.85rem;text-transform:uppercase;letter-spacing:.5px;">Consignee</h6>
+        <div class="retro-row">
+          <div class="retro-field" style="width:100%;"><label>Consignee <span class="retro-required">*</span> :</label>
+            <select class="retro-box xwide party-select" name="consignee_client_id" data-target="consignee" required>
+              <option value="">— Select consignee —</option>
+              <?php foreach ($clients as $c): ?>
+                <option value="<?= (int) $c['id'] ?>"
+                        data-name="<?= esc($c['company_name']) ?>"
+                        data-mobile="<?= esc($c['mobile'] ?? '') ?>"
+                        data-address="<?= esc(trim(($c['address'] ?? '') . ' ' . ($c['city'] ?? '') . ' ' . ($c['pincode'] ?? ''))) ?>"
+                        data-gstin="<?= esc($c['gst_no'] ?? '') ?>"
+                        data-state="<?= esc($c['state'] ?? '') ?>"
+                        <?= (int) $g('consignee_client_id') === (int) $c['id'] ? 'selected' : '' ?>>
+                  <?= esc($c['company_name']) ?><?= !empty($c['city']) ? ' · ' . esc($c['city']) : '' ?>
+                </option>
+              <?php endforeach; ?>
+            </select>
+          </div>
+        </div>
+        <div class="retro-row">
+          <div class="retro-field"><label>Mobile :</label><input class="retro-box" id="consignee-mobile-view" name="consignee_mobile" value="<?= esc($g('consignee_mobile')) ?>" readonly></div>
+          <div class="retro-field"><label>GSTIN :</label><input class="retro-box wide" id="consignee-gstin-view" name="consignee_gstin" value="<?= esc($g('consignee_gstin')) ?>" readonly></div>
+        </div>
+        <div class="retro-row">
+          <div class="retro-field" style="width:100%;"><label>Address :</label><input class="retro-box xwide" style="min-width:400px;" id="consignee-address-view" name="consignee_address" value="<?= esc($g('consignee_address')) ?>" readonly></div>
+        </div>
+        <input type="hidden" id="consignee-name-hidden"  name="consignee_name"  value="<?= esc($g('consignee_name')) ?>">
+      </div>
     </div>
 
-    <div class="col-md-3"><label class="form-label">Consignor Mobile</label>
-      <input class="form-control" id="consignor-mobile-view" name="consignor_mobile" value="<?= esc($g('consignor_mobile')) ?>" readonly style="background:#f6f8fa;"></div>
-    <div class="col-md-3"><label class="form-label">Consignor GSTIN</label>
-      <input class="form-control" id="consignor-gstin-view" name="consignor_gstin" value="<?= esc($g('consignor_gstin')) ?>" readonly style="background:#f6f8fa;"></div>
-    <div class="col-md-3"><label class="form-label">Consignee Mobile</label>
-      <input class="form-control" id="consignee-mobile-view" name="consignee_mobile" value="<?= esc($g('consignee_mobile')) ?>" readonly style="background:#f6f8fa;"></div>
-    <div class="col-md-3"><label class="form-label">Consignee GSTIN</label>
-      <input class="form-control" id="consignee-gstin-view" name="consignee_gstin" value="<?= esc($g('consignee_gstin')) ?>" readonly style="background:#f6f8fa;"></div>
+    <div class="tab-pane fade" id="dkt-cargo">
+      <div class="formwrap">
+        <div class="retro-row">
+          <div class="retro-field"><label>No. of Packages :</label><input type="number" min="0" class="retro-box narrow" name="packages_count" value="<?= esc($g('packages_count')) ?>"></div>
+          <div class="retro-field"><label>Method of Packing :</label><input class="retro-box wide" name="packing_method" value="<?= esc($g('packing_method')) ?>" placeholder="e.g. Wooden crate / Loose"></div>
+        </div>
+        <div class="retro-row" style="align-items:flex-start;">
+          <div class="retro-field" style="width:100%;"><label style="white-space:nowrap;">Particulars :</label>
+            <input class="retro-box xwide" style="min-width:400px;" name="particulars_text" value="<?= esc($g('particulars_text')) ?>" placeholder="e.g. Home appliances — 24× refrigerators">
+          </div>
+        </div>
+        <div class="retro-row">
+          <div class="retro-field"><label>Actual Weight (kg) :</label><input type="number" step="0.01" min="0" class="retro-box" name="actual_weight_kg" value="<?= esc($g('actual_weight_kg')) ?>"></div>
+          <div class="retro-field"><label>Chargeable Weight (kg) <span class="retro-required">*</span> :</label><input type="number" step="0.01" min="0" class="retro-box" name="charge_weight_kg" value="<?= esc($g('charge_weight_kg')) ?>" required></div>
+        </div>
+        <div class="retro-row">
+          <div class="retro-field"><label>Vehicle Type :</label><input class="retro-box wide" name="vehicle_type" value="<?= esc($g('vehicle_type')) ?>" placeholder="e.g. 32 FT MXL"></div>
+          <div class="retro-field"><label>Vehicle Number :</label><input class="retro-box wide" style="text-transform:uppercase;" name="vehicle_number" value="<?= esc($g('vehicle_number', 'vehicle_number', 'vehicle_number')) ?>" placeholder="e.g. HR 55 AR 7375"></div>
+          <div class="retro-field"><label>Driver Mobile :</label><input class="retro-box" name="driver_mobile" value="<?= esc($g('driver_mobile', 'driver_mobile', 'driver_mobile')) ?>" placeholder="10-digit"></div>
+        </div>
+        <div class="retro-row">
+          <div class="retro-field"><label>Bill of Entry :</label><input class="retro-box wide" name="bill_of_entry" value="<?= esc($g('bill_of_entry')) ?>"></div>
+          <div class="retro-field"><label>Container No. :</label><input class="retro-box wide" name="container_number" value="<?= esc($g('container_number')) ?>"></div>
+          <div class="retro-field"><label>E-Way Bill No. :</label><input class="retro-box wide" name="ewb_no" value="<?= esc($g('ewb_no', 'ewb_no', 'ewb_no')) ?>" placeholder="12-digit EWB"></div>
+        </div>
 
-    <div class="col-md-6"><label class="form-label">Consignor Address</label>
-      <input class="form-control" id="consignor-address-view" name="consignor_address" value="<?= esc($g('consignor_address')) ?>" readonly style="background:#f6f8fa;"></div>
-    <div class="col-md-6"><label class="form-label">Consignee Address</label>
-      <input class="form-control" id="consignee-address-view" name="consignee_address" value="<?= esc($g('consignee_address')) ?>" readonly style="background:#f6f8fa;"></div>
-
-    <input type="hidden" id="consignor-name-hidden"  name="consignor_name"  value="<?= esc($g('consignor_name')) ?>">
-    <input type="hidden" id="consignor-state-view"   name="consignor_state" value="<?= esc($g('consignor_state')) ?>">
-    <input type="hidden" id="consignee-name-hidden"  name="consignee_name"  value="<?= esc($g('consignee_name')) ?>">
-
-    <div class="col-12"><hr class="mt-2 mb-0"></div>
-    <div class="col-md-2"><label class="form-label">No. of Packages</label>
-      <input type="number" min="0" class="form-control" name="packages_count" value="<?= esc($g('packages_count')) ?>"></div>
-    <div class="col-md-3"><label class="form-label">Method of Packaging</label>
-      <input class="form-control" name="packing_method" value="<?= esc($g('packing_method')) ?>" placeholder="e.g. Wooden crate / Loose"></div>
-    <div class="col-md-7"><label class="form-label">Particulars</label>
-      <input class="form-control" name="particulars_text" value="<?= esc($g('particulars_text')) ?>" placeholder="e.g. Home appliances — 24× refrigerators"></div>
-
-    <div class="col-md-3"><label class="form-label">Actual Weight (kg)</label>
-      <input type="number" step="0.01" min="0" class="form-control" name="actual_weight_kg" value="<?= esc($g('actual_weight_kg')) ?>"></div>
-    <div class="col-md-3"><label class="form-label">Chargeable Weight (kg) <span class="text-danger">*</span></label>
-      <input type="number" step="0.01" min="0" class="form-control" name="charge_weight_kg" value="<?= esc($g('charge_weight_kg')) ?>" required></div>
-    <div class="col-md-3"><label class="form-label">Vehicle Type</label>
-      <input class="form-control" name="vehicle_type" value="<?= esc($g('vehicle_type')) ?>" placeholder="e.g. 32 FT MXL"></div>
-    <div class="col-md-3"><label class="form-label">Vehicle Number</label>
-      <input class="form-control" name="vehicle_number" value="<?= esc($g('vehicle_number', 'vehicle_number', 'vehicle_number')) ?>" placeholder="e.g. HR 55 AR 7375"
-             style="text-transform:uppercase;"></div>
-    <div class="col-md-3"><label class="form-label">Driver Mobile Number</label>
-      <input class="form-control" name="driver_mobile" value="<?= esc($g('driver_mobile', 'driver_mobile', 'driver_mobile')) ?>" placeholder="10-digit"></div>
-
-    <div class="col-12"><hr class="mt-2 mb-0"></div>
-    <div class="col-md-4"><label class="form-label">Bill of Entry Number</label>
-      <input class="form-control" name="bill_of_entry" value="<?= esc($g('bill_of_entry')) ?>"></div>
-    <div class="col-md-4"><label class="form-label">Container Number</label>
-      <input class="form-control" name="container_number" value="<?= esc($g('container_number')) ?>"></div>
-    <div class="col-md-4"><label class="form-label">E-Way Bill Number</label>
-      <input class="form-control" name="ewb_no" value="<?= esc($g('ewb_no', 'ewb_no', 'ewb_no')) ?>" placeholder="12-digit EWB"></div>
-
-    <div class="col-12">
-      <label class="form-label"><strong>Shipper Invoice(s) &amp; Value</strong></label>
-      <table class="table table-sm mb-1" id="shipperInvoiceTable" style="max-width:720px;">
-        <thead>
-          <tr>
-            <th style="width:40px;">#</th>
-            <th>Invoice No.</th>
-            <th style="width:180px;">Invoice Value (₹)</th>
-            <th style="width:60px;"></th>
-          </tr>
-        </thead>
-        <tbody>
-          <?php foreach ($existingRows as $idx => $ri): ?>
+        <h6 class="mb-1 mt-3 text-muted" style="font-size:.82rem;text-transform:uppercase;letter-spacing:.5px;">Shipper Invoice(s) &amp; Value</h6>
+        <table class="table table-sm grid mb-1 mt-2" id="shipperInvoiceTable" style="max-width:720px;">
+          <thead>
             <tr>
-              <td class="text-muted"><?= (int) $idx + 1 ?></td>
-              <td><input class="form-control form-control-sm" name="shipper_invoices[<?= $idx ?>][no]" value="" placeholder="e.g. HO/LS01142"></td>
-              <td><input type="number" step="0.01" min="0" class="form-control form-control-sm si-value" name="shipper_invoices[<?= $idx ?>][value]" value=""></td>
-              <td><button type="button" class="btn btn-sm btn-outline-danger si-remove" title="Remove">×</button></td>
+              <th style="width:40px;">#</th>
+              <th>Invoice No.</th>
+              <th style="width:180px;">Invoice Value (₹)</th>
+              <th style="width:60px;"></th>
             </tr>
-          <?php endforeach; ?>
-        </tbody>
-      </table>
-      <button type="button" class="btn btn-sm btn-outline-primary" id="siAddRow"><i class="bi bi-plus-lg"></i> Add another invoice</button>
-      <div class="text-muted mt-1" style="font-size:.8rem;">Total invoice value: ₹<span id="siTotal">0.00</span></div>
+          </thead>
+          <tbody>
+            <?php foreach ($existingRows as $idx => $ri): ?>
+              <tr>
+                <td class="text-muted"><?= (int) $idx + 1 ?></td>
+                <td><input class="retro-box" style="width:100%;" name="shipper_invoices[<?= $idx ?>][no]" value="<?= esc($ri['no'] ?? '') ?>" placeholder="e.g. HO/LS01142"></td>
+                <td><input type="number" step="0.01" min="0" class="retro-box si-value" style="width:100%;" name="shipper_invoices[<?= $idx ?>][value]" value="<?= esc($ri['value'] ?? '') ?>"></td>
+                <td><button type="button" class="retro-tbtn retro-danger si-remove" style="width:auto;flex-direction:row;padding:4px 8px !important;" title="Remove">&times;</button></td>
+              </tr>
+            <?php endforeach; ?>
+          </tbody>
+        </table>
+        <button type="button" class="retro-tbtn retro-primary" style="width:auto;flex-direction:row;padding:5px 10px !important;" id="siAddRow"><i class="bi bi-plus-lg"></i> Add another invoice</button>
+        <div class="text-muted mt-1" style="font-size:.8rem;">Total invoice value: ₹<span id="siTotal">0.00</span></div>
+
+        <div class="retro-row" style="margin-top:14px;">
+          <div class="retro-field"><label>Remarks / Payment Method <span class="retro-required">*</span> :</label>
+            <select class="retro-box wide" name="freight_mode" required>
+              <option value="">— Select —</option>
+              <?php foreach (['To Pay','Paid','To Be Billed'] as $fm): ?>
+                <option value="<?= $fm ?>" <?= $g('freight_mode') === $fm ? 'selected' : '' ?>><?= $fm ?></option>
+              <?php endforeach; ?>
+            </select>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <div class="col-12"><hr class="mt-2 mb-0"></div>
-    <div class="col-md-4"><label class="form-label">Remarks / Payment Method <span class="text-danger">*</span></label>
-      <select class="form-select" name="freight_mode" required>
-        <option value="">— Select —</option>
-        <?php foreach (['To Pay','Paid','To Be Billed'] as $fm): ?>
-          <option value="<?= $fm ?>" <?= $g('freight_mode') === $fm ? 'selected' : '' ?>><?= $fm ?></option>
-        <?php endforeach; ?>
-      </select>
-    </div>
   </div>
 
-  <div class="mt-3 d-flex gap-2">
-    <button class="btn btn-primary" type="submit"><i class="bi bi-check2-circle"></i> Save &amp; open Dispatch Pack</button>
-    <a class="btn btn-light" href="<?= site_url('trips') ?>">Cancel</a>
+  <div class="retro-toolbar mt-3" style="position:static;">
+    <button type="submit" class="retro-tbtn retro-primary"><i class="bi bi-check2-circle"></i>Save &amp; Dispatch Pack</button>
+    <a class="retro-tbtn" href="<?= site_url('trips') ?>"><i class="bi bi-x-circle"></i>Close</a>
   </div>
 </form>
-</div></div>
 
 <script>
 // Consignor / Consignee autofill
@@ -260,9 +278,9 @@ if (empty($existingRows)) $existingRows = [['no' => '', 'value' => '']];
     var tr = document.createElement('tr');
     tr.innerHTML =
       '<td class="text-muted">' + (i + 1) + '</td>' +
-      '<td><input class="form-control form-control-sm" name="shipper_invoices[' + i + '][no]" placeholder="e.g. HO/LS01142"></td>' +
-      '<td><input type="number" step="0.01" min="0" class="form-control form-control-sm si-value" name="shipper_invoices[' + i + '][value]"></td>' +
-      '<td><button type="button" class="btn btn-sm btn-outline-danger si-remove" title="Remove">&times;</button></td>';
+      '<td><input class="retro-box" style="width:100%;" name="shipper_invoices[' + i + '][no]" placeholder="e.g. HO/LS01142"></td>' +
+      '<td><input type="number" step="0.01" min="0" class="retro-box si-value" style="width:100%;" name="shipper_invoices[' + i + '][value]"></td>' +
+      '<td><button type="button" class="retro-tbtn retro-danger si-remove" style="width:auto;flex-direction:row;padding:4px 8px !important;" title="Remove">&times;</button></td>';
     tbody.appendChild(tr);
     renumber();
   });
@@ -277,5 +295,21 @@ if (empty($existingRows)) $existingRows = [['no' => '', 'value' => '']];
     if (e.target && e.target.classList.contains('si-value')) renumber();
   });
   renumber();
+})();
+
+// If validation failed on a tab other than Route & Docket, activate it so the user sees the error.
+(function () {
+  var f = document.getElementById('docketForm');
+  if (!f) return;
+  f.addEventListener('submit', function (e) {
+    var invalid = f.querySelector(':invalid');
+    if (!invalid) return;
+    var pane = invalid.closest('.tab-pane');
+    if (!pane) return;
+    var btn = document.querySelector('[data-bs-target="#' + pane.id + '"]');
+    if (btn && !pane.classList.contains('active')) {
+      new bootstrap.Tab(btn).show();
+    }
+  }, true);
 })();
 </script>

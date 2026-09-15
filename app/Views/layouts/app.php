@@ -1,19 +1,6 @@
 <?php
 /** @var \App\Libraries\Auth $auth */
-$menu = tpt_menu_visible($auth);
 $appName = env('tpt.appName', 'TPT Aggregator');
-// Figure out which accordion section owns the active route, so we can open it on first render.
-$activeSectionKey = '';
-foreach ($menu as $item) {
-    if (!empty($item['children'])) {
-        foreach ($item['children'] as $c) {
-            if (tpt_active($c['url']) === 'active') {
-                $activeSectionKey = strtolower(preg_replace('/\s+/', '-', $item['label']));
-                break 2;
-            }
-        }
-    }
-}
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
@@ -31,12 +18,22 @@ foreach ($menu as $item) {
 <link href="<?= base_url('assets/css/app.css') ?>" rel="stylesheet">
 <!-- Theme v2 loads LAST so its CSS variables + overrides win. Delete this line to revert. -->
 <link href="<?= base_url('assets/css/theme-v2.css') ?>?v=2026-08-03" rel="stylesheet">
+<!-- Retro theme loads after theme-v2 so it wins. Delete this line to go back to theme-v2 look. -->
+<link href="<?= base_url('assets/css/theme-retro.css') ?>?v=2026-09-14-7" rel="stylesheet">
 </head>
-<body data-active-section="<?= esc($activeSectionKey) ?>">
+<body class="<?= !empty($retroFixedShell) ? 'retro-fixed-shell' : '' ?>">
 <a href="#tpt-main-content" class="skip-to-main">Skip to main content</a>
+<div class="retro-banner">
+  <div class="retro-banner-spacer"></div>
+  <div class="retro-banner-text">
+    TOTAL CARGO EXPRESS PRIVATE LIMITED – DELHI [2026-2027]
+    <small><?= esc($appName) ?></small>
+  </div>
+  <div class="retro-banner-controls" id="tptBannerControls"></div>
+</div>
 <div class="tpt-app">
   <aside class="tpt-sidebar">
-    <div class="tpt-sidebar-brand">
+    <!-- <div class="tpt-sidebar-brand">
       <?php $logo = function_exists('tpt_logo_url') ? tpt_logo_url() : null; ?>
       <?php if ($logo): ?>
         <img src="<?= esc($logo) ?>" alt="<?= esc($appName) ?>" style="height:24px;max-width:160px;vertical-align:middle;margin-right:.4rem;">
@@ -44,37 +41,16 @@ foreach ($menu as $item) {
         <i class="bi bi-truck"></i>
       <?php endif; ?>
       <?= esc($appName) ?>
-    </div>
+    </div> -->
+    <?php $activeHub = tpt_active_hub($auth); ?>
     <ul class="tpt-nav">
-      <?php foreach ($menu as $item): ?>
-        <?php if (!empty($item['children'])):
-          $key = strtolower(preg_replace('/\s+/', '-', $item['label']));
-        ?>
-          <li class="tpt-section" data-section="<?= esc($key) ?>">
-            <button type="button" class="tpt-section-head" aria-expanded="false">
-              <i class="bi bi-<?= esc($item['icon'] ?? 'folder') ?>"></i>
-              <span class="flex-grow-1 text-start"><?= esc($item['label']) ?></span>
-              <i class="bi bi-chevron-down tpt-section-caret"></i>
-            </button>
-            <ul class="tpt-section-items" style="padding:0;margin:0;list-style:none;">
-              <?php foreach ($item['children'] as $c): ?>
-                <li>
-                  <a href="<?= site_url($c['url']) ?>" class="<?= tpt_active($c['url']) ?>">
-                    <?= esc($c['label']) ?>
-                  </a>
-                </li>
-              <?php endforeach; ?>
-            </ul>
-          </li>
-        <?php else: ?>
-          <li>
-            <a href="<?= site_url($item['url']) ?>" class="tpt-single <?= tpt_active($item['url']) ?>">
-              <?php if (!empty($item['icon'])): ?><i class="bi bi-<?= esc($item['icon']) ?>"></i><?php endif; ?>
-              <?= esc($item['label']) ?>
-            </a>
-          </li>
-        <?php endif; ?>
-      <?php endforeach; ?>
+      <li><a href="<?= site_url('dashboard') ?>" class="tpt-single <?= $activeHub === 'masters' ? 'active' : '' ?>">General Masters</a></li>
+      <li><a href="<?= site_url('hub/transportation') ?>" class="tpt-single <?= $activeHub === 'transportation' ? 'active' : '' ?>">Transportation</a></li>
+      <li><a href="<?= site_url('hub/accounts') ?>" class="tpt-single <?= $activeHub === 'accounts' ? 'active' : '' ?>">Accounts</a></li>
+      <li><a href="<?= site_url('_search') ?>" id="tptSidebarSearch" class="tpt-single <?= $activeHub === 'search' ? 'active' : '' ?>">Search</a></li>
+      <li><a href="<?= site_url('profile') ?>" class="tpt-single <?= $activeHub === 'password' ? 'active' : '' ?>">Change Password</a></li>
+      <li><a href="<?= site_url('hub/administration') ?>" class="tpt-single <?= $activeHub === 'administration' ? 'active' : '' ?>">Administration</a></li>
+      <li><a href="<?= site_url('logout') ?>" class="tpt-single">Exit</a></li>
     </ul>
   </aside>
 
@@ -84,41 +60,16 @@ foreach ($menu as $item) {
         <i class="bi bi-list"></i>
       </button>
       <div class="tpt-topbar-title"><?= esc($pageTitle ?? '') ?></div>
+      <!-- Search now opens from the sidebar's "Search" link (and Ctrl+K still works anywhere) — see #tptSidebarSearch wiring below. -->
 
-      <!-- Universal search trigger -->
-      <button id="tptSearchBtn" type="button" class="btn btn-sm btn-light d-none d-md-inline-flex align-items-center gap-2" style="font-size:.85rem;color:#6b7280;min-width:240px;justify-content:flex-start;" aria-label="Open search">
-        <i class="bi bi-search"></i>
-        <span>Search clients, trips, invoices…</span>
-        <kbd style="margin-left:auto;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:4px;padding:0 .35em;font-size:.7em;color:#6b7280;">Ctrl K</kbd>
-      </button>
-      <button id="tptSearchBtnMobile" type="button" class="btn btn-sm btn-light d-md-none" aria-label="Search"><i class="bi bi-search"></i></button>
-
-      <div class="tpt-topbar-right">
+      <div class="tpt-topbar-right" id="tptGlobalControls">
         <?php
-          // Quick Add menu — only shows actions the current user is allowed to create.
-          $quickAdd = [];
-          if ($auth->can('leads', 'can_add'))      $quickAdd[] = ['url' => site_url('leads/create'),    'icon' => 'person-plus',     'label' => 'Add Lead'];
-          if ($auth->can('rfq', 'can_add'))        $quickAdd[] = ['url' => site_url('rfq/create'),       'icon' => 'file-earmark-plus','label' => 'Add RFQ'];
-          if ($auth->can('bookings', 'can_add'))   $quickAdd[] = ['url' => site_url('bookings/create'),  'icon' => 'journal-plus',    'label' => 'Add Booking'];
-          if ($auth->can('trips', 'can_edit'))     $quickAdd[] = ['url' => site_url('dockets/create'), 'icon' => 'file-earmark-ruled', 'label' => 'Create Docket (LR)'];
-          if ($auth->can('clients', 'can_add'))    $quickAdd[] = ['url' => site_url('clients/create'),   'icon' => 'building-add',    'label' => 'Add Client'];
-          if ($auth->can('vendors', 'can_add'))    $quickAdd[] = ['url' => site_url('vendors/create'),   'icon' => 'truck',           'label' => 'Add Vendor'];
+          // "New" was removed from here — every retro-styled page's own
+          // toolbar New button already covers this (see tpt_toolbar()'s
+          // 'auth' option), so keeping a second one in the banner just
+          // duplicated it. Pages without a retro toolbar simply have no
+          // quick-add entry point here any more.
         ?>
-        <?php if (!empty($quickAdd)): ?>
-        <div class="dropdown">
-          <button class="btn btn-sm btn-primary dropdown-toggle d-inline-flex align-items-center gap-1" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Quick add">
-            <i class="bi bi-plus-lg"></i> <span class="d-none d-md-inline">Quick Add</span>
-          </button>
-          <ul class="dropdown-menu dropdown-menu-end shadow-sm" style="font-size:.9rem;">
-            <li><h6 class="dropdown-header">Create new</h6></li>
-            <?php foreach ($quickAdd as $qa): ?>
-              <li><a class="dropdown-item d-flex align-items-center gap-2" href="<?= $qa['url'] ?>"><i class="bi bi-<?= $qa['icon'] ?>"></i> <?= esc($qa['label']) ?></a></li>
-            <?php endforeach; ?>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item d-flex align-items-center gap-2 text-muted" href="<?= site_url('bookings') ?>?status=Pending"><i class="bi bi-check2-circle"></i> Confirm a Booking…</a></li>
-          </ul>
-        </div>
-        <?php endif; ?>
         <?php
           // Hide the bell for admins — owner opted out of notifications for
           // admin roles. Master switch (\App\Libraries\Notify::isEnabled) still
@@ -128,10 +79,11 @@ foreach ($menu as $item) {
           $showBell    = \App\Libraries\Notify::isEnabled() && !$isAdminView;
         ?>
         <?php if ($showBell): ?>
-        <div class="tpt-bell" style="position:relative;">
-          <button id="tptBellBtn" class="btn btn-sm btn-light" type="button" aria-label="Notifications" style="position:relative;">
+        <div class="tpt-bell retro-tbtn" style="position:relative;">
+          <button id="tptBellBtn" type="button" aria-label="Notifications" style="position:relative;border:none;background:transparent;display:flex;flex-direction:column;align-items:center;gap:4px;color:inherit;font:inherit;padding:0;">
             <i class="bi bi-bell"></i>
-            <span id="tptBellBadge" class="badge bg-danger" style="position:absolute;top:-4px;right:-4px;font-size:.6rem;padding:.18em .35em;border-radius:99px;display:none;">0</span>
+            <span id="tptBellBadge" class="badge bg-danger" style="position:absolute;top:-4px;right:6px;font-size:.6rem;padding:.18em .35em;border-radius:99px;display:none;">0</span>
+            Alerts
           </button>
           <div id="tptBellMenu" style="display:none;position:absolute;right:0;top:calc(100% + 6px);background:#fff;border:1px solid #e3e7ee;border-radius:10px;box-shadow:0 6px 24px rgba(15,23,42,.12);min-width:280px;max-width:340px;z-index:1000;padding:.4rem 0;">
             <div style="padding:.65rem .9rem;border-bottom:1px solid #f1f3f5;font-weight:600;font-size:.85rem;">Notifications</div>
@@ -141,11 +93,11 @@ foreach ($menu as $item) {
           </div>
         </div>
         <?php endif; ?>
-        <a href="<?= site_url('profile') ?>" class="d-none d-md-inline text-muted text-decoration-none" style="font-size:.85rem;" title="My profile + 2FA">
-          <i class="bi bi-person-circle"></i> <?= esc($currentUser['name'] ?? '') ?>
+        <a href="<?= site_url('profile') ?>" class="retro-tbtn d-none d-md-flex" title="My profile + 2FA">
+          <i class="bi bi-person-circle"></i><?= esc(explode(' ', $currentUser['name'] ?? 'Profile')[0]) ?>
         </a>
-        <a href="<?= site_url('logout') ?>" class="btn btn-sm btn-light" aria-label="Sign out">
-          <i class="bi bi-box-arrow-right"></i> <span class="d-none d-md-inline">Sign out</span>
+        <a href="<?= site_url('logout') ?>" class="retro-tbtn retro-danger" aria-label="Sign out">
+          <i class="bi bi-box-arrow-right"></i>Sign out
         </a>
       </div>
       <script>
@@ -201,6 +153,8 @@ foreach ($menu as $item) {
         })();
       </script>
     </div>
+
+    <div class="win-titlebar"><div class="win-title"><?= esc($pageTitle ?? $appName) ?></div></div>
 
     <?php if ($auth->isImpersonating()): ?>
       <div style="background:#2b1d3d;color:#fff;padding:.5rem 1rem;font-size:.85rem;text-align:center;">
@@ -268,8 +222,7 @@ foreach ($menu as $item) {
   }
   function close() { modal.style.display = 'none'; }
 
-  document.getElementById('tptSearchBtn')?.addEventListener('click', open);
-  document.getElementById('tptSearchBtnMobile')?.addEventListener('click', open);
+  document.getElementById('tptSidebarSearch')?.addEventListener('click', function (e) { e.preventDefault(); open(); });
   document.addEventListener('keydown', function (e) {
     if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) { e.preventDefault(); open(); }
     if (e.key === 'Escape' && modal.style.display !== 'none') close();

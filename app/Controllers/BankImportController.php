@@ -31,9 +31,9 @@ class BankImportController extends BaseController
     public function form()
     {
         return $this->render('receipts/import', [
-            'pageTitle' => 'Bank Statement Import',
+            'pageTitle' => 'Client Receipt Master [Accounts] — Bank Import',
             'lastSummary' => $this->session->get('bank_import_last_summary') ?? null,
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function parse()
@@ -72,9 +72,9 @@ class BankImportController extends BaseController
     {
         $proposed = $this->session->get('bank_import_proposed') ?? [];
         return $this->render('receipts/import_review', [
-            'pageTitle' => 'Review proposed receipts',
+            'pageTitle' => 'Client Receipt Master [Accounts] — Review Import',
             'proposed'  => $proposed,
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function confirm()

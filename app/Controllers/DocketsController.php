@@ -26,7 +26,7 @@ class DocketsController extends BaseController
     public function create()
     {
         return $this->render('dockets/create', [
-            'pageTitle' => 'Create Docket',
+            'pageTitle' => 'Docket Master [Transportation] — New',
             'clients'   => (new ClientModel())->where('status', 1)->orderBy('company_name')->findAll(),
             'trip'      => null,
             'booking'   => null,
@@ -34,7 +34,7 @@ class DocketsController extends BaseController
             // ops can jump straight into filling in the LR for an existing trip instead
             // of re-keying party/route data from scratch.
             'pending'   => $this->pendingDocketQuery()->limit(20)->get()->getResultArray(),
-        ]);
+        ], retroFixedShell: true);
     }
 
     /**
@@ -44,9 +44,9 @@ class DocketsController extends BaseController
     public function pendingDockets()
     {
         return $this->render('dockets/pending', [
-            'pageTitle' => 'Trips awaiting docket',
+            'pageTitle' => 'Docket Master [Transportation] — Awaiting Docket',
             'rows'      => $this->pendingDocketQuery()->get()->getResultArray(),
-        ]);
+        ], retroFixedShell: true);
     }
 
     /**
@@ -122,11 +122,11 @@ class DocketsController extends BaseController
             : null;
 
         return $this->render('dockets/create', [
-            'pageTitle' => 'Docket for ' . $trip['trip_no'],
+            'pageTitle' => 'Docket Master [Transportation] — ' . $trip['trip_no'],
             'clients'   => (new ClientModel())->where('status', 1)->orderBy('company_name')->findAll(),
             'trip'      => $trip,
             'booking'   => $booking,
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function store()

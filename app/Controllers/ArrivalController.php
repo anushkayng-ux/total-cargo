@@ -47,11 +47,11 @@ class ArrivalController extends BaseController
         }
 
         return $this->render('arrival/index', [
-            'pageTitle'      => 'Arrival Log',
+            'pageTitle'      => 'Arrival Log [Transportation]',
             'rows'           => $rows,
             'pager'          => $model->pager,
             'feedbackByTrip' => $feedbackByTrip,
-        ]);
+        ], retroFixedShell: true);
     }
 
     /** POST /arrival/:id/save — quick-log arrival timestamps + POD + remarks. */

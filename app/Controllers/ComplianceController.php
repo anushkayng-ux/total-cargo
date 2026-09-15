@@ -18,12 +18,12 @@ class ComplianceController extends BaseController
         if ($kind)   $rows = array_values(array_filter($rows, fn($r) => $r['kind']   === $kind));
 
         return $this->render('compliance/index', [
-            'pageTitle' => 'Document Compliance',
+            'pageTitle' => 'Document Compliance [Reports]',
             'summary'   => $summary,
             'rows'      => $rows,
             'horizon'   => $horizon,
             'bucket'    => $bucket,
             'kind'      => $kind,
-        ]);
+        ], retroFixedShell: true);
     }
 }

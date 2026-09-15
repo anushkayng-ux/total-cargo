@@ -1,38 +1,40 @@
-<div class="d-flex align-items-center mb-3 gap-2 flex-wrap">
-  <a href="<?= site_url('help') ?>" class="btn btn-sm btn-light"><i class="bi bi-arrow-left"></i></a>
-  <h5 class="m-0"><?= esc($row['title']) ?></h5>
-  <span class="badge-soft ms-1"><?= esc($row['category']) ?></span>
-  <?php if (!empty($isAdmin)): ?>
-    <a href="<?= site_url('help/' . $row['id'] . '/edit') ?>" class="btn btn-sm btn-outline-secondary ms-auto"><i class="bi bi-pencil"></i> Edit</a>
-  <?php endif; ?>
+<?= tpt_toolbar([
+    'edit_href'  => !empty($isAdmin) ? site_url('help/' . $row['id'] . '/edit') : null,
+    'close_href' => site_url('help'),
+    'auth'       => $auth,
+]) ?>
+<div class="tabs">
+  <div class="tab active"><?= esc($row['title']) ?></div>
+  <div class="spacer"></div>
+  <div class="recordnav"><span class="badge-soft"><?= esc($row['category']) ?></span></div>
 </div>
 
-<div class="row g-3">
-  <div class="col-lg-8">
-    <article class="card"><div class="card-body help-body">
-      <?= $rendered ?>
-    </div></article>
-  </div>
-  <div class="col-lg-4">
-    <div class="card"><div class="card-body">
-      <h6 class="mb-2"><i class="bi bi-folder2"></i> Related in <?= esc($row['category']) ?></h6>
-      <ul class="list-unstyled mb-0">
-        <?php foreach ($siblings as $s): ?>
-          <li class="mb-1">
-            <?php if ((int) $s['id'] === (int) $row['id']): ?>
-              <strong><?= esc($s['title']) ?></strong>
-            <?php else: ?>
-              <a href="<?= site_url('help/' . $s['slug']) ?>"><?= esc($s['title']) ?></a>
-            <?php endif; ?>
-          </li>
-        <?php endforeach; ?>
-      </ul>
-    </div></div>
-    <div class="card mt-3"><div class="card-body">
-      <h6 class="mb-2">Need more help?</h6>
-      <p class="small mb-2 text-muted">Can't find what you need or spotted a bug? Raise a support ticket and our team will respond.</p>
-      <a class="btn btn-sm btn-primary" href="<?= site_url('support/create') ?>"><i class="bi bi-plus-lg"></i> Raise ticket</a>
-    </div></div>
+<div class="formwrap">
+  <div class="row g-3">
+    <div class="col-lg-8">
+      <div class="help-body"><?= $rendered ?></div>
+    </div>
+    <div class="col-lg-4">
+      <div class="card"><div class="card-body">
+        <h6 class="mb-2"><i class="bi bi-folder2"></i> Related in <?= esc($row['category']) ?></h6>
+        <ul class="list-unstyled mb-0">
+          <?php foreach ($siblings as $s): ?>
+            <li class="mb-1">
+              <?php if ((int) $s['id'] === (int) $row['id']): ?>
+                <strong><?= esc($s['title']) ?></strong>
+              <?php else: ?>
+                <a href="<?= site_url('help/' . $s['slug']) ?>"><?= esc($s['title']) ?></a>
+              <?php endif; ?>
+            </li>
+          <?php endforeach; ?>
+        </ul>
+      </div></div>
+      <div class="card mt-3"><div class="card-body">
+        <h6 class="mb-2">Need more help?</h6>
+        <p class="small mb-2 text-muted">Can't find what you need or spotted a bug? Raise a support ticket and our team will respond.</p>
+        <a class="btn btn-sm btn-primary" href="<?= site_url('support/create') ?>"><i class="bi bi-plus-lg"></i> Raise ticket</a>
+      </div></div>
+    </div>
   </div>
 </div>
 

@@ -23,7 +23,7 @@ class LaneProfitabilityController extends BaseController
               ROUND(SUM(b.final_sell_rate),  2) AS revenue,
               ROUND(SUM(b.final_buy_rate),   2) AS buy_cost,
               ROUND(SUM(b.margin_amount),    2) AS margin,
-              ROUND(SUM(b.final_sell_rate) > 0 ? SUM(b.margin_amount) * 100 / SUM(b.final_sell_rate) : 0, 1) AS margin_pct
+              ROUND(IF(SUM(b.final_sell_rate) > 0, SUM(b.margin_amount) * 100 / SUM(b.final_sell_rate), 0), 1) AS margin_pct
             FROM bookings b
            WHERE b.deleted_at IS NULL
              AND b.booking_status IN ('Approved','Handed Over','Completed')
@@ -37,10 +37,10 @@ class LaneProfitabilityController extends BaseController
         $rows = $db->query($sql, [$from, $to])->getResultArray();
 
         return $this->render('reports/lane_profitability', [
-            'pageTitle' => 'Lane Profitability',
+            'pageTitle' => 'Lane Profitability [Reports]',
             'rows'      => $rows,
             'from'      => $from,
             'to'        => $to,
-        ]);
+        ], retroFixedShell: true);
     }
 }

@@ -14,11 +14,11 @@ class WhatsAppController extends BaseController
         $model = new WhatsappLogModel();
         $rows  = $model->orderBy('id', 'DESC')->paginate(30);
         return $this->render('whatsapp/logs', [
-            'pageTitle' => 'WhatsApp — Outgoing Logs',
+            'pageTitle' => 'WhatsApp [Communication] — Logs',
             'rows'      => $rows,
             'pager'     => $model->pager,
             'service'   => new WhatsAppService(),
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function inbox()
@@ -26,18 +26,18 @@ class WhatsAppController extends BaseController
         $model = new WhatsappIncomingMessageModel();
         $rows  = $model->orderBy('id', 'DESC')->paginate(30);
         return $this->render('whatsapp/inbox', [
-            'pageTitle' => 'WhatsApp — Inbox',
+            'pageTitle' => 'WhatsApp [Communication] — Inbox',
             'rows'      => $rows,
             'pager'     => $model->pager,
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function templates()
     {
         return $this->render('whatsapp/templates', [
-            'pageTitle' => 'WhatsApp — Templates',
+            'pageTitle' => 'WhatsApp [Communication] — Templates',
             'rows'      => (new WhatsappTemplateModel())->orderBy('audience_type')->orderBy('template_key')->findAll(),
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function saveTemplate()

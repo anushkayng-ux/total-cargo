@@ -22,20 +22,42 @@ class DriversController extends BaseController
                 ->groupEnd();
         }
         return $this->render('drivers/index', [
-            'pageTitle' => 'Drivers',
+            'pageTitle' => 'Driver Master [General Masters] — List',
             'rows'      => $query->paginate($this->perPage()),
             'pager'     => $model->pager,
             'search'    => $search,
-        ]);
+        ], retroFixedShell: true);
+    }
+
+    /** Read-only driver detail page, matching the retro demo's record view. */
+    public function show(int $id)
+    {
+        $row = (new DriverModel())->select('drivers.*, vendors.company_name AS vendor_name')
+            ->join('vendors', 'vendors.id = drivers.vendor_id', 'left')
+            ->find($id);
+        if (!$row) return redirect()->to(site_url('drivers'))->with('error', 'Not found.');
+
+        $db      = \Config\Database::connect();
+        $prevRow = $db->table('drivers')->select('id')->where('id <', $id)->orderBy('id', 'DESC')->get(1)->getRowArray();
+        $nextRow = $db->table('drivers')->select('id')->where('id >', $id)->orderBy('id', 'ASC')->get(1)->getRowArray();
+        $total   = $db->table('drivers')->countAllResults();
+
+        return $this->render('drivers/show', [
+            'pageTitle' => 'Driver Master [General Masters]',
+            'row'       => $row,
+            'prevId'    => $prevRow['id'] ?? null,
+            'nextId'    => $nextRow['id'] ?? null,
+            'total'     => $total,
+        ], retroFixedShell: true);
     }
 
     public function create()
     {
         return $this->render('drivers/form', [
-            'pageTitle' => 'Add Driver',
+            'pageTitle' => 'Driver Master [General Masters] — New',
             'row'       => null,
             'vendors'   => (new VendorModel())->where('status', 1)->orderBy('company_name')->findAll(),
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function store()
@@ -57,10 +79,10 @@ class DriversController extends BaseController
         $row = (new DriverModel())->find($id);
         if (!$row) return redirect()->to(site_url('drivers'))->with('error', 'Not found.');
         return $this->render('drivers/form', [
-            'pageTitle' => 'Edit Driver',
+            'pageTitle' => 'Driver Master [General Masters] — Edit',
             'row'       => $row,
             'vendors'   => (new VendorModel())->where('status', 1)->orderBy('company_name')->findAll(),
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function update(int $id)

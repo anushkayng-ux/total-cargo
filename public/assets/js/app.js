@@ -11,6 +11,29 @@
     });
   }
 
+  // Retro theme: fold the global topbar controls (Quick Add / notifications /
+  // profile / sign out) into the navy title banner's right side, next to
+  // "TOTAL CARGO EXPRESS…" — the banner is on every page (unlike the icon
+  // toolbar, which only exists on retro-styled pages), so this keeps them
+  // reachable everywhere instead of only on the handful of rebuilt pages.
+  (function () {
+    var controls = document.getElementById('tptGlobalControls');
+    var target = document.getElementById('tptBannerControls');
+    if (controls && target) {
+      target.appendChild(controls);
+    }
+  })();
+
+  // Retro-style clickable grid rows — click anywhere on a row to open its
+  // detail page, same as the total-cargo-demo prototype. Clicks on a link,
+  // button, form, or form field inside the row still do their own thing.
+  document.querySelectorAll('tr.row-link[data-href]').forEach(tr => {
+    tr.addEventListener('click', (e) => {
+      if (e.target.closest('a, button, input, select, textarea, form, [data-tpt-inline-select]')) return;
+      window.location.href = tr.dataset.href;
+    });
+  });
+
   document.querySelectorAll('[data-confirm]').forEach(el => {
     el.addEventListener('submit', (e) => {
       const msg = el.getAttribute('data-confirm') || 'Are you sure?';

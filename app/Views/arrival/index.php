@@ -3,16 +3,22 @@ $fmtDt   = fn ($x) => $x ? date('d-m-Y H:i', strtotime((string) $x)) : '—';
 $dtLocal = fn ($x) => $x ? date('Y-m-d\TH:i', strtotime((string) $x)) : '';
 $fbMap   = $feedbackByTrip ?? [];
 ?>
-<div class="d-flex align-items-center mb-3 gap-2 flex-wrap">
-  <h5 class="m-0"><i class="bi bi-geo-alt"></i> Arrival Log</h5>
+<?= tpt_toolbar([
+    'close_href' => site_url('dashboard'),
+    'auth'       => $auth,
+]) ?>
+<div class="tabs">
+  <div class="tab active">Active Trips</div>
+  <div class="spacer"></div>
+  <div class="recordnav"><?= (int) ($pager->getTotal() ?: count($rows)) ?> total records</div>
 </div>
 
 <?php if (empty($rows)): ?>
-  <div class="card"><div class="card-body text-center text-muted">No active trips.</div></div>
+  <div class="gridwrap"><div class="text-center text-muted py-4">No active trips.</div></div>
 <?php else: ?>
-  <div class="card">
+  <div class="gridwrap">
     <div class="table-responsive">
-      <table class="table table-hover align-middle mb-0" style="font-size:.9rem;" data-tpt-cols="arrival">
+      <table class="table grid table-hover align-middle mb-0" style="font-size:.9rem;" data-tpt-cols="arrival">
         <thead class="table-light">
           <tr>
             <th style="width:32px;"></th>
@@ -150,11 +156,8 @@ $fbMap   = $feedbackByTrip ?? [];
         </tbody>
       </table>
     </div>
+    <?php if (!empty($pager)): ?><div class="mt-3"><?= $pager->links() ?></div><?php endif; ?>
   </div>
-<?php endif; ?>
-
-<?php if (!empty($pager)): ?>
-  <div class="mt-3"><?= $pager->links() ?></div>
 <?php endif; ?>
 
 <script>

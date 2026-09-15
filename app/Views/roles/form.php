@@ -2,35 +2,35 @@
 $isEdit = !empty($role);
 $action = $isEdit ? site_url('roles/' . $role['id']) : site_url('roles/store');
 ?>
-<h5 class="mb-3"><?= esc($pageTitle) ?></h5>
-<div class="card">
-  <div class="card-body">
-    <form method="post" action="<?= $action ?>">
-      <?= csrf_field() ?>
-      <div class="row g-3">
-        <div class="col-md-6">
-          <label class="form-label">Role Name <span class="text-danger">*</span></label>
-          <input type="text" class="form-control" name="role_name" required
-                 value="<?= esc(old('role_name', $role['role_name'] ?? '')) ?>">
-        </div>
-        <div class="col-md-6">
-          <label class="form-label">Role Key <small class="text-muted">(unique, lowercase)</small></label>
-          <input type="text" class="form-control" name="role_key"
-                 value="<?= esc(old('role_key', $role['role_key'] ?? '')) ?>">
-        </div>
-        <div class="col-md-6">
-          <label class="form-label d-block">Status</label>
-          <div class="form-check form-switch">
-            <input class="form-check-input" type="checkbox" name="status" value="1" id="statusSwitch"
-                   <?= (int)($role['status'] ?? 1) === 1 ? 'checked' : '' ?>>
-            <label class="form-check-label" for="statusSwitch">Active</label>
-          </div>
-        </div>
-      </div>
-      <div class="mt-3 d-flex gap-2">
-        <button class="btn btn-primary" type="submit">Save</button>
-        <a class="btn btn-light" href="<?= site_url('roles') ?>">Cancel</a>
-      </div>
-    </form>
-  </div>
+<?= tpt_toolbar([
+    'save_form'   => 'roleForm',
+    'close_href'  => site_url('roles'),
+    'auth'        => $auth,
+]) ?>
+<div class="tabs">
+  <div class="tab active">Role Details</div>
+  <div class="spacer"></div>
 </div>
+
+<form id="roleForm" method="post" action="<?= $action ?>">
+  <?= csrf_field() ?>
+  <div class="formwrap">
+    <div class="retro-row">
+      <div class="retro-field" style="width:48%;"><label>Role Name <span class="retro-required">*</span> :</label>
+        <input type="text" class="retro-box" style="width:100%;" name="role_name" required value="<?= esc(old('role_name', $role['role_name'] ?? '')) ?>">
+      </div>
+      <div class="retro-field" style="width:48%;margin-left:auto;"><label>Role Key :</label>
+        <input type="text" class="retro-box" style="width:100%;" name="role_key" value="<?= esc(old('role_key', $role['role_key'] ?? '')) ?>">
+      </div>
+    </div>
+    <div style="font-size:11px;color:var(--v2-fg-muted);margin-top:-8px;">Unique, lowercase.</div>
+    <div class="retro-row" style="margin-top:10px;">
+      <label class="retro-checkline"><input type="checkbox" name="status" value="1" <?= (int)($role['status'] ?? 1) === 1 ? 'checked' : '' ?>> Active</label>
+    </div>
+  </div>
+
+  <div class="retro-toolbar mt-3" style="position:static;">
+    <button type="submit" class="retro-tbtn retro-primary"><i class="bi bi-save-fill"></i>Save</button>
+    <a class="retro-tbtn" href="<?= site_url('roles') ?>"><i class="bi bi-x-circle"></i>Close</a>
+  </div>
+</form>

@@ -43,13 +43,13 @@ class RfqController extends BaseController
         }
 
         return $this->render('rfq/index', [
-            'pageTitle' => 'RFQs',
+            'pageTitle' => 'RFQ Master [Sales & Operations] — List',
             'rows'      => $query->paginate($this->perPage()),
             'pager'     => $model->pager,
             'search'    => $search,
             'status'    => $status,
             'statuses'  => RfqModel::STATUSES,
-        ]);
+        ], retroFixedShell: true);
     }
 
     /**
@@ -70,9 +70,9 @@ class RfqController extends BaseController
             ->get()->getResultArray();
 
         return $this->render('rfq/queue', [
-            'pageTitle' => 'Purchase Inbox',
+            'pageTitle' => 'RFQ Master [Sales & Operations] — Purchase Inbox',
             'rows'      => $rows,
-        ]);
+        ], retroFixedShell: true);
     }
 
     /**
@@ -110,14 +110,14 @@ class RfqController extends BaseController
         }
 
         return $this->render('rfq/form', [
-            'pageTitle'         => 'Create RFQ',
+            'pageTitle'         => 'RFQ Master [Sales & Operations] — New',
             'lead'              => $lead,
             'prefill'           => $prefill,
             'suggested'         => $suggested,
             'includeUncovered'  => $includeUncovered,
             'totalVendors'      => $totalVendors,
             'historyHint'       => $this->historyHint($prefill['pickup_city'], $prefill['drop_city']),
-        ]);
+        ], retroFixedShell: true);
     }
 
     /**
@@ -277,15 +277,23 @@ class RfqController extends BaseController
         $rfqVendors = (new RfqVendorModel())->forRfq($id);
         $quotations = (new \App\Models\QuotationModel())->forRfq($id);
 
+        $db      = \Config\Database::connect();
+        $prevRow = $db->table('rfq_master')->select('id')->where('id <', $id)->orderBy('id', 'DESC')->get(1)->getRowArray();
+        $nextRow = $db->table('rfq_master')->select('id')->where('id >', $id)->orderBy('id', 'ASC')->get(1)->getRowArray();
+        $total   = $db->table('rfq_master')->countAllResults();
+
         return $this->render('rfq/show', [
-            'pageTitle'   => 'RFQ ' . ($row['rfq_no'] ?? ''),
+            'pageTitle'   => 'RFQ Master [Sales & Operations]',
             'row'         => $row,
             'rfqVendors'  => $rfqVendors,
             'quotations'  => $quotations,
             'staff'       => (new \App\Models\UserModel())->activeList(),
             'wa'          => new WhatsAppService(),
             'template'    => (new WhatsappTemplateModel())->getByKey('rfq_vendor'),
-        ]);
+            'prevId'      => $prevRow['id'] ?? null,
+            'nextId'      => $nextRow['id'] ?? null,
+            'total'       => $total,
+        ], retroFixedShell: true);
     }
 
     /** POST /rfq/:id/assign — give this RFQ to a team member and notify them. */

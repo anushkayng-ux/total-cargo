@@ -1,30 +1,35 @@
 <?php
 $exportQs   = http_build_query(array_filter(['q' => $search, 'status' => $status, 'pod' => $pod]));
 $tripStatuses = $statuses ?? [];
+
+$extra = '<a class="btn btn-sm btn-outline-dark" href="' . site_url('trips/export') . ($exportQs ? '?' . $exportQs : '') . '" title="Download CSV"><i class="bi bi-download"></i> Export</a>'
+    . '<form class="d-flex align-items-center gap-2 m-0 flex-wrap" method="get" action="' . site_url('trips') . '">'
+    . '<input type="text" name="q" class="form-control form-control-sm" placeholder="Search no/vehicle/driver/client" value="' . esc($search) . '" style="width:190px;">'
+    . '<select name="status" class="form-select form-select-sm" style="width:auto;"><option value="">All</option>';
+foreach ($tripStatuses as $s) {
+    $extra .= '<option value="' . esc($s) . '"' . ($status === $s ? ' selected' : '') . '>' . esc($s) . '</option>';
+}
+$extra .= '</select>'
+    . '<label class="form-check form-check-inline m-0 align-self-center" style="font-size:.85rem;">'
+    . '<input type="checkbox" class="form-check-input" name="pod" value="pending" ' . ($pod === 'pending' ? 'checked' : '') . '> POD pending</label>'
+    . '<button class="btn btn-sm btn-outline-dark">Filter</button></form>';
+
+echo tpt_toolbar([
+    'close_href' => site_url('dashboard'),
+    'extra'      => $extra,
+    'auth'       => $auth,
+]);
 ?>
-<div class="d-flex align-items-center mb-3 gap-2 flex-wrap">
-  <h5 class="m-0"><?= esc($pageTitle) ?></h5>
-  <div data-tpt-saved-views="trips" class="ms-2"></div>
-  <form class="ms-auto d-flex gap-2" method="get" action="<?= site_url('trips') ?>">
-    <input type="text" name="q" class="form-control form-control-sm" placeholder="Search no/vehicle/driver/client" value="<?= esc($search) ?>">
-    <select name="status" class="form-select form-select-sm">
-      <option value="">All</option>
-      <?php foreach ($tripStatuses as $s): ?>
-        <option value="<?= esc($s) ?>" <?= $status === $s ? 'selected' : '' ?>><?= esc($s) ?></option>
-      <?php endforeach; ?>
-    </select>
-    <label class="form-check form-check-inline m-0 align-self-center" style="font-size:.85rem;">
-      <input type="checkbox" class="form-check-input" name="pod" value="pending" <?= $pod === 'pending' ? 'checked' : '' ?>>
-      POD pending
-    </label>
-    <button class="btn btn-sm btn-outline-dark">Filter</button>
-  </form>
-  <a class="btn btn-sm btn-light" href="<?= site_url('trips/export') . ($exportQs ? '?' . $exportQs : '') ?>" title="Download CSV"><i class="bi bi-download"></i> Export</a>
+<div class="tabs">
+  <div class="tab active">All Trips</div>
+  <div data-tpt-saved-views="trips" style="margin-left:10px;"></div>
+  <div class="spacer"></div>
+  <div class="recordnav"><?= (int) ($pager->getTotal() ?: count($rows)) ?> total records</div>
 </div>
 
 <form method="post" action="<?= site_url('trips/bulk') ?>" id="bulkForm">
   <?= csrf_field() ?>
-  <div class="d-none mb-2" id="bulkBar">
+  <div class="d-none mb-2 mt-3 mx-3" id="bulkBar">
     <div class="alert alert-info py-2 d-flex flex-wrap align-items-center gap-2 mb-2">
       <span><strong id="bulkCount">0</strong> selected</span>
       <select name="action" class="form-select form-select-sm" style="width:auto;">
@@ -37,9 +42,9 @@ $tripStatuses = $statuses ?? [];
     </div>
   </div>
 
-  <div class="card">
+  <div class="gridwrap">
     <div class="table-responsive">
-      <table class="table mobile-cards mb-0" data-tpt-cols="trips">
+      <table class="table grid mobile-cards mb-0" data-tpt-cols="trips">
         <thead>
           <tr>
             <th style="width:32px;"><input type="checkbox" id="selAllBulk"></th>
@@ -57,7 +62,7 @@ $tripStatuses = $statuses ?? [];
         <tbody>
           <?php if (empty($rows)): ?><tr><td colspan="10" class="text-center text-muted">No trips.</td></tr><?php endif; ?>
           <?php foreach ($rows as $r): ?>
-            <tr>
+            <tr class="row-link" data-href="<?= site_url('trips/' . $r['id']) ?>">
               <td><input type="checkbox" name="ids[]" value="<?= (int) $r['id'] ?>" class="bulk-chk"></td>
               <td data-col="trip" data-label="Trip"><a href="<?= site_url('trips/' . $r['id']) ?>"><code><?= esc($r['trip_no']) ?></code></a></td>
               <td data-col="booking" data-label="Booking"><a href="<?= site_url('bookings/' . $r['booking_id']) ?>"><code><?= esc($r['booking_no']) ?></code></a></td>
@@ -91,10 +96,9 @@ $tripStatuses = $statuses ?? [];
         </tbody>
       </table>
     </div>
+    <?php if (!empty($pager)): ?><div class="mt-3"><?= $pager->links() ?></div><?php endif; ?>
   </div>
 </form>
-
-<?php if (!empty($pager)): ?><div class="mt-3"><?= $pager->links() ?></div><?php endif; ?>
 
 <script>
 (function () {

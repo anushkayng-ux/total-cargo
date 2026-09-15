@@ -12,17 +12,17 @@ class RolesController extends BaseController
     {
         $roles = (new RoleModel())->orderBy('role_name')->findAll();
         return $this->render('roles/index', [
-            'pageTitle' => 'Roles',
+            'pageTitle' => 'Role Master [Administration] — List',
             'roles'     => $roles,
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function create()
     {
         return $this->render('roles/form', [
-            'pageTitle' => 'Add Role',
+            'pageTitle' => 'Role Master [Administration] — New',
             'role'      => null,
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function store()
@@ -52,9 +52,9 @@ class RolesController extends BaseController
         $role = (new RoleModel())->find($id);
         if (!$role) return redirect()->to(site_url('roles'))->with('error', 'Role not found.');
         return $this->render('roles/form', [
-            'pageTitle' => 'Edit Role',
+            'pageTitle' => 'Role Master [Administration] — Edit',
             'role'      => $role,
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function update(int $id)
@@ -91,11 +91,11 @@ class RolesController extends BaseController
             $map[(int) $c['permission_id']] = $c;
         }
         return $this->render('roles/permissions', [
-            'pageTitle'   => 'Permissions · ' . $role['role_name'],
+            'pageTitle'   => 'Role Master [Administration] — Permissions',
             'role'        => $role,
             'permissions' => $perms,
             'map'         => $map,
-        ]);
+        ], retroFixedShell: true);
     }
 
     public function savePermissions(int $id)

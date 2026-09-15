@@ -1,5 +1,26 @@
 <?php
 
+if (!function_exists('tpt_quick_add_items')) {
+    /**
+     * The "New…" dropdown's options — every record type the current user
+     * is allowed to create, regardless of which page they're on. Shared by
+     * the banner's global New button and each page's own toolbar New
+     * button (see tpt_toolbar()), so both list the same options instead of
+     * drifting apart.
+     */
+    function tpt_quick_add_items(\App\Libraries\Auth $auth): array
+    {
+        $items = [];
+        if ($auth->can('leads', 'can_add'))      $items[] = ['url' => site_url('leads/create'),    'icon' => 'person-plus',        'label' => 'Add Lead'];
+        if ($auth->can('rfq', 'can_add'))        $items[] = ['url' => site_url('rfq/create'),       'icon' => 'file-earmark-plus',  'label' => 'Add RFQ'];
+        if ($auth->can('bookings', 'can_add'))   $items[] = ['url' => site_url('bookings/create'),  'icon' => 'journal-plus',       'label' => 'Add Booking'];
+        if ($auth->can('trips', 'can_edit'))     $items[] = ['url' => site_url('dockets/create'),   'icon' => 'file-earmark-ruled', 'label' => 'Create Docket (LR)'];
+        if ($auth->can('clients', 'can_add'))    $items[] = ['url' => site_url('clients/create'),   'icon' => 'building-add',       'label' => 'Add Client'];
+        if ($auth->can('vendors', 'can_add'))    $items[] = ['url' => site_url('vendors/create'),   'icon' => 'truck',              'label' => 'Add Vendor'];
+        return $items;
+    }
+}
+
 if (!function_exists('tpt_menu')) {
     /**
      * Sidebar menu — organised into 9 purpose-driven groups. No "More"
@@ -155,6 +176,99 @@ if (!function_exists('tpt_menu_visible')) {
             }
         }
         return $out;
+    }
+}
+
+if (!function_exists('tpt_hub_buckets')) {
+    /**
+     * Groups every visible menu link into the 4 retro-demo "hub" pages
+     * (masters / transportation / accounts / administration) so the sidebar
+     * can be collapsed to the demo's 7 items without losing any real route.
+     * Anything not explicitly bucketed below falls into 'administration' —
+     * a safety net so a future new menu item is never unreachable.
+     */
+    function tpt_hub_buckets(\App\Libraries\Auth $auth): array
+    {
+        $mastersUrls = ['clients', 'vehicles', 'drivers', 'vendors', 'cities'];
+        $transportUrls = [
+            'leads', 'rfq', 'rfq/queue', 'quotations', 'calendar', 'lead-sources',
+            'bookings', 'trips', 'dockets/pending', 'arrival', 'gps', 'documents',
+        ];
+        $accountsUrls = [
+            'invoices', 'receipts', 'receipts/import', 'gst-returns',
+            'vendor-bills', 'vendor-payments', 'purchase/advances', 'purchase/insurance',
+            'rate-contracts', 'tds-certificates', 'vendor-deposits',
+        ];
+
+        $buckets = ['masters' => [], 'transportation' => [], 'accounts' => [], 'administration' => []];
+
+        foreach (tpt_menu_visible($auth) as $item) {
+            $candidates = !empty($item['children']) ? $item['children'] : [$item];
+            foreach ($candidates as $c) {
+                $url = trim((string) ($c['url'] ?? ''), '/');
+                if ($url === '' || $url === 'dashboard') {
+                    continue;
+                }
+                $card = [
+                    'label' => $c['label'],
+                    'url'   => $c['url'],
+                    'icon'  => $c['icon'] ?? $item['icon'] ?? 'folder',
+                ];
+                if (in_array($url, $mastersUrls, true)) {
+                    $buckets['masters'][] = $card;
+                } elseif (in_array($url, $transportUrls, true)) {
+                    $buckets['transportation'][] = $card;
+                } elseif (in_array($url, $accountsUrls, true)) {
+                    $buckets['accounts'][] = $card;
+                } else {
+                    $buckets['administration'][] = $card;
+                }
+            }
+        }
+
+        return $buckets;
+    }
+}
+
+if (!function_exists('tpt_active_hub')) {
+    /**
+     * Which of the 7 flat sidebar items (masters/transportation/accounts/
+     * search/password/administration/exit) owns the current request —
+     * used to highlight the right sidebar link now that the accordion
+     * sub-menus are gone.
+     */
+    function tpt_active_hub(\App\Libraries\Auth $auth): string
+    {
+        $current = trim(service('request')->getUri()->getPath(), '/');
+        $base    = trim(parse_url(base_url(), PHP_URL_PATH) ?? '', '/');
+        if ($base && strpos($current, $base) === 0) {
+            $current = trim(substr($current, strlen($base)), '/');
+        }
+        // Dev server / no-rewrite URLs keep a literal "index.php/" prefix.
+        if (strpos($current, 'index.php/') === 0) {
+            $current = substr($current, strlen('index.php/'));
+        } elseif ($current === 'index.php') {
+            $current = '';
+        }
+
+        if ($current === '' || $current === 'dashboard') return 'masters';
+        if ($current === '_search') return 'search';
+        if (strpos($current, 'profile') === 0) return 'password';
+        if ($current === 'logout') return 'exit';
+        if (strpos($current, 'hub/transportation') === 0) return 'transportation';
+        if (strpos($current, 'hub/accounts') === 0) return 'accounts';
+        if (strpos($current, 'hub/administration') === 0) return 'administration';
+
+        $buckets = tpt_hub_buckets($auth);
+        foreach (['masters', 'transportation', 'accounts', 'administration'] as $key) {
+            foreach ($buckets[$key] as $c) {
+                $u = trim((string) $c['url'], '/');
+                if ($u !== '' && ($u === $current || strpos($current, $u . '/') === 0)) {
+                    return $key;
+                }
+            }
+        }
+        return '';
     }
 }
 
