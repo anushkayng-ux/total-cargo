@@ -21,7 +21,10 @@ if (!function_exists('tpt_toolbar')) {
      *                 page's own create action FIRST, then every other record type the
      *                 user can create (the same list as the banner's global New button),
      *                 so "New" means the same thing everywhere instead of two different
-     *                 buttons behaving differently.
+     *                 buttons behaving differently. Passing `auth` WITHOUT new_href (e.g.
+     *                 on a hub/dashboard page with no single "create" action of its own)
+     *                 still gives a working New dropdown listing every creatable record
+     *                 type, instead of leaving New permanently inert.
      *   new_item_label — label for the page's own item inside that dropdown (defaults to "New")
      */
     function tpt_toolbar(array $opts = []): string
@@ -48,19 +51,24 @@ if (!function_exists('tpt_toolbar')) {
 
         // "New" — a plain button normally, but a dropdown (this page's own
         // create action + every other record type) when an Auth is passed.
+        // With no page-specific new_href (hub/dashboard pages), it still
+        // becomes a working dropdown of every creatable record type instead
+        // of staying permanently inert.
         $newBtn = $btn('plus-circle-fill', 'New', $opts['new_href'] ?? null, ['primary' => true]);
-        if (!empty($opts['new_href']) && !empty($opts['auth'])) {
+        if (!empty($opts['auth'])) {
             $others = array_values(array_filter(
                 tpt_quick_add_items($opts['auth']),
-                fn ($qa) => rtrim($qa['url'], '/') !== rtrim($opts['new_href'], '/')
+                fn ($qa) => empty($opts['new_href']) || rtrim($qa['url'], '/') !== rtrim($opts['new_href'], '/')
             ));
             if ($others) {
                 $newBtn = '<div class="dropdown d-inline-block">'
                     . '<button type="button" class="retro-tbtn retro-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-plus-circle-fill"></i>New</button>'
-                    . '<ul class="dropdown-menu shadow-sm" style="font-size:.85rem;">'
-                    . '<li><a class="dropdown-item d-flex align-items-center gap-2" href="' . esc($opts['new_href']) . '"><i class="bi bi-plus-circle"></i> ' . esc($opts['new_item_label'] ?? 'New') . '</a></li>'
-                    . '<li><hr class="dropdown-divider"></li>'
-                    . '<li><h6 class="dropdown-header">Other…</h6></li>';
+                    . '<ul class="dropdown-menu shadow-sm" style="font-size:.85rem;">';
+                if (!empty($opts['new_href'])) {
+                    $newBtn .= '<li><a class="dropdown-item d-flex align-items-center gap-2" href="' . esc($opts['new_href']) . '"><i class="bi bi-plus-circle"></i> ' . esc($opts['new_item_label'] ?? 'New') . '</a></li>'
+                        . '<li><hr class="dropdown-divider"></li>'
+                        . '<li><h6 class="dropdown-header">Other…</h6></li>';
+                }
                 foreach ($others as $qa) {
                     $newBtn .= '<li><a class="dropdown-item d-flex align-items-center gap-2" href="' . esc($qa['url']) . '"><i class="bi bi-' . esc($qa['icon']) . '"></i> ' . esc($qa['label']) . '</a></li>';
                 }

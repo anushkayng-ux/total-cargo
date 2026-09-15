@@ -11,7 +11,7 @@ $v = function ($k, $d = '') use ($row) { return old($k, $row[$k] ?? $d); };
     'auth'           => $auth,
 ]) ?>
 
-<div class="tabs" id="vendorFormTabs">
+<div class="tabs" role="tablist" id="vendorFormTabs">
   <button type="button" class="tab active" data-bs-toggle="tab" data-bs-target="#venf-details">Vendor Details</button>
   <button type="button" class="tab" data-bs-toggle="tab" data-bs-target="#venf-contacts">Contacts</button>
   <button type="button" class="tab" data-bs-toggle="tab" data-bs-target="#venf-bank">Bank &amp; Compliance</button>

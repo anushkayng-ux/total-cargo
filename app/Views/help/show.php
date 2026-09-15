@@ -3,7 +3,7 @@
     'close_href' => site_url('help'),
     'auth'       => $auth,
 ]) ?>
-<div class="tabs">
+<div class="tabs" role="tablist">
   <div class="tab active"><?= esc($row['title']) ?></div>
   <div class="spacer"></div>
   <div class="recordnav"><span class="badge-soft"><?= esc($row['category']) ?></span></div>

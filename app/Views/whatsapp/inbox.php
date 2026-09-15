@@ -2,7 +2,7 @@
     'close_href' => site_url('dashboard'),
     'auth'       => $auth,
 ]) ?>
-<div class="tabs">
+<div class="tabs" role="tablist">
   <a class="tab" href="<?= site_url('whatsapp/logs') ?>">Message Logs</a>
   <div class="tab active">Inbox</div>
   <a class="tab" href="<?= site_url('whatsapp/templates') ?>">Templates</a>

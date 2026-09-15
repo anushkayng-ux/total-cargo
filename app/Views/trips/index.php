@@ -20,7 +20,7 @@ echo tpt_toolbar([
     'auth'       => $auth,
 ]);
 ?>
-<div class="tabs">
+<div class="tabs" role="tablist">
   <div class="tab active">All Trips</div>
   <div data-tpt-saved-views="trips" style="margin-left:10px;"></div>
   <div class="spacer"></div>

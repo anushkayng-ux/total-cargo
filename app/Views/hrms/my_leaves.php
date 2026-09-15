@@ -7,7 +7,7 @@ echo tpt_toolbar([
     'auth'       => $auth,
 ]);
 ?>
-<div class="tabs">
+<div class="tabs" role="tablist">
   <div class="tab active">My Leaves</div>
   <div class="spacer"></div>
   <div class="recordnav"><?= count($leaves) ?> applications</div>

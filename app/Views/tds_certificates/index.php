@@ -12,7 +12,7 @@ echo tpt_toolbar([
     'auth'       => $auth,
 ]);
 ?>
-<div class="tabs">
+<div class="tabs" role="tablist">
   <div class="tab active">TDS Certificates (Form 16A)</div>
   <div class="spacer"></div>
   <div class="recordnav"><?= (int) ($pager->getTotal() ?: count($rows)) ?> total records</div>

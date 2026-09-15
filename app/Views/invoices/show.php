@@ -65,7 +65,7 @@ $otherQuickAdd = array_values(array_filter(
   <a class="retro-tbtn" href="<?= site_url('invoices') ?>"><i class="bi bi-x-lg"></i>Close</a>
 </div>
 
-<div class="tabs" id="invoiceTabs">
+<div class="tabs" role="tablist" id="invoiceTabs">
   <button type="button" class="tab active" data-bs-toggle="tab" data-bs-target="#inv-details">Invoice Details</button>
   <button type="button" class="tab" data-bs-toggle="tab" data-bs-target="#inv-items">Line Items</button>
   <div class="spacer"></div>

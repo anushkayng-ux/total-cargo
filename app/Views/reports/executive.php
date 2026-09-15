@@ -32,7 +32,7 @@ $extra = '<a class="btn btn-sm btn-outline-dark" href="' . site_url('reports/pro
     'extra'      => $extra,
     'auth'       => $auth,
 ]) ?>
-<div class="tabs">
+<div class="tabs" role="tablist">
   <div class="tab active">Executive Dashboard</div>
   <div class="spacer"></div>
   <div class="recordnav">Today · <?= esc(date('d M Y')) ?></div>

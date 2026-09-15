@@ -6,7 +6,7 @@
     'extra'          => '<a class="btn btn-sm btn-outline-dark" href="' . site_url('rfq') . '"><i class="bi bi-list-ul"></i> All RFQs</a>',
     'auth'           => $auth,
 ]) ?>
-<div class="tabs">
+<div class="tabs" role="tablist">
   <div class="tab active">Purchase Inbox</div>
   <div class="spacer"></div>
   <div class="recordnav"><?= count($rows) ?> waiting</div>

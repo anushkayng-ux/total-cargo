@@ -7,7 +7,7 @@ $new = !empty($row['new_value_json']) ? json_decode((string) $row['new_value_jso
     'close_href' => site_url('audit-logs'),
     'auth'       => $auth,
 ]) ?>
-<div class="tabs">
+<div class="tabs" role="tablist">
   <div class="tab active">Audit Entry</div>
   <div class="spacer"></div>
   <div class="recordnav"><a href="<?= site_url('audit-logs') ?>"><i class="bi bi-list"></i> List</a></div>

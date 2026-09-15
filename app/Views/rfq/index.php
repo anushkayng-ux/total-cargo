@@ -15,7 +15,7 @@ echo tpt_toolbar([
     'auth'           => $auth,
 ]);
 ?>
-<div class="tabs">
+<div class="tabs" role="tablist">
   <div class="tab active">All RFQs</div>
   <a class="tab" href="<?= site_url('rfq/queue') ?>">Purchase Inbox</a>
   <div class="spacer"></div>

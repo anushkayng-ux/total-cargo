@@ -19,7 +19,7 @@ echo tpt_toolbar([
     'auth'       => $auth,
 ]);
 ?>
-<div class="tabs">
+<div class="tabs" role="tablist">
   <div class="tab active">My Attendance</div>
   <div class="spacer"></div>
   <div class="recordnav">Today is <?= esc(date('D, d-m-Y')) ?></div>

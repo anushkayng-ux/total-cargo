@@ -3,7 +3,7 @@
     'auth'        => $auth,
 ]) ?>
 
-<div class="tabs" id="empTabs">
+<div class="tabs" role="tablist" id="empTabs">
   <button type="button" class="tab active" data-bs-toggle="tab" data-bs-target="#emp-details">Employee Details</button>
   <button type="button" class="tab" data-bs-toggle="tab" data-bs-target="#emp-salary">Salary Structure</button>
   <button type="button" class="tab" data-bs-toggle="tab" data-bs-target="#emp-leaves">Leave Balances</button>

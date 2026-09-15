@@ -16,9 +16,9 @@ if (!empty($counts['invoices_overdue']))     $attention[] = ['n' => (int) $count
 if (!empty($counts['open_rfq']))             $attention[] = ['n' => (int) $counts['open_rfq'],         'label' => 'RFQs waiting',       'icon' => 'chat-square-text',     'color' => '#0d6efd', 'url' => site_url('rfq') . '?status=Open'];
 ?>
 
-<?= tpt_toolbar(['close_href' => site_url('dashboard')]) ?>
+<?= tpt_toolbar(['close_href' => site_url('dashboard'), 'auth' => $auth]) ?>
 
-<div class="tabs">
+<div class="tabs" role="tablist">
   <div class="tab active">Master Records</div>
   <div class="spacer"></div>
   <div class="recordnav">

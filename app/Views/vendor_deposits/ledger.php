@@ -3,7 +3,7 @@
     'close_href' => site_url('vendor-deposits'),
     'auth'       => $auth,
 ]) ?>
-<div class="tabs">
+<div class="tabs" role="tablist">
   <div class="tab active">Deposit Ledger</div>
   <div class="spacer"></div>
   <div class="recordnav">

@@ -114,7 +114,7 @@ $quickAdd = tpt_quick_add_items($auth);
   $fmtAmt    = fn($n) => '₹' . number_format((float) $n, 0);
 ?>
 
-<div class="tabs" id="tripTabs">
+<div class="tabs" role="tablist" id="tripTabs">
   <button type="button" class="tab active" data-bs-toggle="tab" data-bs-target="#tab-overview">Overview</button>
   <?php if (!empty($booking)): ?>
     <button type="button" class="tab" data-bs-toggle="tab" data-bs-target="#tab-parties">Parties</button>

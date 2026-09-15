@@ -11,7 +11,7 @@ $v = function ($k, $d = '') use ($row) { return old($k, $row[$k] ?? $d); };
     'auth'           => $auth,
 ]) ?>
 
-<div class="tabs" id="vehicleFormTabs">
+<div class="tabs" role="tablist" id="vehicleFormTabs">
   <button type="button" class="tab active" data-bs-toggle="tab" data-bs-target="#vehf-details">Vehicle Details</button>
   <button type="button" class="tab" data-bs-toggle="tab" data-bs-target="#vehf-compliance">Compliance Documents</button>
   <button type="button" class="tab" data-bs-toggle="tab" data-bs-target="#vehf-gps">GPS / Tracking</button>

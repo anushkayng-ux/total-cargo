@@ -36,7 +36,7 @@ echo tpt_toolbar([
     'auth'       => $auth,
 ]);
 ?>
-<div class="tabs">
+<div class="tabs" role="tablist">
   <div class="tab active">Audit Log</div>
   <div class="spacer"></div>
   <div class="recordnav"><?= number_format($total) ?> total records</div>

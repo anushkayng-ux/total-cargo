@@ -5,7 +5,7 @@
     'auth'        => $auth,
 ]) ?>
 
-<div class="tabs" id="rfqFormTabs">
+<div class="tabs" role="tablist" id="rfqFormTabs">
   <button type="button" class="tab active" data-bs-toggle="tab" data-bs-target="#rfqf-details">RFQ Details</button>
   <button type="button" class="tab" data-bs-toggle="tab" data-bs-target="#rfqf-vendors">Suggested Vendors</button>
   <div class="spacer"></div>

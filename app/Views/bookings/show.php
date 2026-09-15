@@ -107,7 +107,7 @@ $otherQuickAdd = array_values(array_filter(
 </div>
 <?php endif; ?>
 
-<div class="tabs" id="bookingTabs">
+<div class="tabs" role="tablist" id="bookingTabs">
   <button type="button" class="tab active" data-bs-toggle="tab" data-bs-target="#tab-grlr">GR/LR Details</button>
   <button type="button" class="tab" data-bs-toggle="tab" data-bs-target="#tab-status">Shipment Status Update</button>
   <button type="button" class="tab" data-bs-toggle="tab" data-bs-target="#tab-charges">Charges Details / Document Tagging</button>

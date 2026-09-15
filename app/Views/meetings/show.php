@@ -16,7 +16,7 @@ $cls = match($row['status']) { 'Planned'=>'secondary','InProgress'=>'primary','C
     'close_href'     => site_url('meetings'),
     'auth'           => $auth,
 ]) ?>
-<div class="tabs">
+<div class="tabs" role="tablist">
   <div class="tab active">Meeting Details</div>
   <div class="spacer"></div>
   <div class="recordnav">

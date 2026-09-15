@@ -8,7 +8,7 @@ $v = function ($k, $d = '') use ($row) { return old($k, $row[$k] ?? $d); };
     'close_href'  => site_url('help/admin'),
     'auth'        => $auth,
 ]) ?>
-<div class="tabs">
+<div class="tabs" role="tablist">
   <div class="tab active">Topic Details</div>
   <div class="spacer"></div>
 </div>

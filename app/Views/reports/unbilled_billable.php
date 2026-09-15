@@ -2,7 +2,7 @@
     'close_href' => site_url('reports'),
     'auth'       => $auth,
 ]) ?>
-<div class="tabs">
+<div class="tabs" role="tablist">
   <div class="tab active">Unbilled Billable Expenses</div>
   <div class="spacer"></div>
   <div class="recordnav"><?= count($rows) ?> entries · ₹<?= number_format((float) $total, 0) ?></div>

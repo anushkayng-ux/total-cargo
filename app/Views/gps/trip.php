@@ -19,7 +19,7 @@ if ($latest && $latest['latitude'] && $latest['longitude']) {
   <a class="retro-tbtn" href="<?= site_url('gps') ?>"><i class="bi bi-x-lg"></i>Close</a>
 </div>
 
-<div class="tabs">
+<div class="tabs" role="tablist">
   <div class="tab active">Live Map</div>
   <div class="spacer"></div>
   <div class="recordnav">

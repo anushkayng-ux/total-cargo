@@ -29,7 +29,7 @@ $extra .= '<button class="btn btn-sm btn-outline-dark">Filter</button></form>';
     'auth'           => $auth,
 ]) ?>
 
-<div class="tabs">
+<div class="tabs" role="tablist">
   <div class="tab active">All Tickets</div>
   <div class="spacer"></div>
   <div class="recordnav"><?= (int) ($pager->getTotal() ?: count($rows)) ?> total records</div>

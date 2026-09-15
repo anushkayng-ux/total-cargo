@@ -4,7 +4,7 @@
     'auth'        => $auth,
 ]) ?>
 
-<div class="tabs" id="supportFormTabs">
+<div class="tabs" role="tablist" id="supportFormTabs">
   <button type="button" class="tab active" data-bs-toggle="tab" data-bs-target="#suppf-details">Raise a Ticket</button>
   <div class="spacer"></div>
 </div>

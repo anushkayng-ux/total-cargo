@@ -9,7 +9,7 @@ foreach ($permissions as $p) {
     'close_href'  => site_url('roles'),
     'auth'        => $auth,
 ]) ?>
-<div class="tabs">
+<div class="tabs" role="tablist">
   <div class="tab active">Permissions</div>
   <div class="spacer"></div>
   <div class="recordnav">

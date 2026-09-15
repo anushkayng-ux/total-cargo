@@ -41,7 +41,7 @@ $otherQuickAdd = array_values(array_filter(
   <a class="retro-tbtn" href="<?= site_url('leads') ?>"><i class="bi bi-x-lg"></i>Close</a>
 </div>
 
-<div class="tabs" id="leadTabs">
+<div class="tabs" role="tablist" id="leadTabs">
   <button type="button" class="tab active" data-bs-toggle="tab" data-bs-target="#lead-details">Lead Details</button>
   <button type="button" class="tab" data-bs-toggle="tab" data-bs-target="#lead-followups">Follow-ups</button>
   <button type="button" class="tab" data-bs-toggle="tab" data-bs-target="#lead-status">Status &amp; Assignment</button>

@@ -12,7 +12,7 @@ $extra = '<a class="retro-tbtn" href="' . site_url('import/' . $otherType) . '">
     'extra'       => $extra,
     'auth'        => $auth,
 ]) ?>
-<div class="tabs">
+<div class="tabs" role="tablist">
   <div class="tab active">Import <?= esc(ucfirst($type)) ?></div>
   <div class="spacer"></div>
 </div>

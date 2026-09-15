@@ -7,7 +7,7 @@ $action = $isEdit ? site_url('roles/' . $role['id']) : site_url('roles/store');
     'close_href'  => site_url('roles'),
     'auth'        => $auth,
 ]) ?>
-<div class="tabs">
+<div class="tabs" role="tablist">
   <div class="tab active">Role Details</div>
   <div class="spacer"></div>
 </div>

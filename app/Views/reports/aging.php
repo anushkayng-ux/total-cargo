@@ -13,7 +13,7 @@ $extra = $activeBucket
     'extra'      => $extra,
     'auth'       => $auth,
 ]) ?>
-<div class="tabs">
+<div class="tabs" role="tablist">
   <div class="tab active"><?= esc($label) ?></div>
   <div class="spacer"></div>
   <div class="recordnav"><?= count($rows) ?> <?= $isReceivables ? 'invoices' : 'bills' ?><?= $activeBucket ? ' · filtered: ' . esc($activeBucket) : '' ?></div>

@@ -3,7 +3,7 @@
     'close_href' => site_url('receipts'),
     'auth'       => $auth,
 ]) ?>
-<div class="tabs">
+<div class="tabs" role="tablist">
   <div class="tab active">Bank Import</div>
   <div class="spacer"></div>
 </div>

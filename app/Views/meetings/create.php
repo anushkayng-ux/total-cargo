@@ -3,7 +3,7 @@
     'close_href'  => site_url('meetings'),
     'auth'        => $auth,
 ]) ?>
-<div class="tabs">
+<div class="tabs" role="tablist">
   <div class="tab active">Plan a Meeting</div>
   <div class="spacer"></div>
 </div>

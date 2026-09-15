@@ -12,7 +12,7 @@ $extra = $isEdit ? '<a class="btn btn-sm btn-outline-dark" target="_blank" href=
     'extra'          => $extra,
     'auth'           => $auth,
 ]) ?>
-<div class="tabs">
+<div class="tabs" role="tablist">
   <div class="tab active">Template Details</div>
   <div class="spacer"></div>
 </div>

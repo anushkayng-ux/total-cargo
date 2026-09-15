@@ -29,7 +29,7 @@ $extra = '<form method="get" class="d-flex align-items-center gap-2 flex-wrap m-
     'extra'      => $extra,
     'auth'       => $auth,
 ]) ?>
-<div class="tabs">
+<div class="tabs" role="tablist">
   <div class="tab active">SOP / TAT KPIs</div>
   <div class="spacer"></div>
   <div class="recordnav"><?= esc($from) ?> – <?= esc($to) ?></div>

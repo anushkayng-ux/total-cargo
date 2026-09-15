@@ -7,7 +7,7 @@ $isVendor = ($type === 'vendors');
     'close_href'  => $listUrl,
     'auth'        => $auth,
 ]) ?>
-<div class="tabs">
+<div class="tabs" role="tablist">
   <div class="tab active">Review <?= esc(ucfirst($type)) ?> Import</div>
   <div class="spacer"></div>
   <?php if (!empty($rows)): ?><div class="recordnav"><?= count($rows) ?> rows parsed</div><?php endif; ?>

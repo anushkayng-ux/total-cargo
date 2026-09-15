@@ -7,7 +7,7 @@ $fbMap   = $feedbackByTrip ?? [];
     'close_href' => site_url('dashboard'),
     'auth'       => $auth,
 ]) ?>
-<div class="tabs">
+<div class="tabs" role="tablist">
   <div class="tab active">Active Trips</div>
   <div class="spacer"></div>
   <div class="recordnav"><?= (int) ($pager->getTotal() ?: count($rows)) ?> total records</div>

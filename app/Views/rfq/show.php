@@ -63,7 +63,7 @@ if (!empty($template)) {
   </form>
 </div>
 
-<div class="tabs" id="rfqTabs">
+<div class="tabs" role="tablist" id="rfqTabs">
   <button type="button" class="tab active" data-bs-toggle="tab" data-bs-target="#rfq-details">RFQ Details</button>
   <button type="button" class="tab" data-bs-toggle="tab" data-bs-target="#rfq-vendors">Vendors</button>
   <button type="button" class="tab" data-bs-toggle="tab" data-bs-target="#rfq-quotes">Quotations</button>

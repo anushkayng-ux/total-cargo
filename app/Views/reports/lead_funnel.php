@@ -5,7 +5,7 @@ $total = 0; foreach ($funnel as $f) $total += $f['count'];
     'close_href' => site_url('reports'),
     'auth'       => $auth,
 ]) ?>
-<div class="tabs">
+<div class="tabs" role="tablist">
   <div class="tab active">Lead Funnel</div>
   <div class="spacer"></div>
   <div class="recordnav"><?= $total ?> leads total</div>

@@ -37,7 +37,7 @@ if ($pendingCount > 0 && empty($t['id'])) {
     'auth'        => $auth,
 ]) ?>
 
-<div class="tabs" id="docketFormTabs">
+<div class="tabs" role="tablist" id="docketFormTabs">
   <button type="button" class="tab active" data-bs-toggle="tab" data-bs-target="#dkt-route">Route &amp; Docket</button>
   <button type="button" class="tab" data-bs-toggle="tab" data-bs-target="#dkt-parties">Parties</button>
   <button type="button" class="tab" data-bs-toggle="tab" data-bs-target="#dkt-cargo">Cargo &amp; Details</button>

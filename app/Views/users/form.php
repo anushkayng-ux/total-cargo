@@ -9,7 +9,7 @@ $action = $isEdit ? site_url('users/' . $user['id']) : site_url('users/store');
     'close_href'     => site_url('users'),
     'auth'           => $auth,
 ]) ?>
-<div class="tabs">
+<div class="tabs" role="tablist">
   <div class="tab active">User Details</div>
   <div class="spacer"></div>
 </div>

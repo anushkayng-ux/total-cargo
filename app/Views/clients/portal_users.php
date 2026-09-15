@@ -2,7 +2,7 @@
     'close_href' => site_url('clients/' . $client['id'] . '/edit'),
     'auth'       => $auth,
 ]) ?>
-<div class="tabs">
+<div class="tabs" role="tablist">
   <div class="tab active">Portal Users</div>
   <div class="spacer"></div>
   <div class="recordnav">

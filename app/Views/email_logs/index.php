@@ -28,7 +28,7 @@ echo tpt_toolbar([
     'auth'       => $auth,
 ]);
 ?>
-<div class="tabs" id="emailLogsTabs">
+<div class="tabs" role="tablist" id="emailLogsTabs">
   <button type="button" class="tab active" data-bs-toggle="tab" data-bs-target="#el-logs">Email Logs</button>
   <button type="button" class="tab" data-bs-toggle="tab" data-bs-target="#el-suppress">Suppression List</button>
   <div class="spacer"></div>

@@ -16,7 +16,7 @@ if (!empty($isAdmin)) {
     'extra'      => $extra,
     'auth'       => $auth,
 ]) ?>
-<div class="tabs">
+<div class="tabs" role="tablist">
   <div class="tab active">Help Topics</div>
   <div class="spacer"></div>
   <?php if (!empty($byCategory)): ?><div class="recordnav"><?= $totalTopics ?> topic<?= $totalTopics === 1 ? '' : 's' ?></div><?php endif; ?>

@@ -10,7 +10,7 @@ $v = function ($k, $d = '') use ($row) { return old($k, $row[$k] ?? $d); };
     'auth'        => $auth,
 ]) ?>
 
-<div class="tabs" id="clientFormTabs">
+<div class="tabs" role="tablist" id="clientFormTabs">
   <button type="button" class="tab active" data-bs-toggle="tab" data-bs-target="#cf-details">Client Details</button>
   <button type="button" class="tab" data-bs-toggle="tab" data-bs-target="#cf-credit">Credit &amp; Billing</button>
   <button type="button" class="tab" data-bs-toggle="tab" data-bs-target="#cf-kyc">KYC / Documents</button>

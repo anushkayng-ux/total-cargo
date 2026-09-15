@@ -76,7 +76,7 @@ $errorId = uniqid('error', true);
     <?php if (defined('SHOW_DEBUG_BACKTRACE') && SHOW_DEBUG_BACKTRACE) : ?>
     <div class="container">
 
-        <ul class="tabs" id="tabs">
+        <ul class="tabs" role="tablist" id="tabs">
             <li><a href="#backtrace">Backtrace</a></li>
             <li><a href="#server">Server</a></li>
             <li><a href="#request">Request</a></li>

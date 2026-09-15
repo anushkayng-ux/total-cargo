@@ -11,7 +11,7 @@ $v = function ($k, $d = '') use ($row) { return old($k, $row[$k] ?? $d); };
     'auth'        => $auth,
 ]) ?>
 
-<div class="tabs" id="driverFormTabs">
+<div class="tabs" role="tablist" id="driverFormTabs">
   <button type="button" class="tab active" data-bs-toggle="tab" data-bs-target="#drvf-details">Driver Details</button>
   <button type="button" class="tab" data-bs-toggle="tab" data-bs-target="#drvf-kyc">KYC / Verification</button>
   <div class="spacer"></div>

@@ -16,7 +16,7 @@ $showRating = $ratingEnabled && !empty($row['rating']);
     'auth'           => $auth,
 ]) ?>
 
-<div class="tabs" id="supportTabs">
+<div class="tabs" role="tablist" id="supportTabs">
   <button type="button" class="tab active" data-bs-toggle="tab" data-bs-target="#supp-details">Ticket Details</button>
   <button type="button" class="tab" data-bs-toggle="tab" data-bs-target="#supp-thread">Conversation</button>
   <div class="spacer"></div>

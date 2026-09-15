@@ -37,9 +37,10 @@ if (empty($existingRows)) $existingRows = [['no' => '', 'value' => '']];
 <?= tpt_toolbar([
     'save_form'   => 'bookingForm',
     'close_href'  => site_url('bookings'),
+    'auth'        => $auth,
 ]) ?>
 
-<div class="tabs" id="bookingFormTabs">
+<div class="tabs" role="tablist" id="bookingFormTabs">
   <button type="button" class="tab active" data-bs-toggle="tab" data-bs-target="#tab-basics">1 · Basics</button>
   <button type="button" class="tab" data-bs-toggle="tab" data-bs-target="#tab-parties">2 · Consignor / Consignee</button>
   <button type="button" class="tab" data-bs-toggle="tab" data-bs-target="#tab-cargo">3 · Cargo &amp; Docket</button>

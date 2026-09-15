@@ -8,7 +8,7 @@ echo tpt_toolbar([
     'auth'       => $auth,
 ]);
 ?>
-<div class="tabs">
+<div class="tabs" role="tablist">
   <div class="tab active">Message Logs</div>
   <a class="tab" href="<?= site_url('whatsapp/inbox') ?>">Inbox</a>
   <a class="tab" href="<?= site_url('whatsapp/templates') ?>">Templates</a>

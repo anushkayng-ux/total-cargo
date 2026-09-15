@@ -16,7 +16,7 @@ $kycCls = match ($row['kyc_status'] ?? 'Pending') {
     'auth'           => $auth,
 ]) ?>
 
-<div class="tabs" id="driverTabs">
+<div class="tabs" role="tablist" id="driverTabs">
   <button type="button" class="tab active" data-bs-toggle="tab" data-bs-target="#drv-details">Driver Details</button>
   <button type="button" class="tab" data-bs-toggle="tab" data-bs-target="#drv-kyc">KYC / Verification</button>
   <div class="spacer"></div>

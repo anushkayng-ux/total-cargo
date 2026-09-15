@@ -2,7 +2,7 @@
     'close_href'  => site_url('receipts'),
     'auth'        => $auth,
 ]) ?>
-<div class="tabs">
+<div class="tabs" role="tablist">
   <div class="tab active">Review Import</div>
   <div class="spacer"></div>
   <?php if (!empty($proposed)): ?><div class="recordnav"><?= count($proposed) ?> rows parsed</div><?php endif; ?>

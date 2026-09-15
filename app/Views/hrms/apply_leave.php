@@ -4,7 +4,7 @@
     'auth'        => $auth,
 ]) ?>
 
-<div class="tabs">
+<div class="tabs" role="tablist">
   <div class="tab active">Apply for Leave</div>
   <div class="spacer"></div>
 </div>

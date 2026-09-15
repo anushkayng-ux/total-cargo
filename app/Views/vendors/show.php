@@ -17,7 +17,7 @@ foreach ($routes as $r) {
     'auth'           => $auth,
 ]) ?>
 
-<div class="tabs" id="vendorTabs">
+<div class="tabs" role="tablist" id="vendorTabs">
   <button type="button" class="tab active" data-bs-toggle="tab" data-bs-target="#ven-details">Vendor Details</button>
   <button type="button" class="tab" data-bs-toggle="tab" data-bs-target="#ven-contacts">Contacts</button>
   <button type="button" class="tab" data-bs-toggle="tab" data-bs-target="#ven-bank">Bank &amp; Compliance</button>

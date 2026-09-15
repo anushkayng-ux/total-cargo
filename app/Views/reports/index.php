@@ -28,7 +28,7 @@ $visible = array_values(array_filter($cards, fn ($c) => $auth->can($c['mod'], 'c
     'close_href' => site_url('dashboard'),
     'auth'       => $auth,
 ]) ?>
-<div class="tabs">
+<div class="tabs" role="tablist">
   <div class="tab active">Reports</div>
   <div class="spacer"></div>
   <?php if (!empty($visible)): ?><div class="recordnav"><?= count($visible) ?> available</div><?php endif; ?>

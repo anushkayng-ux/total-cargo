@@ -4,7 +4,7 @@
     'auth'       => $auth,
 ]) ?>
 
-<div class="tabs" id="profileTabs">
+<div class="tabs" role="tablist" id="profileTabs">
   <button type="button" class="tab active" data-bs-toggle="tab" data-bs-target="#prof-personal">Personal Details</button>
   <button type="button" class="tab" data-bs-toggle="tab" data-bs-target="#prof-kin">Next of Kin</button>
   <div class="spacer"></div>

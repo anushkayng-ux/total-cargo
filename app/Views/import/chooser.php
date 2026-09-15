@@ -8,7 +8,7 @@ $extra = '<a class="retro-tbtn" id="templateLink" href="' . site_url('import/cli
     'extra'       => $extra,
     'auth'        => $auth,
 ]) ?>
-<div class="tabs">
+<div class="tabs" role="tablist">
   <div class="tab active">Import Data</div>
   <div class="spacer"></div>
 </div>

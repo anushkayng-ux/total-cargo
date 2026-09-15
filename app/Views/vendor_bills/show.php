@@ -36,7 +36,7 @@ $otherQuickAdd = array_values(array_filter(
   <a class="retro-tbtn" href="<?= site_url('vendor-bills') ?>"><i class="bi bi-x-lg"></i>Close</a>
 </div>
 
-<div class="tabs">
+<div class="tabs" role="tablist">
   <div class="tab active">Bill Details</div>
   <div class="spacer"></div>
   <div class="recordnav">

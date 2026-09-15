@@ -10,7 +10,7 @@ $extra = $run['run_status'] === 'Draft'
     'extra'      => $extra,
     'auth'       => $auth,
 ]) ?>
-<div class="tabs">
+<div class="tabs" role="tablist">
   <div class="tab active">Payroll Run</div>
   <div class="spacer"></div>
   <div class="recordnav">

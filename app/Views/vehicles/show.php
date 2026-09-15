@@ -11,7 +11,7 @@ $val = fn ($v, $empty = '—') => ($v === null || $v === '') ? $empty : esc((str
     'auth'           => $auth,
 ]) ?>
 
-<div class="tabs" id="vehicleTabs">
+<div class="tabs" role="tablist" id="vehicleTabs">
   <button type="button" class="tab active" data-bs-toggle="tab" data-bs-target="#veh-details">Vehicle Details</button>
   <button type="button" class="tab" data-bs-toggle="tab" data-bs-target="#veh-compliance">Compliance Documents</button>
   <button type="button" class="tab" data-bs-toggle="tab" data-bs-target="#veh-gps">GPS / Tracking</button>

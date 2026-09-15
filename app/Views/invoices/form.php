@@ -27,7 +27,7 @@ $v = function ($k, $d = '') use ($row, $prefill) {
     'auth'        => $auth,
 ]) ?>
 
-<div class="tabs" id="invoiceFormTabs">
+<div class="tabs" role="tablist" id="invoiceFormTabs">
   <button type="button" class="tab active" data-bs-toggle="tab" data-bs-target="#invf-details">Invoice Details</button>
   <button type="button" class="tab" data-bs-toggle="tab" data-bs-target="#invf-items">Line Items</button>
   <div class="spacer"></div>

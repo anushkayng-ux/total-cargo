@@ -13,7 +13,7 @@ echo tpt_toolbar([
     'auth'       => $auth,
 ]);
 ?>
-<div class="tabs">
+<div class="tabs" role="tablist">
   <div class="tab active">GST Returns</div>
   <div class="spacer"></div>
 </div>

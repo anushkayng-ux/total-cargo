@@ -69,7 +69,7 @@ $audienceLabels = [
     'extra'      => '<span class="text-muted" style="font-size:.78rem;">Company branding, email, GPS &amp; alert configuration — each tab saves independently.</span>',
 ]) ?>
 
-<div class="tabs" id="settingsTabs">
+<div class="tabs" role="tablist" id="settingsTabs">
   <button type="button" class="tab active" data-bs-toggle="tab" data-bs-target="#set-branding">Branding</button>
   <button type="button" class="tab" data-bs-toggle="tab" data-bs-target="#set-company">Company</button>
   <button type="button" class="tab" data-bs-toggle="tab" data-bs-target="#set-email">Email</button>

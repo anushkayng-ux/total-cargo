@@ -12,7 +12,7 @@ $v = function ($k, $d = '') use ($row, $pre) { return old($k, $row[$k] ?? $pre[$
     'auth'           => $auth,
 ]) ?>
 
-<div class="tabs">
+<div class="tabs" role="tablist">
   <div class="tab active">Bill Details</div>
   <div class="spacer"></div>
 </div>

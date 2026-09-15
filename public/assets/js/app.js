@@ -89,3 +89,24 @@
     });
   }
 })();
+
+// Multi-tab forms (Docket, Booking, Lead, etc.) mix Bootstrap tabs with
+// native HTML5 `required` validation. A required field on a tab the user
+// hasn't switched to sits inside a hidden .tab-pane — the browser can't
+// focus or show its "please fill this out" bubble on a hidden element, so
+// clicking Save on a required-but-empty other tab just does nothing with
+// zero visible feedback. The (non-bubbling, so caught here in the capture
+// phase) `invalid` event still fires for hidden fields during validation;
+// switch to that field's own tab as soon as it fires so the browser's
+// normal focus+bubble lands on a now-visible field instead of a hidden one.
+(function () {
+  document.addEventListener('invalid', function (e) {
+    var field = e.target;
+    var pane = field.closest && field.closest('.tab-pane');
+    if (!pane || pane.classList.contains('active')) return;
+    var btn = document.querySelector('[data-bs-toggle="tab"][data-bs-target="#' + pane.id + '"]');
+    if (btn && window.bootstrap && bootstrap.Tab) {
+      bootstrap.Tab.getOrCreateInstance(btn).show();
+    }
+  }, true);
+})();

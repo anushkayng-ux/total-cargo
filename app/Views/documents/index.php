@@ -46,7 +46,7 @@ echo tpt_toolbar([
     'auth'       => $auth,
 ]);
 ?>
-<div class="tabs">
+<div class="tabs" role="tablist">
   <div class="tab active">All Documents</div>
   <?php if ($anyFilter): ?><span class="badge-soft" style="margin-left:10px;">Filtered</span><?php endif; ?>
   <div class="spacer"></div>

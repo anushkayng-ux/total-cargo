@@ -11,7 +11,7 @@ echo tpt_toolbar([
     'auth'       => $auth,
 ]);
 ?>
-<div class="tabs">
+<div class="tabs" role="tablist">
   <div class="tab active">Team Attendance — <?= esc(date('D, d-m-Y', strtotime($date))) ?></div>
   <div class="spacer"></div>
   <div class="recordnav"><?= count($rows) ?> staff</div>

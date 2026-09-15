@@ -11,7 +11,7 @@
     'close_href'     => site_url('dashboard'),
     'auth'           => $auth,
 ]) ?>
-<div class="tabs">
+<div class="tabs" role="tablist">
   <div class="tab active">Trips Awaiting Docket</div>
   <div class="spacer"></div>
   <div class="recordnav"><?= count($rows) ?> waiting</div>
